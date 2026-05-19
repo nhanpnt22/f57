@@ -1,0 +1,59 @@
+============================================================
+B57 REPOSITORY STRUCTURE
+============================================================
+
+b57/
+│
+├── README.md
+├── LICENSE
+├── CONTRIBUTING.md
+│
+├── spec/
+│   ├── draft-nhan-b57-v0.1.0.txt
+│   ├── draft-nhan-b57-v0.1.0.md
+│   └── CHANGELOG.md
+│
+├── test-vectors/
+│   ├── encode.json
+│   ├── decode.json
+│   └── edge-cases.json
+│
+├── reference/
+│   ├── pseudocode.txt
+│   └── algorithm.txt
+│
+├── implementations/
+│   ├── go/
+│   ├── rust/
+│   ├── python/
+│   ├── javascript/
+│   └── c/
+│
+├── compliance/
+│   ├── test_runner/
+│   └── conformance.txt
+│
+├── docs/
+│   ├── rationale.txt
+│   ├── design-decisions.txt
+│   └── faq.txt
+│
+└── examples/
+    ├── basic_usage.txt
+    └── id57_integration.txt
+
+============================================================
+NOTES
+============================================================
+
+- /spec is the source of truth (immutable spec versions)
+- /test-vectors ensures cross-language consistency
+- /reference provides implementation guidance
+- /implementations contains minimal, spec-faithful code
+- /compliance enforces correctness across implementations
+- /docs explains design and adoption rationale
+- /examples shows real-world usage patterns
+
+============================================================
+END
+============================================================

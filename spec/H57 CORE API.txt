@@ -1,0 +1,368 @@
+============================================================
+H57 CORE API (MINDU)
+Hash → B57 Canonical Representation Interface
+Version: v0.1.0 FINAL
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+H57 Core API defines a minimal, canonical interface for
+representing cryptographic hash outputs using B57 encoding.
+
+It standardizes deterministic, ASCII-safe, and entropy-
+preserving conversion of hash outputs into human-readable
+strings.
+
+H57 Core API is strictly a representation interface and
+does not define hashing, randomness, or encoding behavior
+beyond B57.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+Internet-Drafts are valid for a maximum of six months and
+may be updated, replaced, or obsoleted at any time.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+H57 Core API defines the minimal function set required to
+produce canonical H57 representations.
+
+H57 is a representation layer:
+
+ input → HASH → bytes → B57 → string
+
+Goals:
+
+- deterministic output
+- canonical representation
+- entropy preservation
+- minimal API surface
+- implementation portability
+
+H57 Core API MUST NOT introduce ambiguity, randomness, or
+hidden transformations.
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. DEPENDENCIES
+============================================================
+
+H57 Core API depends on:
+
+- B57 encoding
+- cryptographic hash functions
+
+Requirements:
+
+- All encoding MUST comply with the B57 specification
+- H57 MUST NOT redefine or modify B57 behavior
+- Hash functions MUST be cryptographic
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+Given:
+
+ input_bytes
+
+Compute:
+
+ hash_bytes = HASH(input_bytes)
+ h57 = b57_encode(hash_bytes)
+
+Where:
+
+- HASH is a cryptographic hash function
+- Output MUST be canonical B57
+
+============================================================
+5. CORE FUNCTION
+============================================================
+
+5.1 h57_hash
+
+function h57_hash(input_bytes, hash_fn, length_enum) -> string
+
+Definition:
+
+ hash_bytes = HASH(input_bytes)
+
+ if length_enum == H57_HASH_AUTO:
+     effective_bytes = hash_bytes
+ else:
+     effective_bytes = truncate_bytes(hash_bytes, length_enum)
+
+ output = b57_encode(effective_bytes)
+
+Requirements:
+
+- HASH MUST be cryptographic
+- HASH MUST be deterministic
+- HASH MUST produce fixed-length output
+- Encoding MUST be canonical B57
+- Output MUST be deterministic
+- Input MUST NOT be modified
+
+- length_enum MUST be one of:
+  - defined H57 length values
+  - H57_HASH_AUTO
+
+- length_enum MUST map to byte-level truncation
+  BEFORE B57 encoding
+
+- Implementations MUST fail if requested length_enum
+  exceeds available entropy of hash_bytes
+
+============================================================
+6. AUTO MODE
+============================================================
+
+H57_HASH_AUTO defines full entropy preservation.
+
+Behavior:
+
+ h57 = b57_encode(HASH(input_bytes))
+
+Properties:
+
+- MUST preserve full entropy
+- MUST NOT truncate
+- MUST produce exactly one canonical output
+
+------------------------------------------------------------
+6.1 Length Resolution
+------------------------------------------------------------
+
+ output_chars = ceil(hash_bits / log2(57))
+
+ log2(57) ≈ 5.83
+
+------------------------------------------------------------
+6.2 Canonical Lengths
+------------------------------------------------------------
+
+- 256-bit hashes → 44 chars
+- 512-bit hashes → 88 chars
+
+============================================================
+7. LENGTH ENUMERATION
+============================================================
+
+Implementations MUST support the following values:
+
+------------------------------------------------------------
+7.1 Minimum Security Thresholds (REQUIRED)
+------------------------------------------------------------
+
+- H57_LEN_8    → 2 chars   (≥ 8-bit)
+- H57_LEN_16   → 3 chars   (≥ 16-bit)
+- H57_LEN_32   → 6 chars   (≥ 32-bit)
+- H57_LEN_64   → 11 chars  (≥ 64-bit)
+- H57_LEN_128  → 22 chars  (≥ 128-bit, minimum)
+- H57_LEN_256  → 44 chars  (≥ 256-bit)
+- H57_LEN_512  → 88 chars  (≥ 512-bit)
+
+------------------------------------------------------------
+7.2 Hash-Aligned Lengths (CANONICAL)
+------------------------------------------------------------
+
+- H57_HASH_256 → 44 chars
+- H57_HASH_512 → 88 chars
+
+------------------------------------------------------------
+7.3 Informational Values (NON-SECURITY)
+------------------------------------------------------------
+
+- H57_LEN_23   → 4 chars
+- H57_LEN_29   → 5 chars
+- H57_LEN_47   → 8 chars
+- H57_LEN_70   → 12 chars
+- H57_LEN_93   → 16 chars
+- H57_LEN_186  → 32 chars
+- H57_LEN_373  → 64 chars
+
+Requirements:
+
+- Implementations MUST map enums to byte-level truncation
+- Implementations MUST NOT accept arbitrary lengths
+- Implementations MUST NOT exceed hash entropy
+
+- Informational values MUST NOT be used in
+  security-sensitive contexts
+
+- Security-sensitive usage MUST use ≥ H57_LEN_128
+
+============================================================
+8. TRUNCATION MODEL
+============================================================
+
+Truncation is only permitted in controlled mode.
+
+Definition:
+
+ truncate_bytes(hash_bytes, length_enum)
+
+Rules:
+
+- MUST operate on raw hash bytes
+- MUST occur BEFORE B57 encoding
+- MUST be deterministic
+- SHOULD use prefix truncation
+
+Prohibited:
+
+- truncating encoded strings
+- post-encoding manipulation
+
+============================================================
+9. HASH FUNCTION REQUIREMENTS
+============================================================
+
+Hash functions:
+
+- MUST be cryptographic
+- MUST be deterministic
+- MUST produce fixed-length output
+- MUST provide uniform distribution
+
+Recommended:
+
+- BLAKE3 (preferred)
+- SHA-256
+- SHA-512
+
+Implementations MUST NOT infer hash function from output.
+
+============================================================
+10. OPTIONAL FUNCTIONS
+============================================================
+
+10.1 h57_verify
+
+function h57_verify(input_bytes, h57_string, hash_fn, length_enum) -> boolean
+
+ expected = h57_hash(input_bytes, hash_fn, length_enum)
+
+ return (expected == h57_string)
+
+------------------------------------------------------------
+
+10.2 h57_is_valid
+
+function h57_is_valid(h57_string) -> boolean
+
+- MUST validate characters using B57 rules
+- MUST reject INVALID_CHAR
+
+------------------------------------------------------------
+
+10.3 h57_is_canonical
+
+function h57_is_canonical(h57_string) -> boolean
+
+ decoded = b57_decode(h57_string)
+ reencoded = b57_encode(decoded)
+
+ return (h57_string == reencoded)
+
+============================================================
+11. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+ h57_hash(x) == b57_encode(HASH(x)) (AUTO mode)
+
+Determinism:
+
+ same input → same output
+
+Canonical constraint:
+
+ b57_encode(b57_decode(y)) == y
+ (only if y is canonical)
+
+============================================================
+12. ERROR MODEL
+============================================================
+
+Implementations MUST distinguish:
+
+- INVALID_CHAR
+- NON_CANONICAL
+- INVALID_LENGTH_ENUM
+- ENTROPY_EXCEEDED
+
+Implementations MUST NOT use ambiguous errors.
+
+============================================================
+13. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- use non-cryptographic hashes
+- truncate outputs implicitly
+- truncate after encoding
+- accept arbitrary output lengths
+- normalize or transform outputs
+- mix encoding schemes
+- re-hash encoded values
+
+============================================================
+14. SECURITY CONSIDERATIONS
+============================================================
+
+H57 Core API provides no cryptographic guarantees beyond
+the underlying hash function.
+
+Security depends on:
+
+- hash function strength
+- entropy preservation
+- correct implementation
+
+Reduced-length outputs reduce security proportionally.
+
+Encoded length MUST NOT be treated as a guarantee.
+
+============================================================
+15. IANA CONSIDERATIONS
+============================================================
+
+This document has no IANA actions.
+
+============================================================
+16. REFERENCES
+============================================================
+
+RFC 2119 - Requirement Levels
+RFC 8174 - Requirement Terminology Clarification
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================

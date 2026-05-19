@@ -1,0 +1,355 @@
+============================================================
+B57 CORE API (MINDU)
+Binary → B57 Canonical Representation Interface
+Version: v0.1.0 FINAL
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+B57 Core API defines a minimal, canonical interface for
+bijective binary-to-text encoding using the B57 scheme.
+
+It standardizes deterministic, ASCII-safe, and entropy-
+preserving conversion between raw bytes and human-readable
+strings.
+
+B57 Core API is strictly an encoding interface and MUST NOT
+introduce randomness, normalization, or higher-level behavior.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+Internet-Drafts are valid for a maximum of six months and
+may be updated, replaced, or obsoleted at any time.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+B57 Core API defines the minimal function set required to
+produce canonical B57 encodings.
+
+B57 is a pure encoding layer:
+
+ bytes ↔ B57 string
+
+Goals:
+
+- deterministic behavior
+- canonical representation
+- bijective mapping
+- entropy preservation
+- minimal API surface
+- implementation portability
+
+B57 Core API MUST NOT introduce ambiguity, randomness, or
+hidden transformations.
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. DEPENDENCIES
+============================================================
+
+B57 Core API is self-contained.
+
+Requirements:
+
+- Implementations MUST follow the B57 Encoding Scheme
+- The B57 alphabet MUST NOT be modified
+- Behavior MUST remain canonical and bijective
+- Byte interpretation MUST follow B57 rules (big-endian)
+- Implementations MUST operate on raw bytes, not characters
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+Given:
+
+ input_bytes
+
+Compute:
+
+ encoded_string = b57_encode(input_bytes)
+
+And:
+
+ output_bytes = b57_decode(encoded_string)
+
+Where:
+
+- Input MUST be raw binary data
+- Output MUST be canonical B57
+
+Empty mapping rule:
+
+- Empty input MUST map to empty output in both directions
+
+============================================================
+5. CORE FUNCTIONS
+============================================================
+
+5.1 b57_encode
+
+function b57_encode(input_bytes) -> string
+
+Purpose:
+
+- Convert raw bytes into canonical B57 string
+
+Requirements:
+
+- MUST be deterministic
+- MUST be bijective
+- MUST preserve all entropy
+- MUST return empty string if input is empty
+- MUST NOT introduce bias
+- MUST NOT modify input
+- MUST produce canonical output
+- MUST NOT depend on platform-specific behavior
+
+------------------------------------------------------------
+
+5.2 b57_decode
+
+function b57_decode(input_string) -> bytes | error
+
+Purpose:
+
+- Convert B57 string into original bytes
+
+Requirements:
+
+- MUST validate all characters against B57 alphabet
+- MUST ensure canonical form
+- MUST be deterministic
+- MUST NOT produce multiple outputs
+- MUST return empty bytes if input is empty
+
+- MUST reject inputs that are not canonical, even if decodable
+
+- MUST fail on:
+ - INVALID_CHAR
+ - NON_CANONICAL
+
+- MUST reject non-ASCII input
+- MUST reject whitespace
+
+============================================================
+6. OPTIONAL FUNCTIONS
+============================================================
+
+6.1 b57_is_valid
+
+function b57_is_valid(input_string) -> boolean
+
+Purpose:
+
+- Validate input without decoding
+
+Requirements:
+
+- MUST return true only if all characters ∈ B57 alphabet
+- MUST reject non-ASCII and whitespace
+- MUST accept empty string as valid
+
+------------------------------------------------------------
+
+6.2 b57_is_canonical
+
+function b57_is_canonical(input_string) -> boolean
+
+Purpose:
+
+- Verify canonical encoding
+
+Definition:
+
+ If decoding fails, function MUST return false.
+
+ decoded = b57_decode(input_string)
+ reencoded = b57_encode(decoded)
+
+ return (input_string == reencoded)
+
+------------------------------------------------------------
+
+6.3 b57_encoded_length
+
+function b57_encoded_length(byte_length) -> integer
+
+Purpose:
+
+- Predict encoded string length
+
+Formula:
+
+ ceil(byte_length * 8 / log2(57))
+
+Where:
+
+ log2(57) ≈ 5.83
+
+Notes:
+
+- Result is an estimate, not an exact guarantee
+- Implementations MUST NOT rely on this for validation
+
+------------------------------------------------------------
+
+6.4 b57_decoded_length
+
+function b57_decoded_length(char_length) -> integer
+
+Purpose:
+
+- Estimate decoded byte length
+
+Formula:
+
+ floor(char_length * log2(57) / 8)
+
+Where:
+
+ log2(57) ≈ 5.83
+
+Notes:
+
+- Result is an estimate, not an exact guarantee
+- MUST NOT be used for security decisions
+
+============================================================
+7. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+ b57_decode(b57_encode(x)) == x
+
+ b57_encode(b57_decode(y)) == y
+ (only if y is canonical)
+
+These invariants define correctness of implementation.
+
+============================================================
+8. ERROR MODEL
+============================================================
+
+The following error types are defined:
+
+- INVALID_CHAR
+ Input contains characters outside the B57 alphabet
+
+- NON_CANONICAL
+ Input is valid B57 but not canonical encoding
+
+Requirements:
+
+- Implementations MUST distinguish error types
+- Implementations MUST NOT use ambiguous or generic errors
+- Errors MUST be deterministic
+
+Additions:
+- Implementations MUST NOT continue decoding after detecting an error
+
+============================================================
+9. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- modify the B57 alphabet
+- use modulo-biased mapping
+- sample alphabet characters directly
+- produce multiple encodings for the same input
+- accept characters outside the alphabet
+- normalize or transform input or output
+- truncate, pad, or compress data
+- embed metadata or versioning
+- perform partial or lenient decoding
+
+============================================================
+10. UNIVERSAL DESIGN RULES
+============================================================
+
+- Input MUST be raw bytes (not strings)
+- Output MUST be ASCII string
+- MUST be platform-independent
+- MUST NOT depend on locale
+- MUST NOT use Unicode transformations
+- MUST NOT use padding schemes
+- MUST NOT introduce hidden state
+- MUST NOT depend on external configuration
+
+============================================================
+11. MINIMAL IMPLEMENTATION SET
+============================================================
+
+REQUIRED:
+
+- b57_encode
+- b57_decode
+
+OPTIONAL:
+
+- b57_is_valid
+- b57_is_canonical
+
+All other functionality MUST be derived from core functions.
+
+============================================================
+12. SECURITY CONSIDERATIONS
+============================================================
+
+B57 provides no cryptographic guarantees.
+
+Security depends entirely on:
+
+- entropy of input data
+- correctness of encoding
+- sufficient input length
+
+Weak randomness, biased encoding, or insufficient entropy
+compromises all guarantees.
+
+Encoded length alone MUST NOT be treated as a guarantee.
+
+B57 MUST NOT be used as a substitute for hashing,
+encryption, or randomness generation.
+
+============================================================
+13. IANA CONSIDERATIONS
+============================================================
+
+This document has no IANA actions.
+
+============================================================
+14. REFERENCES
+============================================================
+
+RFC 2119 - Requirement Levels
+RFC 8174 - Requirement Terminology Clarification
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================

@@ -1,0 +1,343 @@
+============================================================
+ID57 CORE API (MINDU)
+One-Way Identifier Profile (Hash → Truncate → B57)
+Version: v0.1.0 FINAL
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+ID57 Core API defines a minimal, canonical interface for
+generating human-centric identifiers using a one-way
+transformation pipeline based on cryptographic hashing,
+controlled prefix truncation, and B57 encoding.
+
+It standardizes deterministic, ASCII-safe, compact
+identifier generation while ensuring canonical form and
+entropy-derived security properties.
+
+ID57 is strictly an identifier profile and MUST NOT be used
+for reversible encoding.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+Internet-Drafts are valid for a maximum of six months and
+may be updated, replaced, or obsoleted at any time.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+ID57 Core API defines the minimal function set required to
+produce canonical, fixed-length identifiers.
+
+ID57 is a one-way transformation:
+
+ input → HASH → truncate → B57 → identifier
+
+Goals:
+
+- deterministic output
+- canonical representation
+- compact identifiers
+- human readability
+- controlled entropy reduction
+- minimal API surface
+
+ID57 MUST NOT introduce reversibility, ambiguity, or
+post-encoding transformations.
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. DEPENDENCIES
+============================================================
+
+ID57 Core API depends on:
+
+- B57 Core API
+- Cryptographic hash functions
+
+Requirements:
+
+- B57 encoding MUST remain canonical and bijective
+- Hash functions MUST be cryptographic
+- BLAKE3 SHOULD be used as the primary hash function
+- ID57 MUST NOT redefine or modify B57 behavior
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+Given:
+
+ input_bytes
+
+Compute:
+
+ hash_bytes = HASH(input_bytes)
+ truncated_bytes = truncate_bytes(hash_bytes, bits(L))
+ id57 = b57_encode(truncated_bytes)
+
+Where:
+
+- HASH is a cryptographic hash function
+- L is a predefined length_enum mapped to bit length
+- Truncation MUST occur at byte level using prefix truncation
+- Encoding MUST be canonical B57
+
+============================================================
+5. CORE FUNCTION
+============================================================
+
+5.1 id57_generate
+
+function id57_generate(input_bytes, hash_fn, length_enum) -> string
+
+Definition:
+
+ hash_bytes = hash_fn(input_bytes)
+
+ if length_enum == ID57_DEFAULT:
+     effective_bytes = truncate_bytes(hash_bytes, bits(ID57_LEN_128))
+ else:
+     effective_bytes = truncate_bytes(hash_bytes, bits(length_enum))
+
+ output = b57_encode(effective_bytes)
+
+Requirements:
+
+- hash_fn MUST be cryptographic
+- hash_fn MUST be deterministic
+- BLAKE3 SHOULD be default
+- Truncation MUST be prefix-based
+- Truncation MUST occur BEFORE encoding
+- Encoding MUST be canonical B57
+- Output MUST be deterministic
+- Input MUST NOT be modified
+
+- length_enum MUST be one of defined ID57 values or DEFAULT
+
+============================================================
+6. DEFAULT BEHAVIOR
+============================================================
+
+ID57_DEFAULT:
+
+- MUST resolve to ID57_LEN_128
+- MUST produce 22-character identifiers
+- MUST NOT preserve full hash entropy
+
+Default pipeline:
+
+ id57 = b57_encode(truncate_bytes(HASH(input), 128-bit))
+
+============================================================
+7. LENGTH MODEL
+============================================================
+
+Implementations MUST support:
+
+------------------------------------------------------------
+7.1 Security Lengths (REQUIRED)
+------------------------------------------------------------
+
+- ID57_LEN_8   → 2 chars
+- ID57_LEN_16  → 3 chars
+- ID57_LEN_32  → 6 chars
+- ID57_LEN_64  → 11 chars
+- ID57_LEN_128 → 22 chars (DEFAULT)
+- ID57_LEN_256 → 44 chars
+- ID57_LEN_512 → 88 chars
+
+------------------------------------------------------------
+7.2 Informational Lengths (NON-SECURITY)
+------------------------------------------------------------
+
+- ID57_LEN_23  → 4 chars
+- ID57_LEN_29  → 5 chars
+- ID57_LEN_47  → 8 chars
+- ID57_LEN_70  → 12 chars
+- ID57_LEN_93  → 16 chars
+- ID57_LEN_186 → 32 chars
+- ID57_LEN_373 → 64 chars
+
+Requirements:
+
+- Length MUST correspond to defined model values
+- Implementations MUST NOT accept arbitrary lengths
+- Security-sensitive use MUST use ≥ ID57_LEN_128
+
+============================================================
+8. TRUNCATION MODEL
+============================================================
+
+Definition:
+
+ truncate_bytes(hash_bytes, bit_length)
+
+Rules:
+
+- MUST operate on raw hash bytes
+- MUST occur BEFORE B57 encoding
+- MUST use prefix truncation
+- MUST be deterministic
+
+Bit handling:
+
+- bit_length MUST be converted to byte length using:
+  byte_length = ceil(bit_length / 8)
+- Excess bits in the final byte MUST be truncated (not rounded)
+
+Prohibited:
+
+- truncating encoded strings
+- suffix truncation
+- post-encoding manipulation
+
+============================================================
+9. ONE-WAY PROPERTY
+============================================================
+
+ID57 is a one-way transformation:
+
+- Original input is computationally infeasible to recover
+- ID57 does not define a decoding interface
+- Any decoding yields truncated hash bytes only,
+  which have no reversible relation to original input
+
+Security depends on hash function properties.
+
+============================================================
+10. OPTIONAL FUNCTIONS
+============================================================
+
+10.1 id57_verify
+
+function id57_verify(input_bytes, hash_fn, id57_string, length_enum) -> boolean
+
+ expected = id57_generate(input_bytes, hash_fn, length_enum)
+
+ return (expected == id57_string)
+
+------------------------------------------------------------
+
+10.2 id57_is_valid
+
+function id57_is_valid(id57_string) -> boolean
+
+- MUST validate characters using B57 rules
+- MUST reject INVALID_CHAR
+
+------------------------------------------------------------
+
+10.3 id57_is_canonical
+
+function id57_is_canonical(id57_string) -> boolean
+
+ decoded = b57_decode(id57_string)
+ reencoded = b57_encode(decoded)
+
+ return (id57_string == reencoded)
+
+============================================================
+11. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+ id57_generate(x, h, L) ==
+ b57_encode(truncate_bytes(h(x), bits(L)))
+
+Determinism:
+
+ same input + same hash_fn + same length → same output
+
+Canonical constraint:
+
+ b57_encode(b57_decode(y)) == y
+ (only if y is canonical)
+
+============================================================
+12. ERROR MODEL
+============================================================
+
+Implementations MUST distinguish:
+
+- INVALID_CHAR
+- NON_CANONICAL
+- INVALID_LENGTH_ENUM
+
+Requirements:
+
+- Errors MUST be deterministic
+- MUST NOT continue after failure
+- MUST NOT use ambiguous errors
+
+============================================================
+13. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- bypass hashing stage
+- encode raw input directly
+- truncate after encoding
+- use suffix truncation
+- accept arbitrary lengths
+- normalize or transform identifiers
+- re-hash encoded values
+- introduce randomness
+
+============================================================
+14. SECURITY CONSIDERATIONS
+============================================================
+
+ID57 provides no cryptographic guarantees beyond the
+underlying hash function.
+
+Security depends on:
+
+- hash function strength (BLAKE3 recommended)
+- truncation length
+- entropy preservation
+
+Shorter identifiers reduce security proportionally.
+
+Encoded length MUST NOT be treated as a guarantee.
+
+============================================================
+15. IANA CONSIDERATIONS
+============================================================
+
+This document has no IANA actions.
+
+============================================================
+16. REFERENCES
+============================================================
+
+RFC 2119 - Requirement Levels
+RFC 8174 - Requirement Terminology Clarification
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================

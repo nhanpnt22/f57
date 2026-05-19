@@ -1,0 +1,465 @@
+============================================================
+R57 CORE API (MINDU)
+Random → B57 Canonical Representation Interface
+Version: v0.1.0 FINAL
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+R57 Core API defines a minimal, secure interface for
+generating ≥128-bit entropy identifiers encoded in canonical
+B57 format.
+
+It standardizes how randomness is generated, structured,
+and encoded into human-readable, ASCII-safe strings.
+
+R57 is strictly a randomness interface and representation
+layer and MUST NOT introduce bias, ambiguity, or
+non-canonical behavior.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+R57 defines secure random identifier generation:
+
+ entropy → bytes → B57 → string
+
+R57 is NOT a randomness source. It defines how entropy is
+produced and represented.
+
+Goals:
+
+- ≥128-bit entropy guarantee
+- canonical representation
+- zero bias
+- deterministic encoding
+- minimal API surface
+- implementation portability
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. DEPENDENCIES
+============================================================
+
+R57 depends on:
+
+- B57 Encoding Scheme
+- cryptographic primitives (CSPRNG, HASH, KDF)
+
+Requirements:
+
+- Encoding MUST comply with B57
+- Randomness MUST be cryptographically secure
+- Output MUST be canonical
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+Given:
+
+ entropy_bytes (exactly 128-bit)
+
+Compute:
+
+ r57 = b57_encode(entropy_bytes)
+
+Where:
+
+- entropy MUST be generated via CSPRNG or approved derivation
+- output MUST be canonical B57
+
+============================================================
+5. CORE FUNCTION
+============================================================
+
+5.1 r57_generate
+
+function r57_generate(mode_enum) -> string
+
+Definition:
+
+ entropy_bytes = generate_entropy(mode_enum)
+ output = b57_encode(entropy_bytes)
+
+ return output
+
+Requirements:
+
+- MUST produce EXACTLY 128-bit entropy
+- MUST be unbiased
+- MUST ensure independent entropy per invocation
+- Encoding MUST be deterministic
+- Output MUST be canonical B57
+- MUST NOT depend on platform-specific behavior
+
+Note:
+
+Uniqueness is probabilistic and NOT guaranteed.
+
+============================================================
+6. RANDOM MODES (128-BIT ONLY)
+============================================================
+
+All modes MUST produce EXACTLY 128-bit entropy.
+
+------------------------------------------------------------
+STRUCTURE RULE (GLOBAL)
+------------------------------------------------------------
+
+- total output MUST be 128-bit
+- random_component MUST be ≥96-bit
+- non-random components MUST NOT exceed 32-bit
+
+For structured modes (V2–V8):
+
+- entropy MUST be derived via cryptographic mixing:
+
+ entropy = HASH(structured_input)
+
+- raw concatenation MUST NOT be used
+
+------------------------------------------------------------
+6.1 R57_MODE_V1 (PURE RANDOM)
+------------------------------------------------------------
+
+entropy = CSPRNG(128-bit)
+
+Properties:
+- non-deterministic
+- fully unpredictable
+- maximum entropy
+
+Use:
+- default mode
+
+------------------------------------------------------------
+6.2 R57_MODE_V2 (TIME + RANDOM)
+------------------------------------------------------------
+
+input = time_component || random_component
+
+Rules:
+
+- time_component MUST be ≤32-bit
+- MUST be coarse-grained
+- MUST NOT expose precise timestamps
+- random_component MUST be ≥96-bit
+
+Derivation:
+
+ entropy = HASH(input)
+
+Use:
+- loosely time-ordered identifiers
+
+------------------------------------------------------------
+6.3 R57_MODE_V3 (COUNTER + RANDOM)
+------------------------------------------------------------
+
+input = counter || random_component
+
+Rules:
+
+- counter MUST be ≤32-bit
+- MUST NOT be externally predictable
+- random_component MUST be ≥96-bit
+
+Derivation:
+
+ entropy = HASH(input)
+
+Use:
+- high-throughput systems
+
+------------------------------------------------------------
+6.4 R57_MODE_V4 (SESSION-BOUND)
+------------------------------------------------------------
+
+entropy = KDF(session_secret, nonce)
+
+Requirements:
+
+- MUST include secret input
+- MUST include unique nonce
+- MUST produce 128-bit output
+
+Use:
+- session identifiers
+
+------------------------------------------------------------
+6.5 R57_MODE_V5 (DEVICE-BOUND)
+------------------------------------------------------------
+
+entropy = KDF(device_secret, random_nonce)
+
+Use:
+- device identifiers
+
+------------------------------------------------------------
+6.6 R57_MODE_V6 (DETERMINISTIC DERIVED)
+------------------------------------------------------------
+
+entropy = KDF(master_secret, unique_input)
+
+Requirements:
+
+- MUST be indistinguishable from random
+- MUST ensure uniqueness via input
+
+Use:
+- deterministic secure IDs
+
+------------------------------------------------------------
+6.7 R57_MODE_V7 (HASH-HARDENED RANDOM)
+------------------------------------------------------------
+
+entropy = HASH(CSPRNG(128-bit))
+
+Properties:
+- preserves entropy
+- removes structural bias
+
+Use:
+- hardened pipelines
+
+------------------------------------------------------------
+6.8 R57_MODE_V8 (HYBRID ENTROPY)
+------------------------------------------------------------
+
+entropy = HASH(source1 || source2 || ...)
+
+Requirements:
+
+- MUST include ≥128-bit total entropy
+- sources SHOULD be independent
+
+Use:
+- high-assurance systems
+
+============================================================
+7. HASH REQUIREMENTS
+============================================================
+
+HASH functions MUST:
+
+- be cryptographic
+- be deterministic
+- produce ≥128-bit output
+- provide uniform distribution
+
+RECOMMENDED:
+
+- BLAKE3
+- SHA-256
+
+============================================================
+8. KDF REQUIREMENTS
+============================================================
+
+KDF MUST:
+
+- be cryptographic (HKDF, BLAKE3 derive_key, etc.)
+- include:
+ - secret input
+ - unique input
+- produce exactly 128-bit output
+- be deterministic
+- be indistinguishable from random
+
+============================================================
+9. MIX DEFINITION
+============================================================
+
+MIX(a, b, ...) = HASH(a || b || ...)
+
+Requirements:
+
+- MUST combine all inputs
+- MUST produce uniform output
+- MUST NOT expose individual sources
+
+============================================================
+10. LENGTH MODEL
+============================================================
+
+128-bit entropy → B57 encoding:
+
+- MUST produce exactly 22 characters
+
+Requirements:
+
+- MUST NOT truncate entropy
+- MUST NOT truncate encoded output
+- MUST NOT vary output length
+
+============================================================
+11. OPTIONAL FUNCTIONS
+============================================================
+
+11.1 r57_is_valid
+
+function r57_is_valid(input_string) -> boolean
+
+- MUST validate B57 characters
+- MUST reject non-ASCII
+
+------------------------------------------------------------
+
+11.2 r57_is_canonical
+
+function r57_is_canonical(input_string) -> boolean
+
+ decoded = b57_decode(input_string)
+ reencoded = b57_encode(decoded)
+
+ return (input_string == reencoded)
+
+============================================================
+12. MODE SELECTION GUIDANCE
+============================================================
+
+- V1 SHOULD be default
+- V2 SHOULD be used for sortable IDs
+- V3 SHOULD be used for high-throughput systems
+- V4–V6 SHOULD be used for secret-bound identifiers
+- V8 SHOULD be used for high-assurance environments
+
+============================================================
+13. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+ b57_decode(b57_encode(x)) == x
+
+Output MUST be:
+
+- canonical
+- bijective
+- entropy-preserving
+
+============================================================
+14. ERROR MODEL
+============================================================
+
+Defined errors:
+
+- INVALID_CHAR
+- NON_CANONICAL
+- ENTROPY_FAILURE
+- INVALID_MODE
+
+Requirements:
+
+- MUST be deterministic
+- MUST NOT continue after error
+
+============================================================
+15. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- use non-CSPRNG randomness
+- produce <128-bit entropy
+- truncate entropy before encoding
+- truncate encoded output
+- introduce modulo bias
+- sample B57 alphabet directly
+- reuse entropy
+- expose internal structure
+
+============================================================
+16. SECURITY CONSIDERATIONS
+============================================================
+
+Security depends on:
+
+- entropy quality
+- correct implementation
+- CSPRNG integrity
+
+Failures:
+
+- weak RNG → full compromise
+- entropy reuse → collision risk
+- improper structured input usage MAY reduce effective entropy
+
+R57 MUST NOT be used:
+
+- as a hash function
+- as encryption
+- as a standalone authentication mechanism
+
+Comparisons SHOULD use constant-time logic in
+security-sensitive contexts.
+
+============================================================
+17. RELATIONSHIP TO STACK
+============================================================
+
+- B57 → encoding layer
+- H57 → hash representation
+- R57 → random generation
+- ID57 → identifier policy
+- BOTP → authentication protocol
+
+R57 outputs MAY be used as:
+
+- nonce
+- session_id
+- device_id (via ID57 constraints)
+
+============================================================
+18. UNIQUENESS NOTE
+============================================================
+
+R57 does NOT guarantee global uniqueness.
+
+Uniqueness depends on:
+
+- entropy quality
+- system design
+- collision handling
+
+============================================================
+19. IANA CONSIDERATIONS
+============================================================
+
+None.
+
+============================================================
+20. REFERENCES
+============================================================
+
+RFC 2119
+RFC 8174
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================
