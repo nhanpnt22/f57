@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: b57
+Version: 0.1.0
+Summary: B57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, R57 profiles
+Author: B57 Project
+License: All rights reserved
+Requires-Python: >=3.8
+Requires-Dist: cryptography>=3.4
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=3.0; extra == "dev"
+Dynamic: author
+Dynamic: license
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
