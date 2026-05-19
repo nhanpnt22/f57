@@ -7,6 +7,7 @@
       "name": "b57",
       "version": "0.1.0",
       "dependencies": [
+        "blake3_dart",
         "convert",
         "crypto",
         "hex"
@@ -51,6 +52,11 @@
         "webkit_inspection_protocol",
         "yaml"
       ]
+    },
+    {
+      "name": "blake3_dart",
+      "version": "1.0.0",
+      "dependencies": []
     },
     {
       "name": "convert",

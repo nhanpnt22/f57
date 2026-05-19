@@ -20,7 +20,7 @@ def test_default_uses_len128():
     """Test default uses 128-bit."""
     input_data = b"x"
     d = id57_generate_default(input_data)
-    p = id57_generate(input_data, HashFunction.SHA256, ID57Length.DEFAULT)
+    p = id57_generate(input_data, HashFunction.BLAKE3, ID57Length.DEFAULT)
     assert d == p
     assert len(d) == 22
 

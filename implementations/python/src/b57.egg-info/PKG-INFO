@@ -6,6 +6,7 @@ Author: B57 Project
 License: All rights reserved
 Requires-Python: >=3.8
 Requires-Dist: cryptography>=3.4
+Requires-Dist: blake3>=0.3
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-cov>=3.0; extra == "dev"

@@ -1,5 +1,7 @@
 library b57_id57;
 
+import 'dart:typed_data';
+import 'package:blake3_dart/blake3_dart.dart';
 import 'package:crypto/crypto.dart';
 import 'errors.dart';
 import 'b57.dart' as b57;
@@ -30,16 +32,25 @@ String id57Generate(List<int> input, HashFunction? hashFn, ID57Length length) {
   final effective = _resolveLength(length);
   final bits = _bitsByLength(effective);
   final requested = (bits + 7) ~/ 8;
-  final hashBytes = _computeHash(input, hashFn ?? HashFunction.sha256, requested);
+  
+  final effectiveHashFn = hashFn ?? HashFunction.blake3;
+  List<int> hashBytes;
+  if (effectiveHashFn == HashFunction.blake3) {
+    hashBytes = blake3(Uint8List.fromList(input), requested).toList();
+  } else {
+    hashBytes = _computeHash(input, effectiveHashFn, requested);
+  }
+  
   final effectiveBytes = hashBytes.sublist(0, requested);
   _maskExcessBits(effectiveBytes, bits);
   return b57.encode(effectiveBytes);
 }
 
 String id57GenerateDefault(List<int> input) =>
-    id57Generate(input, HashFunction.sha256, ID57Length.def);
+    id57Generate(input, HashFunction.blake3, ID57Length.def);
 
-bool id57Verify(List<int> input, HashFunction? hashFn, String id57String, ID57Length length) {
+bool id57Verify(List<int> input, HashFunction? hashFn, String id57String,
+    ID57Length length) {
   try {
     return id57Generate(input, hashFn, length) == id57String;
   } catch (_) {
@@ -48,7 +59,7 @@ bool id57Verify(List<int> input, HashFunction? hashFn, String id57String, ID57Le
 }
 
 bool id57VerifyDefault(List<int> input, String id57String) =>
-    id57Verify(input, HashFunction.sha256, id57String, ID57Length.def);
+    id57Verify(input, HashFunction.blake3, id57String, ID57Length.def);
 
 bool id57IsValid(String id57String) => b57.isValid(id57String);
 bool id57IsCanonical(String id57String) => b57.isCanonical(id57String);
@@ -59,8 +70,15 @@ ID57Length _resolveLength(ID57Length length) {
   return length;
 }
 
-List<int> _computeHash(List<int> input, HashFunction hashFn, int requestedBytes) {
-  final hash = sha256.convert(input).bytes.toList();
+List<int> _computeHash(
+    List<int> input, HashFunction hashFn, int requestedBytes) {
+  List<int> hash;
+  if (hashFn == HashFunction.sha512) {
+    hash = sha512.convert(input).bytes.toList();
+  } else {
+    hash = sha256.convert(input).bytes.toList();
+  }
+  
   if (requestedBytes > hash.length) {
     throw EntropyExceededError(requestedBytes, hash.length);
   }

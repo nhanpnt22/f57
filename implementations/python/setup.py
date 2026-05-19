@@ -11,6 +11,7 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "cryptography>=3.4",
+        "blake3>=0.3",
     ],
     extras_require={
         "dev": [

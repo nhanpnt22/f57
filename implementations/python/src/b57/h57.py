@@ -2,6 +2,7 @@
 
 from enum import Enum
 from hashlib import sha256, sha512
+import blake3 as blake3_module
 from .errors import InvalidLengthEnumError, EntropyExceededError
 from .b57 import encode
 
@@ -54,10 +55,22 @@ _BITS_BY_LENGTH = {
 
 def h57_hash(input_data: bytes, hash_fn: HashFunction, length: H57Length) -> str:
     """Hash input and encode as B57."""
-    hash_bytes = _compute_hash(input_data, hash_fn)
-    selected = _select_effective_bytes(hash_bytes, length, hash_fn)
-    return encode(selected)
+    hash_fn_effective = hash_fn if hash_fn else HashFunction.BLAKE3
+    
+    if hash_fn_effective == HashFunction.BLAKE3:
+        if length == H57Length.HASH_AUTO:
+            hash_bytes = _compute_hash(input_data, hash_fn_effective)
+            return encode(hash_bytes)
+        
+        effective = _resolve_effective_length(length, hash_fn_effective)
+        bits = _bits_by_length(effective)
+        requested = (bits + 7) // 8
+        hash_bytes = _compute_hash_blake3_xof(input_data, requested)
+        return encode(hash_bytes)
 
+    hash_bytes = _compute_hash(input_data, hash_fn_effective)
+    selected = _select_effective_bytes(hash_bytes, length, hash_fn_effective)
+    return encode(selected)
 
 def h57_verify(input_data: bytes, h57_string: str, hash_fn: HashFunction, length: H57Length) -> bool:
     """Verify H57 string matches input."""
@@ -85,10 +98,14 @@ def _compute_hash(input_data: bytes, hash_fn: HashFunction) -> bytes:
     elif hash_fn == HashFunction.SHA512:
         return sha512(input_data).digest()
     elif hash_fn == HashFunction.BLAKE3:
-        # Fallback to SHA256 for BLAKE3 in Python
-        return sha256(input_data).digest()
+        return blake3_module.blake3(input_data).digest()
     else:
         raise ValueError(f"Unknown hash function: {hash_fn}")
+
+def _compute_hash_blake3_xof(input_data: bytes, requested_bytes: int) -> bytes:
+    if requested_bytes <= 0:
+        return b""
+    return blake3_module.blake3(input_data).digest(length=requested_bytes)
 
 
 def _select_effective_bytes(hash_bytes: bytes, length: H57Length, hash_fn: HashFunction) -> bytes:

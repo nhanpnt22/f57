@@ -26,6 +26,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "blake3_dart",
+      "rootUri": "file:///Users/brian/.pub-cache/hosted/pub.dev/blake3_dart-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "boolean_selector",
       "rootUri": "file:///Users/brian/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2",
       "packageUri": "lib/",

@@ -3,7 +3,7 @@
 from enum import Enum
 from hashlib import sha256
 from .errors import InvalidLengthEnumError, EntropyExceededError
-from .h57 import HashFunction
+from .h57 import HashFunction, _compute_hash, _compute_hash_blake3_xof
 from .b57 import encode
 
 
@@ -50,9 +50,14 @@ def id57_generate(input_data: bytes, hash_fn: HashFunction, length: ID57Length) 
     bits = _bits_by_length(effective)
     requested = (bits + 7) // 8
     
-    hash_bytes = sha256(input_data).digest()
-    if requested > len(hash_bytes):
-        raise EntropyExceededError(requested, len(hash_bytes))
+    hash_fn_effective = hash_fn if hash_fn else HashFunction.BLAKE3
+    
+    if hash_fn_effective == HashFunction.BLAKE3:
+        hash_bytes = _compute_hash_blake3_xof(input_data, requested)
+    else:
+        hash_bytes = _compute_hash(input_data, hash_fn_effective)
+        if requested > len(hash_bytes):
+            raise EntropyExceededError(requested, len(hash_bytes))
     
     effective_bytes = bytearray(hash_bytes[:requested])
     _mask_excess_bits(effective_bytes, bits)
@@ -60,8 +65,8 @@ def id57_generate(input_data: bytes, hash_fn: HashFunction, length: ID57Length) 
 
 
 def id57_generate_default(input_data: bytes) -> str:
-    """Generate ID with default settings (128-bit SHA256)."""
-    return id57_generate(input_data, HashFunction.SHA256, ID57Length.DEFAULT)
+    """Generate ID with default settings (128-bit BLAKE3)."""
+    return id57_generate(input_data, HashFunction.BLAKE3, ID57Length.DEFAULT)
 
 
 def id57_verify(input_data: bytes, hash_fn: HashFunction, id57_string: str, length: ID57Length) -> bool:
@@ -74,7 +79,7 @@ def id57_verify(input_data: bytes, hash_fn: HashFunction, id57_string: str, leng
 
 def id57_verify_default(input_data: bytes, id57_string: str) -> bool:
     """Verify ID with default settings."""
-    return id57_verify(input_data, HashFunction.SHA256, id57_string, ID57Length.DEFAULT)
+    return id57_verify(input_data, HashFunction.BLAKE3, id57_string, ID57Length.DEFAULT)
 
 
 def id57_is_valid(s: str) -> bool:

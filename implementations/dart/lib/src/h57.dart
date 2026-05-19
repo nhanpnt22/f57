@@ -1,6 +1,8 @@
 library b57_h57;
 
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:blake3_dart/blake3_dart.dart';
 import 'errors.dart';
 import 'b57.dart' as b57;
 
@@ -30,8 +32,23 @@ enum H57Length {
 }
 
 String h57Hash(List<int> input, HashFunction hashFn, H57Length length) {
-  final hashBytes = _computeHash(input, hashFn);
-  final selected = _selectEffectiveBytes(hashBytes, length, hashFn);
+  final effectiveHashFn = hashFn; // assume hashFn is not null because dart enums
+  
+  if (effectiveHashFn == HashFunction.blake3) {
+    if (length == H57Length.hashAuto) {
+      final hashBytes = _computeHash(input, effectiveHashFn);
+      return b57.encode(hashBytes);
+    }
+    
+    final effective = _resolveEffectiveLength(length, effectiveHashFn);
+    final bits = _bitsByLength(effective);
+    final requested = (bits + 7) ~/ 8;
+    final hashBytes = _computeHashBlake3Xof(input, requested);
+    return b57.encode(hashBytes);
+  }
+
+  final hashBytes = _computeHash(input, effectiveHashFn);
+  final selected = _selectEffectiveBytes(hashBytes, length, effectiveHashFn);
   return b57.encode(selected);
 }
 
@@ -53,8 +70,13 @@ List<int> _computeHash(List<int> input, HashFunction hashFn) {
     case HashFunction.sha512:
       return sha512.convert(input).bytes.toList();
     case HashFunction.blake3:
-      return sha256.convert(input).bytes.toList(); // Fallback for Dart
+      return blake3(Uint8List.fromList(input), 32).toList();
   }
+}
+
+List<int> _computeHashBlake3Xof(List<int> input, int requestedBytes) {
+  if (requestedBytes <= 0) return [];
+  return blake3(Uint8List.fromList(input), requestedBytes).toList();
 }
 
 List<int> _selectEffectiveBytes(List<int> hashBytes, H57Length length, HashFunction hashFn) {

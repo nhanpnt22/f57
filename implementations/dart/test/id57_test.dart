@@ -11,7 +11,7 @@ void main() {
 
     test('default uses len128', () {
       final d = id57GenerateDefault('x'.codeUnits);
-      final p = id57Generate('x'.codeUnits, HashFunction.sha256, ID57Length.def);
+      final p = id57Generate('x'.codeUnits, HashFunction.blake3, ID57Length.def);
       expect(d, p);
       expect(d.length, 22);
     });
