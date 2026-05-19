@@ -12,6 +12,9 @@ Primary implementation folders:
 
 - `implementations/go`
 - `implementations/javascript`
+- `implementations/rust`
+- `implementations/dart`
+- `implementations/python`
 
 Reference specifications live under `spec/`.
 
@@ -24,12 +27,18 @@ Reference specifications live under `spec/`.
 
 ## Current Project Status
 
-- Commit readiness (project level): READY WITH SCOPED COMMIT
-- Release readiness (project level): PARTIAL READY
-- JavaScript scoped release: READY (`v0.1.0-js`)
+- Rust scoped release: READY (`v0.1.0-rust`)
+- Dart scoped release: READY (`v0.1.0-dart`)
+- Python scoped release: READY (`v0.1.0-python`)
 - Go broad spec-claiming release: NOT READY (see Go release assessments)
 
 ## Validation Summary
+
+- Go tests pass (`go test ./...` in `implementations/go`)
+- JavaScript tests pass (`npm test` in `implementations/javascript`)
+- Rust tests pass (`cargo test` in `implementations/rust`)
+- Dart tests pass (`dart test` in `implementations/dart`)
+- Python tests pass (`pytest` in `implementations/python
 
 - Go tests pass (`go test ./...` in `implementations/go`)
 - JavaScript tests pass (`npm test` in `implementations/javascript`)

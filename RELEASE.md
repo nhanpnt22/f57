@@ -6,6 +6,9 @@ This document defines repository-level release decisions and safe release flow.
 
 - Repository-wide unqualified release: NOT READY
 - JavaScript scoped release (`v0.1.0-js`): READY
+- Rust scoped release (`v0.1.0-rust`): READY
+- Dart scoped release (`v0.1.0-dart`): READY
+- Python scoped release (`v0.1.0-python`): READY
 - Go broad spec-claiming release: NOT READY
 
 Authoritative assessment sources:
