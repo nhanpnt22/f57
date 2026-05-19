@@ -1,0 +1,14 @@
+/Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/deps/libserde-fb9f7324fe1007b1.rmeta: /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/build/serde-d4e527a8ea553a85/out/private.rs
+
+/Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/deps/libserde-fb9f7324fe1007b1.rlib: /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/build/serde-d4e527a8ea553a85/out/private.rs
+
+/Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/deps/serde-fb9f7324fe1007b1.d: /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/build/serde-d4e527a8ea553a85/out/private.rs
+
+/Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/Users/brian/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/build/serde-d4e527a8ea553a85/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/brian/dev/aco/aip/pkg/b57/implementations/rust/target/debug/build/serde-d4e527a8ea553a85/out
