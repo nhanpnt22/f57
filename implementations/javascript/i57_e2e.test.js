@@ -24,7 +24,7 @@ test('i57 encode and decode properly', () => {
 
 test('i57 integration hash properly', () => {
   const data = new Uint8Array([0, 255, 128, 64]);
-  const h = i57Hash(data, 'blake3', 47);
+  const h = i57Hash(data, 47);
   assert.equal(i57IsValid(h), true);
 });
 
@@ -37,6 +37,6 @@ test('i57 integration random properly', () => {
 
 test('i57 integration ID properly', () => {
   const data = new Uint8Array([0, 255, 128, 64]);
-  const id = i57Id(data, 'blake3', 47);
+  const id = i57Id(data, 47);
   assert.equal(i57IsValid(id), true);
 });

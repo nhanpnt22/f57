@@ -1,17 +1,6 @@
-import { createHash } from 'node:crypto';
 import { blake3 } from '@noble/hashes/blake3';
 import { encode, isValid, isCanonical } from './b57.js';
-import {
-  newEntropyExceededError,
-  newInvalidHashFunctionError,
-  newInvalidLengthEnumError
-} from './errors.js';
-
-export const HashFunction = Object.freeze({
-  BLAKE3: 'blake3',
-  SHA256: 'sha256',
-  SHA512: 'sha512'
-});
+import { newEntropyExceededError, newInvalidLengthEnumError } from './errors.js';
 
 export const H57Length = Object.freeze({
   HASH_AUTO: -1,
@@ -65,20 +54,6 @@ function toBytes(input) {
   throw new TypeError('input must be Uint8Array, Buffer, or ArrayBuffer');
 }
 
-export function computeHash(input, hashFn) {
-  const data = toBytes(input);
-  switch (hashFn) {
-    case HashFunction.SHA256:
-      return new Uint8Array(createHash('sha256').update(Buffer.from(data)).digest());
-    case HashFunction.SHA512:
-      return new Uint8Array(createHash('sha512').update(Buffer.from(data)).digest());
-    case HashFunction.BLAKE3:
-      return blake3(data, { dkLen: 32 });
-    default:
-      throw newInvalidHashFunctionError(hashFn);
-  }
-}
-
 export function computeHashBLAKE3XOF(input, outputLen) {
   if (outputLen <= 0) {
     return new Uint8Array(0);
@@ -86,50 +61,24 @@ export function computeHashBLAKE3XOF(input, outputLen) {
   return blake3(toBytes(input), { dkLen: outputLen });
 }
 
-export function selectEffectiveHashBytes(hashBytes, length) {
-  if (length === H57Length.HASH_AUTO) {
-    return hashBytes;
-  }
-
-  const bits = h57BitsByLength.get(length);
-  if (!bits) {
-    throw newInvalidLengthEnumError(length);
-  }
-
-  const requestedBytes = Math.ceil(bits / 8);
-  if (requestedBytes > hashBytes.length) {
-    throw newEntropyExceededError(requestedBytes, hashBytes.length);
-  }
-
-  return hashBytes.subarray(0, requestedBytes);
-}
-
-export function h57Hash(input, hashFn, length) {
-	const effectiveHashFn = hashFn || HashFunction.BLAKE3;
+export function h57Hash(input, length = H57Length.HASH_AUTO) {
   let hashBytes;
-
-  if (effectiveHashFn === HashFunction.BLAKE3) {
-    if (length === H57Length.HASH_AUTO) {
-      hashBytes = blake3(toBytes(input), { dkLen: 32 });
-    } else {
-      const bits = h57BitsByLength.get(length);
-      if (!bits) {
-        throw newInvalidLengthEnumError(length);
-      }
-      const requestedBytes = Math.ceil(bits / 8);
-      hashBytes = computeHashBLAKE3XOF(input, requestedBytes);
-    }
+  if (length === H57Length.HASH_AUTO) {
+    hashBytes = blake3(toBytes(input), { dkLen: 32 });
   } else {
-    hashBytes = computeHash(input, effectiveHashFn);
-    hashBytes = selectEffectiveHashBytes(hashBytes, length);
+    const bits = h57BitsByLength.get(length);
+    if (!bits) {
+      throw newInvalidLengthEnumError(length);
+    }
+    const requestedBytes = Math.ceil(bits / 8);
+    hashBytes = computeHashBLAKE3XOF(input, requestedBytes);
   }
-
   return encode(hashBytes);
 }
 
-export function h57Verify(input, h57String, hashFn, length) {
+export function h57Verify(input, h57String, length = H57Length.HASH_AUTO) {
   try {
-    return h57Hash(input, hashFn, length) === h57String;
+    return h57Hash(input, length) === h57String;
   } catch {
     return false;
   }

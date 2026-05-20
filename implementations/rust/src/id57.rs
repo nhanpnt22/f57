@@ -1,6 +1,6 @@
 use crate::b57::{encode, is_canonical, is_valid};
 use crate::errors::B57Error;
-use crate::h57::{compute_hash, compute_hash_blake3_xof, HashFunction};
+use crate::h57::compute_hash_blake3_xof;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,14 +25,13 @@ pub enum ID57Length {
 
 pub fn id57_generate(
     input: &[u8],
-    hash_fn: Option<HashFunction>,
     length: ID57Length,
 ) -> Result<String, B57Error> {
     let effective = resolve_id57_length(length)?;
     let bits = id57_bits_by_length(effective)?;
     let requested = bits.div_ceil(8);
 
-    let hash_bytes = compute_id57_hash_for_length(input, hash_fn, requested)?;
+    let hash_bytes = compute_hash_blake3_xof(input, requested);
     let mut effective_bytes = hash_bytes[..requested].to_vec();
     mask_excess_bits(&mut effective_bytes, bits);
 
@@ -40,16 +39,15 @@ pub fn id57_generate(
 }
 
 pub fn id57_generate_default(input: &[u8]) -> Result<String, B57Error> {
-    id57_generate(input, Some(HashFunction::Blake3), ID57Length::Default)
+    id57_generate(input, ID57Length::Default)
 }
 
 pub fn id57_verify(
     input: &[u8],
-    hash_fn: Option<HashFunction>,
     id57_string: &str,
     length: ID57Length,
 ) -> bool {
-    id57_generate(input, hash_fn, length)
+    id57_generate(input, length)
         .map(|expected| expected == id57_string)
         .unwrap_or(false)
 }
@@ -57,7 +55,6 @@ pub fn id57_verify(
 pub fn id57_verify_default(input: &[u8], id57_string: &str) -> bool {
     id57_verify(
         input,
-        Some(HashFunction::Blake3),
         id57_string,
         ID57Length::Default,
     )
@@ -77,23 +74,6 @@ pub fn resolve_id57_length(length: ID57Length) -> Result<ID57Length, B57Error> {
     }
     id57_bits_by_length(length)?;
     Ok(length)
-}
-
-pub fn compute_id57_hash_for_length(
-    input: &[u8],
-    hash_fn: Option<HashFunction>,
-    requested_bytes: usize,
-) -> Result<Vec<u8>, B57Error> {
-    let effective_hash = hash_fn.unwrap_or(HashFunction::Blake3);
-    if effective_hash == HashFunction::Blake3 {
-        return Ok(compute_hash_blake3_xof(input, requested_bytes));
-    }
-
-    let hash = compute_hash(input, effective_hash)?;
-    if requested_bytes > hash.len() {
-        return Err(B57Error::entropy_exceeded(requested_bytes, hash.len()));
-    }
-    Ok(hash)
 }
 
 pub fn mask_excess_bits(bytes: &mut [u8], bit_length: usize) {
@@ -139,15 +119,15 @@ mod tests {
 
     #[test]
     fn deterministic() {
-        let a = id57_generate(b"id57", Some(HashFunction::Blake3), ID57Length::Len256).unwrap();
-        let b = id57_generate(b"id57", Some(HashFunction::Blake3), ID57Length::Len256).unwrap();
+        let a = id57_generate(b"id57", ID57Length::Len256).unwrap();
+        let b = id57_generate(b"id57", ID57Length::Len256).unwrap();
         assert_eq!(a, b);
     }
 
     #[test]
     fn default_uses_len128() {
         let d = id57_generate_default(b"x").unwrap();
-        let p = id57_generate(b"x", Some(HashFunction::Blake3), ID57Length::Default).unwrap();
+        let p = id57_generate(b"x", ID57Length::Default).unwrap();
         assert_eq!(d, p);
         assert_eq!(d.len(), 22);
     }
@@ -156,12 +136,6 @@ mod tests {
     fn resolve_default() {
         let resolved = resolve_id57_length(ID57Length::Default).unwrap();
         assert_eq!(resolved, ID57Length::Len128);
-    }
-
-    #[test]
-    fn entropy_exceeded() {
-        let e = id57_generate(b"x", Some(HashFunction::Sha256), ID57Length::Len512).unwrap_err();
-        assert_eq!(e.code, ErrorCode::EntropyExceeded);
     }
 
     #[test]

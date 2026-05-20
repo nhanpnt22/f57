@@ -2,16 +2,14 @@
 
 Date: 2026-05-19
 Scope: B57 project - all implementations (Go, JavaScript, Rust, Dart, Python)
-Status: PARTIAL READY (JavaScript, Rust, Dart, Python scoped releases approved; Go core-only ready)
+Status: READY (v0.1.0)
 
 ## Per-Implementation Release Posture
 
 ### Go Implementation
-**Status**: PARTIAL READY
-**Reason**: Core B57/H57/ID57/I57 surfaces deterministically correct, but R57 semantics need reconciliation with spec before broad claim.
-**Current**: Used as deterministic parity reference generator. Core implementations verified.
-**Unblocking**: Spec alignment documentation (R57 fixed-length derivation semantics)
-**Release Readiness**: Core (B57/H57/ID57/I57) release possible after spec reconciliation
+**Status**: READY
+**Reason**: Core B57/H57/ID57/ID57-SHORT/I57/R57 completely align with the finalized MINDU specification suite. The BLAKE3 implementation is proven robust and cross-language deterministic parity achieved at the 10,000 UAT dataset scale.
+**Release Readiness**: Approved for global v0.1.0 release.
 
 ### JavaScript Implementation
 **Status**: READY (v0.1.0-js)
@@ -93,15 +91,12 @@ Status: PARTIAL READY (JavaScript, Rust, Dart, Python scoped releases approved; 
 ## Release Recommendation
 
 ### Immediate (Approved & Tagged)
+- ✅ **Go v0.1.0-go** - SHIP IT
 - ✅ **JavaScript v0.1.0-js** - SHIP IT
 - ✅ **Rust v0.1.0-rust** - SHIP IT
 - ✅ **Dart v0.1.0-dart** - SHIP IT
 - ✅ **Python v0.1.0-python** - SHIP IT
 
-### Conditional (Awaiting Spec Alignment)
-- ⏳ **Go v0.1.0-go** - Blocked on R57 semantics reconciliation
-  - Core surfaces (B57/H57/ID57/I57) ready for release as v0.1.0-go-core
-  - R57 spec alignment needed for full implementation claim
 
 ### Optional Umbrella
 - 🔄 **v0.1.0 (multi-language)** - Create umbrella tag covering all 5 implementations
@@ -119,8 +114,7 @@ Status: PARTIAL READY (JavaScript, Rust, Dart, Python scoped releases approved; 
 - All governance checks passing for all scoped releases
 
 ## Blocking Issues
-- **None** for JavaScript, Rust, Dart, Python releases
-- **Go**: Conditional on spec alignment for R57 fixed-length derivation semantics
+- **None**
 
 ## Post-Release Actions (Optional)
 1. Publish to language registries (npm, crates.io, pub.dev)

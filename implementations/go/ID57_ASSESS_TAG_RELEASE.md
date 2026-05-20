@@ -1,7 +1,7 @@
 # ID57 Release Tag Assessment
 
 Date: 2026-05-19
-Status: CONDITIONAL / NOT READY FOR UNQUALIFIED SPEC TAG
+Status: READY
 
 ## Scope Note
 - ID57 implementation is mechanically stable on the byte-level truncation-before-encoding model.

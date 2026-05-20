@@ -19,23 +19,23 @@ Future<void> main() async {
       final b57Decoded = decode(b57Enc);
       final b57DecodeHex = _bytesToHex(b57Decoded);
       
-      final h57Blake3Len128 = h57Hash(input, HashFunction.sha256, H57Length.len128);
-      final h57Sha256Len128 = h57Hash(input, HashFunction.sha256, H57Length.len128);
-      final h57Sha512Len128 = h57Hash(input, HashFunction.sha512, H57Length.len128);
-      final h57Blake3Auto = h57Hash(input, HashFunction.sha256, H57Length.hashAuto);
+      final h57Blake3Len128 = h57Hash(input, H57Length.len128);
+      final h57Sha256Len128 = h57Hash(input, H57Length.len128);
+      final h57Sha512Len128 = h57Hash(input, H57Length.len128);
+      final h57Blake3Auto = h57Hash(input, H57Length.hashAuto);
       
-      final id57Default = id57GenerateDefault(input);
-      final id57Len47Sha256 = id57Generate(input, HashFunction.sha256, ID57Length.len47);
-      final id57Len70Blake3 = id57Generate(input, HashFunction.sha256, ID57Length.len70);
+      final id57Default = id57Generate(input, ID57Length.def);
+      final id57Len47Sha256 = id57Generate(input, ID57Length.len47);
+      final id57Len70Blake3 = id57Generate(input, ID57Length.len70);
       
-      final id57ShortDefault = id57ShortGenerateDefault(input);
-      final id57ShortLen23 = id57ShortGenerate(input, HashFunction.sha256, ID57ShortLength.len23);
+      final id57ShortDefault = id57ShortGenerate(input, ID57ShortLength.def);
+      final id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.len23);
       
       final i57EncodeOut = i57Encode(input);
       final i57DecodeOut = i57Decode(i57EncodeOut);
       final i57DecodeHex = _bytesToHex(i57DecodeOut);
-      final i57HashBlake3Len128 = i57Hash(input, HashFunction.sha256, H57Length.len128);
-      final i57IdDefault = i57Id(input, HashFunction.sha256, ID57Length.def);
+      final i57HashBlake3Len128 = i57Hash(input, H57Length.len128);
+      final i57IdDefault = i57Id(input, ID57Length.def);
       
       records.add({
         'index': i,
@@ -65,9 +65,9 @@ Future<void> main() async {
         'i57_validate_entropy': i57ValidateEntropy(i57IdDefault),
         'r57_is_valid_on_i57_id': r57IsValid(i57IdDefault),
         'r57_is_canonical_on_i57_id': r57IsCanonical(i57IdDefault),
-        'id57_verify_default': id57VerifyDefault(input, id57Default),
-        'id57_short_verify_default': id57ShortVerifyDefault(input, id57ShortDefault),
-        'h57_verify_blake3_len128': h57Verify(input, h57Blake3Len128, HashFunction.sha256, H57Length.len128),
+        'id57_verify_default': id57Verify(input, id57Default, ID57Length.def),
+        'id57_short_verify_default': id57ShortVerify(input, id57ShortDefault, ID57ShortLength.def),
+        'h57_verify_blake3_len128': h57Verify(input, h57Blake3Len128, H57Length.len128),
         'i57_validate_identifier_id': i57ValidateIdentifier(i57IdDefault),
       });
     }

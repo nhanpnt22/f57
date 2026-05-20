@@ -1,5 +1,5 @@
 ============================================================
-ID57-SHORT PROFILE
+ID57-SHORT PROFILE (MINDU)
 Ultra-Compact Identifier Profile (ID57 Subset)
 Version: v0.1.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
@@ -52,7 +52,7 @@ Requirements:
 
 - Encoding MUST be canonical B57
 - Hash functions MUST be cryptographic
-- BLAKE3 SHOULD be the default hash function
+- BLAKE3 SHOULD be the primary default hash function
 - ID57-SHORT MUST NOT modify B57 behavior
 
 ============================================================
@@ -147,7 +147,7 @@ Requirements:
 
 - hash_fn MUST be cryptographic
 - hash_fn MUST be deterministic
-- BLAKE3 SHOULD be default
+- BLAKE3 SHOULD be the primary default
 - truncation MUST be prefix-based
 - truncation MUST occur BEFORE encoding
 - truncate_bytes_prefix MUST preserve big-endian ordering

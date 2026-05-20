@@ -14,9 +14,7 @@ const (
 	ErrInvalidLengthEnum
 	// ErrEntropyExceeded indicates requested entropy exceeds hash output entropy.
 	ErrEntropyExceeded
-	// ErrInvalidHashFunction indicates an unsupported or unavailable hash function.
-	ErrInvalidHashFunction
-	// ErrInsufficientEntropy indicates RNG failed to provide enough entropy.
+		// ErrInsufficientEntropy indicates RNG failed to provide enough entropy.
 	ErrInsufficientEntropy
 	// ErrInvalidMode indicates an unsupported random generation mode.
 	ErrInvalidMode
@@ -70,15 +68,6 @@ func NewEntropyExceededError(requestedBytes, availableBytes int) *Error {
 	return &Error{
 		Code:    ErrEntropyExceeded,
 		Message: fmt.Sprintf("requested entropy exceeds hash output (%d bytes requested, %d available)", requestedBytes, availableBytes),
-		Index:   -1,
-	}
-}
-
-// NewInvalidHashFunctionError creates an error for unsupported hash functions.
-func NewInvalidHashFunctionError(hashFn string) *Error {
-	return &Error{
-		Code:    ErrInvalidHashFunction,
-		Message: fmt.Sprintf("invalid hash function %q", hashFn),
 		Index:   -1,
 	}
 }

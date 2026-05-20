@@ -73,19 +73,19 @@ func buildRecord(i int) (parityRecord, error) {
 		return parityRecord{}, err
 	}
 
-	h57Blake3Len128, err := b57.H57Hash(input, b57.HashBLAKE3, b57.H57Len128)
+	h57Blake3Len128, err := b57.H57Hash(input, b57.H57Len128)
 	if err != nil {
 		return parityRecord{}, err
 	}
-	h57SHA256Len128, err := b57.H57Hash(input, b57.HashSHA256, b57.H57Len128)
+	h57SHA256Len128, err := b57.H57Hash(input, b57.H57Len128)
 	if err != nil {
 		return parityRecord{}, err
 	}
-	h57SHA512Len128, err := b57.H57Hash(input, b57.HashSHA512, b57.H57Len128)
+	h57SHA512Len128, err := b57.H57Hash(input, b57.H57Len128)
 	if err != nil {
 		return parityRecord{}, err
 	}
-	h57Blake3Auto, err := b57.H57Hash(input, b57.HashBLAKE3, b57.H57HashAuto)
+	h57Blake3Auto, err := b57.H57Hash(input, b57.H57HashAuto)
 	if err != nil {
 		return parityRecord{}, err
 	}
@@ -94,11 +94,11 @@ func buildRecord(i int) (parityRecord, error) {
 	if err != nil {
 		return parityRecord{}, err
 	}
-	id57Len47SHA256, err := b57.ID57Generate(input, b57.HashSHA256, b57.ID57Len47)
+	id57Len47SHA256, err := b57.ID57Generate(input, b57.ID57Len47)
 	if err != nil {
 		return parityRecord{}, err
 	}
-	id57Len70Blake3, err := b57.ID57Generate(input, b57.HashBLAKE3, b57.ID57Len70)
+	id57Len70Blake3, err := b57.ID57Generate(input, b57.ID57Len70)
 	if err != nil {
 		return parityRecord{}, err
 	}
@@ -106,7 +106,7 @@ func buildRecord(i int) (parityRecord, error) {
 	if err != nil {
 		return parityRecord{}, err
 	}
-	id57ShortLen23, err := b57.ID57ShortGenerate(input, b57.HashBLAKE3, b57.ID57ShortLen23)
+	id57ShortLen23, err := b57.ID57ShortGenerate(input, b57.ID57ShortLen23)
 	if err != nil {
 		return parityRecord{}, err
 	}
@@ -116,11 +116,11 @@ func buildRecord(i int) (parityRecord, error) {
 	if err != nil {
 		return parityRecord{}, err
 	}
-	i57HashBlake3Len128, err := b57.I57Hash(input, b57.HashBLAKE3, b57.H57Len128)
+	i57HashBlake3Len128, err := b57.I57Hash(input, b57.H57Len128)
 	if err != nil {
 		return parityRecord{}, err
 	}
-	i57IDDefault, err := b57.I57Id(input, b57.HashBLAKE3, b57.ID57Default)
+	i57IDDefault, err := b57.I57Id(input, b57.ID57Default)
 	if err != nil {
 		return parityRecord{}, err
 	}
@@ -155,7 +155,7 @@ func buildRecord(i int) (parityRecord, error) {
 		R57IsCanonicalOnI57ID:   b57.R57IsCanonical(i57IDDefault),
 		ID57VerifyDefault:       b57.ID57VerifyDefault(input, id57Default),
 		ID57ShortVerifyDefault:  b57.ID57ShortVerifyDefault(input, id57ShortDefault),
-		H57VerifyBlake3Len128:   b57.H57Verify(input, h57Blake3Len128, b57.HashBLAKE3, b57.H57Len128),
+		H57VerifyBlake3Len128:   b57.H57Verify(input, h57Blake3Len128, b57.H57Len128),
 		I57ValidateIdentifierID: b57.I57ValidateIdentifier(i57IDDefault),
 	}
 

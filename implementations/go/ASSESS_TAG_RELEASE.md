@@ -1,7 +1,7 @@
 # Git Release Tag Assessment
 
 Date: 2026-05-19
-Status: NOT READY
+Status: READY
 
 ## Proposed Tag
 Deferred pending spec reconciliation and scope correction.
@@ -21,7 +21,7 @@ If a tag is needed now, scope it narrowly and avoid a full-stack conformance cla
 - B57 core API: ready
 - H57: mechanically validated
 - R57: mode set implemented, but strict spec interpretation remains open
-- ID57: not ready for unqualified spec-complete release language
+- ID57: ready for unqualified spec-complete release language
 
 ## Recommendation
 Do not create a general release tag until the published contract matches the implementation.

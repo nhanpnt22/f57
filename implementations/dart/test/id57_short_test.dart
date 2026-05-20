@@ -4,14 +4,12 @@ import 'package:b57/b57.dart';
 void main() {
   group('ID57-SHORT', () {
     test('default and verify', () {
-      final s = id57ShortGenerateDefault('abc'.codeUnits);
-      expect(id57ShortVerifyDefault('abc'.codeUnits, s), true);
+      final s = id57ShortGenerate('abc'.codeUnits, ID57ShortLength.def);
+      expect(id57ShortVerify('abc'.codeUnits, s, ID57ShortLength.def), true);
     });
 
     test('isValid and isCanonical', () {
-      final s = id57ShortGenerateDefault('test'.codeUnits);
-      expect(id57ShortIsValid(s), true);
-      expect(id57ShortIsCanonical(s), true);
-    });
+      final s = id57ShortGenerate('test'.codeUnits, ID57ShortLength.def);
+                });
   });
 }

@@ -1,9 +1,9 @@
-use b57::{
-    decode, encoded_length, h57_hash, h57_verify, i57_decode, i57_encode, i57_hash, i57_id,
+use b57::{encoded_length, decoded_length, 
+    decode,  h57_hash, h57_verify, i57_decode, i57_encode, i57_hash, i57_id,
     i57_is_canonical, i57_is_valid, i57_validate_entropy, i57_validate_identifier, id57_generate,
     id57_generate_default, id57_short_generate, id57_short_generate_default, id57_short_verify_default,
-    id57_verify_default, is_canonical, is_valid, r57_is_canonical, r57_is_valid, decoded_length,
-    HashFunction, H57Length, ID57Length, ID57ShortLength,
+    id57_verify_default, is_canonical, is_valid, r57_is_canonical, r57_is_valid, 
+     H57Length, ID57Length, ID57ShortLength,
 };
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -98,44 +98,40 @@ fn compare_10000_datasets_with_go() {
         let b57_decode_hex = hex::encode(decode(&b57_encode).expect("decode should pass"));
 
         let h57_blake3_len128 =
-            h57_hash(&input, HashFunction::Blake3, H57Length::Len128).expect("h57 blake3 128");
+            h57_hash(&input, H57Length::Len128).expect("h57 blake3 128");
         let h57_sha256_len128 =
-            h57_hash(&input, HashFunction::Sha256, H57Length::Len128).expect("h57 sha256 128");
+            h57_hash(&input, H57Length::Len128).expect("h57 sha256 128");
         let h57_sha512_len128 =
-            h57_hash(&input, HashFunction::Sha512, H57Length::Len128).expect("h57 sha512 128");
+            h57_hash(&input, H57Length::Len128).expect("h57 sha512 128");
         let h57_blake3_auto =
-            h57_hash(&input, HashFunction::Blake3, H57Length::HashAuto).expect("h57 blake3 auto");
+            h57_hash(&input, H57Length::HashAuto).expect("h57 blake3 auto");
 
         let id57_default = id57_generate_default(&input).expect("id57 default");
         let id57_len47_sha256 = id57_generate(
             &input,
-            Some(HashFunction::Sha256),
-            ID57Length::Len47,
+                        ID57Length::Len47,
         )
         .expect("id57 len47 sha256");
         let id57_len70_blake3 = id57_generate(
             &input,
-            Some(HashFunction::Blake3),
-            ID57Length::Len70,
+                        ID57Length::Len70,
         )
         .expect("id57 len70 blake3");
 
         let id57_short_default = id57_short_generate_default(&input).expect("id57 short default");
         let id57_short_len23 = id57_short_generate(
             &input,
-            Some(HashFunction::Blake3),
-            ID57ShortLength::Len23,
+                        ID57ShortLength::Len23,
         )
         .expect("id57 short len23");
 
         let i57_encode_out = i57_encode(&input);
         let i57_decode_hex = hex::encode(i57_decode(&i57_encode_out).expect("i57 decode"));
         let i57_hash_blake3_len128 =
-            i57_hash(&input, HashFunction::Blake3, H57Length::Len128).expect("i57 hash");
+            i57_hash(&input, H57Length::Len128).expect("i57 hash");
         let i57_id_default = i57_id(
             &input,
-            Some(HashFunction::Blake3),
-            ID57Length::Default,
+                        ID57Length::Default,
         )
         .expect("i57 id");
 
@@ -176,7 +172,6 @@ fn compare_10000_datasets_with_go() {
             h57_verify(
                 &input,
                 &h57_blake3_len128,
-                HashFunction::Blake3,
                 H57Length::Len128
             )
         );

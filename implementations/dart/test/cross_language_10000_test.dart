@@ -17,23 +17,23 @@ void main() {
         final b57Decoded = decode(b57Enc);
         final b57DecodeHex = _bytesToHex(b57Decoded);
 
-        final h57Blake3Len128 = h57Hash(input, HashFunction.sha256, H57Length.len128);
-        final h57Sha256Len128 = h57Hash(input, HashFunction.sha256, H57Length.len128);
-        final h57Sha512Len128 = h57Hash(input, HashFunction.sha512, H57Length.len128);
-        final h57Blake3Auto = h57Hash(input, HashFunction.sha256, H57Length.hashAuto);
+        final h57Blake3Len128 = h57Hash(input, H57Length.len128);
+        final h57Sha256Len128 = h57Hash(input, H57Length.len128);
+        final h57Sha512Len128 = h57Hash(input, H57Length.len128);
+        final h57Blake3Auto = h57Hash(input, H57Length.hashAuto);
 
-        final id57Default = id57GenerateDefault(input);
-        final id57Len47Sha256 = id57Generate(input, HashFunction.sha256, ID57Length.len47);
-        final id57Len70Blake3 = id57Generate(input, HashFunction.sha256, ID57Length.len70);
+        final id57Default = id57Generate(input, ID57Length.def);
+        final id57Len47Sha256 = id57Generate(input, ID57Length.len47);
+        final id57Len70Blake3 = id57Generate(input, ID57Length.len70);
 
-        final id57ShortDefault = id57ShortGenerateDefault(input);
-        final id57ShortLen23 = id57ShortGenerate(input, HashFunction.sha256, ID57ShortLength.len23);
+        final id57ShortDefault = id57ShortGenerate(input, ID57ShortLength.def);
+        final id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.len23);
 
         final i57EncodeOut = i57Encode(input);
         final i57DecodeOut = i57Decode(i57EncodeOut);
         final i57DecodeHex = _bytesToHex(i57DecodeOut);
-        final i57HashBlake3Len128 = i57Hash(input, HashFunction.sha256, H57Length.len128);
-        final i57IdDefault = i57Id(input, HashFunction.sha256, ID57Length.def);
+        final i57HashBlake3Len128 = i57Hash(input, H57Length.len128);
+        final i57IdDefault = i57Id(input, ID57Length.def);
 
         dartRecords.add({
           'index': i,
@@ -59,15 +59,15 @@ void main() {
           'i57IdDefault': i57IdDefault,
           'i57IsValid': i57IsValid(i57EncodeOut),
           'i57IsCanonical': i57IsCanonical(i57EncodeOut),
-          'i57ValidateIdentifier': i57ValidateIdentifier(i57IdDefault),
-          'i57ValidateEntropy': i57ValidateEntropy(i57IdDefault),
+          
+          
           'r57IsValidOnI57Id': r57IsValid(i57IdDefault),
           'r57IsCanonicalOnI57Id': r57IsCanonical(i57IdDefault),
-          'id57VerifyDefault': id57VerifyDefault(input, id57Default),
-          'id57ShortVerifyDefault': id57ShortVerifyDefault(input, id57ShortDefault),
+          'id57VerifyDefault': id57Verify(input, id57Default, ID57Length.def),
+          'id57ShortVerifyDefault': id57ShortVerify(input, id57ShortDefault, ID57ShortLength.def),
           'h57VerifyBlake3Len128':
-              h57Verify(input, h57Blake3Len128, HashFunction.sha256, H57Length.len128),
-          'i57ValidateIdentifierId': i57ValidateIdentifier(i57IdDefault),
+              h57Verify(input, h57Blake3Len128, H57Length.len128),
+          
         });
       }
 

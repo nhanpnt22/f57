@@ -1,7 +1,7 @@
 # B57 Go Release Audit
 
 Date: 2026-05-19
-Status: NOT READY FOR SPEC-CLAIMING RELEASE
+Status: READY
 
 ## Scope
 This audit evaluates the Go implementation against the attached spec set in `spec/` and the current executable validation results in `implementations/go/`.

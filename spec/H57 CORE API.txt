@@ -245,7 +245,7 @@ Hash functions:
 
 Recommended:
 
-- BLAKE3 (preferred)
+- BLAKE3 (primary default)
 - SHA-256
 - SHA-512
 

@@ -3,7 +3,7 @@
 import os
 import secrets
 from enum import Enum
-from hashlib import sha256
+from blake3 import blake3
 from .b57 import encode
 
 
@@ -76,7 +76,7 @@ def _mix_entropy(*parts) -> bytes:
     for part_list in parts:
         for part in part_list:
             data += part
-    return sha256(data).digest()[:16]
+    return blake3(data).digest()[:16]
 
 
 def _encode_r57_128(raw: bytes) -> str:

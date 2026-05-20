@@ -1,4 +1,4 @@
-use b57::{encode, decode, id57_generate_default};
+use b57::{encoded_length, decoded_length, encode, decode, id57_generate_default};
 use std::time::Instant;
 
 fn main() {

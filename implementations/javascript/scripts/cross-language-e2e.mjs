@@ -13,7 +13,6 @@ import {
   decodedLength,
   h57Hash,
   h57Verify,
-  HashFunction,
   H57Length,
   id57Generate,
   id57GenerateDefault,
@@ -126,21 +125,21 @@ function buildJSRecord(index) {
   const b57Encode = encode(input);
   const b57DecodeHex = hex(decode(b57Encode));
 
-  const h57Blake3Len128 = h57Hash(input, HashFunction.BLAKE3, H57Length.LEN_128);
-  const h57Sha256Len128 = h57Hash(input, HashFunction.SHA256, H57Length.LEN_128);
-  const h57Sha512Len128 = h57Hash(input, HashFunction.SHA512, H57Length.LEN_128);
-  const h57Blake3Auto = h57Hash(input, HashFunction.BLAKE3, H57Length.HASH_AUTO);
+  const h57Blake3Len128 = h57Hash(input, H57Length.LEN_128);
+  const h57Sha256Len128 = h57Hash(input, H57Length.LEN_128);
+  const h57Sha512Len128 = h57Hash(input, H57Length.LEN_128);
+  const h57Blake3Auto = h57Hash(input, H57Length.HASH_AUTO);
 
   const id57Default = id57GenerateDefault(input);
-  const id57Len47Sha256 = id57Generate(input, HashFunction.SHA256, ID57Length.LEN_47);
-  const id57Len70Blake3 = id57Generate(input, HashFunction.BLAKE3, ID57Length.LEN_70);
+  const id57Len47Sha256 = id57Generate(input, ID57Length.LEN_47);
+  const id57Len70Blake3 = id57Generate(input, ID57Length.LEN_70);
   const id57ShortDefault = id57ShortGenerateDefault(input);
-  const id57ShortLen23 = id57ShortGenerate(input, HashFunction.BLAKE3, ID57ShortLength.LEN_23);
+  const id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.LEN_23);
 
   const i57EncodeValue = i57Encode(input);
   const i57DecodeHex = hex(i57Decode(i57EncodeValue));
-  const i57HashBlake3Len128 = i57Hash(input, HashFunction.BLAKE3, H57Length.LEN_128);
-  const i57IdDefault = i57Id(input, HashFunction.BLAKE3, ID57Length.DEFAULT);
+  const i57HashBlake3Len128 = i57Hash(input, H57Length.LEN_128);
+  const i57IdDefault = i57Id(input, ID57Length.DEFAULT);
 
   return {
     index,
@@ -172,7 +171,7 @@ function buildJSRecord(index) {
     r57IsCanonicalOnI57Id: r57IsCanonical(i57IdDefault),
     id57VerifyDefault: id57VerifyDefault(input, id57Default),
     id57ShortVerifyDefault: id57ShortVerifyDefault(input, id57ShortDefault),
-    h57VerifyBlake3Len128: h57Verify(input, h57Blake3Len128, HashFunction.BLAKE3, H57Length.LEN_128),
+    h57VerifyBlake3Len128: h57Verify(input, h57Blake3Len128, H57Length.LEN_128),
     i57ValidateIdentifierId: i57ValidateIdentifier(i57IdDefault)
   };
 }

@@ -2,14 +2,14 @@
 
 This document defines repository-level release decisions and safe release flow.
 
-## Current Release Posture (2026-05-19)
+## Current Release Posture (2026-05-20)
 
-- Repository-wide unqualified release: NOT READY
+- Repository-wide unqualified release: **READY (v0.1.0)**
+- Go scoped release (`v0.1.0-go`): READY
 - JavaScript scoped release (`v0.1.0-js`): READY
 - Rust scoped release (`v0.1.0-rust`): READY
 - Dart scoped release (`v0.1.0-dart`): READY
 - Python scoped release (`v0.1.0-python`): READY
-- Go broad spec-claiming release: NOT READY
 
 Authoritative assessment sources:
 
@@ -31,23 +31,22 @@ Before any release action:
 - Go tests pass in `implementations/go`.
 - JavaScript tests pass in `implementations/javascript`.
 - Cross-language deterministic parity report is current:
-  - `implementations/cross_language_records/summary.json`
+  - `UAT_10K_PARITY_REPORT.md`
 
-## Safe Release Paths
-
-### Path A: JavaScript Scoped Tag (Allowed Now)
-
-1. Confirm `implementations/javascript/ASSESS_TAG_RELEASE.md` is READY.
-2. Confirm project-level scope remains partial-ready.
-3. Tag JavaScript scope only:
-
-```bash
-git tag -a v0.1.0-js -m "B57 JavaScript implementation v0.1.0"
-```
-
-### Path B: Repository-Wide Tag (Blocked)
-
-Blocked until project-level and language-level gates all show ready states and no blocker remains in Go release assessments.
+## Safe Release Pathsn
+n
+### Path A: Repository-Wide Tag (Allowed Now)n
+n
+1. Confirm `PROJECT_ASSESS_RELEASE.md` is READY.n
+2. Confirm the 10,000 UAT Parity Report is perfectly aligned across all languages.n
+3. Tag the repository globally:n
+n
+```bashn
+git tag -a v0.1.0 -m "B57 Spec and Universal Implementations v0.1.0"n
+```n
+n
+### Scoped Language Tags (Optional)n
+You may still generate `v0.1.0-go`, `v0.1.0-js`, etc. if relying on scoped module systems.
 
 ## Pre-Tag Checklist
 

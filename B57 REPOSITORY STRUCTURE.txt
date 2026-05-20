@@ -5,54 +5,40 @@ B57 REPOSITORY STRUCTURE
 b57/
 │
 ├── README.md
+├── RELEASE.md
+├── PROJECT_ASSESS_COMMIT.md
+├── PROJECT_ASSESS_RELEASE.md
+├── UAT_10K_PARITY_REPORT.md  (10k Dataset Protocol Consistency)
+├── BENCHMARKS.md             (Performance Metrics)
+├── SECURITY.md               (Cryptographic Policy)
+├── CHANGELOG.md              (SemVer Tracking)
 ├── LICENSE
-├── CONTRIBUTING.md
+├── LICENSE.md
 │
 ├── spec/
-│   ├── draft-nhan-b57-v0.1.0.txt
-│   ├── draft-nhan-b57-v0.1.0.md
-│   └── CHANGELOG.md
+│   ├── B57S-v0.1.0.txt       (Master Unified Stack)
+│   ├── B57 CORE API.txt
+│   ├── H57 CORE API.txt
+│   ├── ID57 CORE API.txt
+│   ├── ID57-SHORT PROFILE.txt
+│   ├── R57 CORE API.txt
+│   └── I57 CORE API.txt
 │
-├── test-vectors/
-│   ├── encode.json
-│   ├── decode.json
-│   └── edge-cases.json
-│
-├── reference/
-│   ├── pseudocode.txt
-│   └── algorithm.txt
-│
-├── implementations/
-│   ├── go/
-│   ├── rust/
-│   ├── python/
-│   ├── javascript/
-│   └── c/
-│
-├── compliance/
-│   ├── test_runner/
-│   └── conformance.txt
-│
-├── docs/
-│   ├── rationale.txt
-│   ├── design-decisions.txt
-│   └── faq.txt
-│
-└── examples/
-    ├── basic_usage.txt
-    └── id57_integration.txt
+└── implementations/
+    ├── go/         (Native Go 1.20+)
+    ├── rust/       (Native Cargo Project)
+    ├── dart/       (Native Dart 3.0+)
+    ├── python/     (Native Python 3.10+)
+    └── javascript/ (Node.js ESM)
 
 ============================================================
 NOTES
 ============================================================
 
-- /spec is the source of truth (immutable spec versions)
-- /test-vectors ensures cross-language consistency
-- /reference provides implementation guidance
-- /implementations contains minimal, spec-faithful code
-- /compliance enforces correctness across implementations
-- /docs explains design and adoption rationale
-- /examples shows real-world usage patterns
+- /spec is the immutable source of truth for the 6-layer architecture (MINDU).
+- /implementations contains 5 natively compiled, mathematically identical implementations.
+- All languages enforce perfect cross-language determinism verified against 10,000 datasets.
+- Governance docs (PROJECT_ASSESS_*) track the global release state.
 
 ============================================================
 END

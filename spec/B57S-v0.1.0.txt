@@ -1,6 +1,6 @@
 ============================================================
 B57S SYSTEM SPECIFICATION (MINDU)
-B57 / H57 / ID57 Unified Stack
+B57 / H57 / ID57 / R57 / I57 Unified Stack
 Version: v0.1.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
@@ -11,11 +11,15 @@ ABSTRACT
 ============================================================
 
 B57S defines a unified, layered system for binary encoding,
-hash representation, and identifier generation based on:
+hash representation, random identification, and identifier 
+generation based on:
 
 - B57 (encoding layer)
 - H57 (hash representation layer)
 - ID57 (identifier profile)
+- ID57-SHORT (ultra-compact identifier profile)
+- R57 (random generation profile)
+- I57 (integration interface)
 
 It standardizes deterministic, ASCII-safe, canonical, and
 entropy-consistent transformations from raw input data to
@@ -37,12 +41,16 @@ may be updated, replaced, or obsoleted at any time.
 B57S defines a composable transformation stack:
 
  input → HASH → truncate → B57 → string
-
+ random → B57 → string
+ 
 Layer separation:
 
 - B57  → encoding primitive
 - H57  → full hash representation
-- ID57 → truncated identifier profile
+- ID57  → truncated identifier profile
+- ID57-SHORT → ultra-compact identifiers 
+- R57  → random identifier generation
+- I57  → consistent integration interface
 
 Goals:
 
@@ -50,6 +58,8 @@ Goals:
 - canonical representation
 - entropy preservation (B57, H57)
 - controlled entropy reduction (ID57)
+- secure random identifier generation (R57)
+- safe domain encapsulation (I57)
 - minimal and consistent API design
 
 ============================================================
@@ -102,6 +112,7 @@ Properties:
 Definition:
 
  ID57(x, L) = b57_encode(truncate_bytes(HASH(x), bits(L)))
+ ID57-SHORT(x, L) = ID57(x, L) for small L values.
 
 Properties:
 
@@ -110,22 +121,57 @@ Properties:
 - one-way transformation
 
 ------------------------------------------------------------
-3.4 Relationship
+3.4 R57 (Random Generation Profile)
 ------------------------------------------------------------
 
-- B57 is the foundation
-- H57 builds on B57
-- ID57 builds on H57
+ random_process → entropy_bytes → B57 → string
+
+Definition:
+
+ R57(mode) = b57_encode(generate_128bit_entropy(mode))
+
+Properties:
+
+- high collision resistance (128-bit)
+- versatile generation modes (CSPRNG, Timestamps, Hashing)
+- 22-character B57 outputs
+
+------------------------------------------------------------
+3.5 I57 (Integration Interface)
+------------------------------------------------------------
+
+ A unified programmatic boundary encapsulating all layers.
+ 
+ I57_encode(input_bytes) = B57(input_bytes)
+ I57_hash(input_bytes, hash_fn, length_enum) = H57(input_bytes)
+ I57_id(input_bytes, hash_fn, length_enum) = ID57(input_bytes, length_enum)
+ I57_random(mode_enum) = B57(random_bytes)
+
+Properties:
+
+- unifies B57, H57, R57, ID57 calls
+- acts as the primary developer interface
+
+------------------------------------------------------------
+3.6 Relationship
+------------------------------------------------------------
+
+- B57 is the foundation governing character mapping
+- H57 builds on B57 for full hashing
+- ID57 builds on H57 for identifiers
+- R57 builds on B57 using 128-bit constraints
+- I57 exposes B57, H57, ID57, and R57 capabilities natively
 
 Constraint:
 
  ID57 ⊂ H57
+ I57 ⊃ (B57, H57, ID57, R57)
 
 ============================================================
 4. CORE TRANSFORMATIONS
 ============================================================
 
-4.1 Encoding:
+4.1 Encoding (B57):
 
  b57_encode(bytes) → string
  b57_decode(string) → bytes
@@ -140,6 +186,18 @@ Constraint:
  effective_bytes = truncate_bytes(hash_bytes, bits(L))
  id57            = b57_encode(effective_bytes)
 
+4.4 Random Generation (R57):
+
+ random_bytes    = _generate_entropy(mode, 16)
+ r57             = b57_encode(random_bytes)
+
+4.5 Ecosystem Integration (I57):
+ 
+ b57_encode_alias  = i57_encode(input_bytes)
+ h57_hash_alias    = i57_hash(input_bytes, hash_fn, length_enum)
+ id57_gen_alias    = i57_id(input_bytes, hash_fn, length_enum)
+ rand_alias        = i57_random(mode_enum)
+
 ============================================================
 5. HASH FUNCTION MODEL
 ============================================================
@@ -153,7 +211,7 @@ Hash functions:
 
 Recommended:
 
-- BLAKE3 (primary)
+- BLAKE3 (primary default)
 - SHA-256
 - SHA-512
 
@@ -334,6 +392,8 @@ B57S defines a composable transformation stack:
  B57  → encoding layer
  H57  → full hash representation
  ID57 → compact identifier profile
+ R57  → random generation profile
+ I57  → unified integration interface
 
 Each layer serves a distinct purpose and MUST be used
 according to its design constraints.
@@ -404,7 +464,43 @@ Properties:
 - human-readable
 
 ------------------------------------------------------------
-15.4 SYSTEM-LEVEL USE (B57S STACK)
+15.4 R57 (RANDOM GENERATION PROFILE)
+------------------------------------------------------------
+
+R57 provides strongly random, un-guessable 128-bit identifiers
+mapped safely into the B57 namespace.
+
+Typical use cases:
+
+- session tokens
+- user authentication boundaries
+- UUIDv4 alternatives
+- dynamic, short-lived, single-use keys
+
+Properties:
+
+- secure randomness
+- 128-bit collision resistance bound (minimum)
+- human-readable, safe strings
+
+------------------------------------------------------------
+15.5 I57 (INTEGRATION INTERFACE)
+------------------------------------------------------------
+
+I57 provides the outer envelope abstraction to decouple application
+logic from B57's internal strict primitives formatting.
+
+Typical use cases:
+
+- simplified developer SDK consumption
+- strict validation of already-generated H57, ID57 values
+
+Properties:
+
+- simplifies and standardizes the API
+
+------------------------------------------------------------
+15.6 SYSTEM-LEVEL USE (B57S STACK)
 ------------------------------------------------------------
 
 B57S enables full pipeline composition:
@@ -428,8 +524,12 @@ Typical system patterns:
    compare H57 for exact match
    index via ID57 for efficiency
 
+4. Novel Random Objects:
+   
+   obj_key = R57(mode=CSPRNG)
+
 ------------------------------------------------------------
-15.5 SECURITY-SENSITIVE VS NON-SENSITIVE USE
+15.7 SECURITY-SENSITIVE VS NON-SENSITIVE USE
 ------------------------------------------------------------
 
 Security-sensitive:
@@ -437,6 +537,7 @@ Security-sensitive:
 - MUST use ≥ ID57_LEN_128
 - SHOULD use H57 when full entropy is required
 - MUST use strong hash functions (e.g., BLAKE3)
+- MUST use R57 CSPRNG mode if deterministic generation is omitted
 
 Non-sensitive / UX-focused:
 
@@ -444,20 +545,19 @@ Non-sensitive / UX-focused:
 - MUST implement collision handling
 
 ------------------------------------------------------------
-15.6 NON-GOALS
+15.8 NON-GOALS
 ------------------------------------------------------------
 
 B57S MUST NOT be used for:
 
 - encryption
 - reversible encoding of sensitive data
-- authentication tokens
-- random identifier generation
+- explicit symmetric/asymmetric cryptosystems
 
 B57S does not replace cryptographic primitives.
 
 ------------------------------------------------------------
-15.7 DESIGN SUMMARY
+15.9 DESIGN SUMMARY
 ------------------------------------------------------------
 
 Layer selection:
@@ -465,9 +565,11 @@ Layer selection:
 - B57  → exact binary representation
 - H57  → full hash integrity
 - ID57 → compact identifiers
+- R57  → random identifiers
+- I57  → outer interface logic
 
 ============================================================
-15.X ID57 SHORT IDENTIFIERS (ULTRA-COMPACT MODE)
+16. ID57-SHORT (ULTRA-COMPACT IDENTIFIERS)
 ============================================================
 
 ID57 supports ultra-compact identifiers starting from
@@ -489,7 +591,7 @@ Typical lengths:
 - 8 chars → ~47-bit
 
 ------------------------------------------------------------
-15.X.1 DESIGN INTENT
+16.1 DESIGN INTENT
 ------------------------------------------------------------
 
 Ultra-compact identifiers prioritize:
@@ -502,7 +604,7 @@ Ultra-compact identifiers prioritize:
 They are NOT designed for strong uniqueness guarantees.
 
 ------------------------------------------------------------
-15.X.2 COLLISION CHARACTERISTICS
+16.2 COLLISION CHARACTERISTICS
 ------------------------------------------------------------
 
 Short identifiers have limited entropy and higher collision
@@ -517,7 +619,7 @@ Approximate practical limits:
 Values are approximate and depend on acceptable risk.
 
 ------------------------------------------------------------
-15.X.3 REQUIRED SAFETY CONSTRAINTS
+16.3 REQUIRED SAFETY CONSTRAINTS
 ------------------------------------------------------------
 
 Implementations using ultra-compact IDs MUST:
@@ -529,7 +631,7 @@ Implementations using ultra-compact IDs MUST:
 - treat identifiers as non-secure
 
 ------------------------------------------------------------
-15.X.4 RECOMMENDED PATTERNS
+16.4 RECOMMENDED PATTERNS
 ------------------------------------------------------------
 
 Pattern 1: Short + Full Mapping
@@ -560,7 +662,7 @@ Pattern 3: Collision-Aware Allocation
      break
 
 ------------------------------------------------------------
-15.X.5 QR CODE USAGE
+16.5 QR CODE USAGE
 ------------------------------------------------------------
 
 ID57 short identifiers are well-suited for QR encoding:
@@ -575,7 +677,7 @@ Recommended:
 - ≥12 chars → persistent identifiers
 
 ------------------------------------------------------------
-15.X.6 PROHIBITED USAGE
+16.6 PROHIBITED USAGE
 ------------------------------------------------------------
 
 Ultra-compact ID57 MUST NOT be used for:
@@ -587,7 +689,7 @@ Ultra-compact ID57 MUST NOT be used for:
 - cryptographic identity
 
 ------------------------------------------------------------
-15.X.7 ESCALATION RULE
+16.7 ESCALATION RULE
 ------------------------------------------------------------
 
 Systems MUST increase length when:
@@ -601,7 +703,7 @@ Recommended progression:
  4 → 8 → 12 → 16 → 22 chars
 
 ------------------------------------------------------------
-15.X.8 DESIGN SUMMARY
+16.8 DESIGN SUMMARY
 ------------------------------------------------------------
 
 Ultra-compact ID57 identifiers are:
@@ -617,7 +719,7 @@ They MUST be treated as:
 - not security primitives
 
 ============================================================
-AUTHOR
+17. AUTHOR
 ============================================================
 
  Pham Nhan

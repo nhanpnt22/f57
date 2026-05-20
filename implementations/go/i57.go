@@ -16,8 +16,8 @@ func I57Decode(input string) ([]byte, error) {
 
 // I57Hash generates a B57-encoded hash using the specified hash function and length.
 // It proxies directly to H57Hash.
-func I57Hash(input []byte, hashFn HashFunction, length H57Length) (string, error) {
-	return H57Hash(input, hashFn, length)
+func I57Hash(input []byte, length H57Length) (string, error) {
+	return H57Hash(input, length)
 }
 
 // I57Random generates a random B57 string according to the specified mode.
@@ -28,8 +28,8 @@ func I57Random(mode R57Mode) (string, error) {
 
 // I57Id generates an identifier by hashing the input and truncating to the specified ID length.
 // It proxies directly to ID57Generate.
-func I57Id(input []byte, hashFn HashFunction, length ID57Length) (string, error) {
-	return ID57Generate(input, hashFn, length)
+func I57Id(input []byte, length ID57Length) (string, error) {
+	return ID57Generate(input, length)
 }
 
 // I57IsValid checks if a string is a valid B57 value under integration-layer rules.

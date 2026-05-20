@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { encode, decode } from './b57.js';
-import { HashFunction, H57Length, h57Hash, h57Verify } from './h57.js';
+import { H57Length, h57Hash, h57Verify } from './h57.js';
 import { ID57Length, id57Generate, id57Verify } from './id57.js';
 import { ID57ShortLength, id57ShortGenerate, id57ShortVerify } from './id57_short.js';
 
@@ -19,13 +19,13 @@ test('e2e b57-h57-id57-id57short pipelines', () => {
     const b57 = encode(input);
     assert.deepEqual(Array.from(decode(b57)), Array.from(input));
 
-    const h57 = h57Hash(input, HashFunction.BLAKE3, H57Length.LEN_128);
-    assert.equal(h57Verify(input, h57, HashFunction.BLAKE3, H57Length.LEN_128), true);
+    const h57 = h57Hash(input, H57Length.LEN_128);
+    assert.equal(h57Verify(input, h57, H57Length.LEN_128), true);
 
-    const id57 = id57Generate(input, HashFunction.BLAKE3, ID57Length.LEN_128);
-    assert.equal(id57Verify(input, HashFunction.BLAKE3, id57, ID57Length.LEN_128), true);
+    const id57 = id57Generate(input, ID57Length.LEN_128);
+    assert.equal(id57Verify(input, id57, ID57Length.LEN_128), true);
 
-    const short = id57ShortGenerate(input, HashFunction.BLAKE3, ID57ShortLength.LEN_47);
-    assert.equal(id57ShortVerify(input, HashFunction.BLAKE3, short, ID57ShortLength.LEN_47), true);
+    const short = id57ShortGenerate(input, ID57ShortLength.LEN_47);
+    assert.equal(id57ShortVerify(input, short, ID57ShortLength.LEN_47), true);
   }
 });

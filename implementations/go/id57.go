@@ -43,9 +43,7 @@ var id57BitsByLength = map[ID57Length]int{
 
 // ID57Generate constructs canonical ID57 representation via one-way transformation:
 // HASH(input) -> byte-level prefix truncation -> B57 encoding.
-//
-// If hashFn is empty, HashBLAKE3 is used as the default hash function.
-func ID57Generate(input []byte, hashFn HashFunction, length ID57Length) (string, error) {
+func ID57Generate(input []byte, length ID57Length) (string, error) {
 	effectiveLength, err := resolveID57Length(length)
 	if err != nil {
 		return "", err
@@ -54,11 +52,7 @@ func ID57Generate(input []byte, hashFn HashFunction, length ID57Length) (string,
 	bits := id57BitsByLength[effectiveLength]
 	requestedBytes := (bits + 7) / 8
 
-	hashBytes, err := computeID57HashForLength(input, hashFn, requestedBytes)
-	if err != nil {
-		return "", err
-	}
-
+	hashBytes := computeHashBLAKE3XOF(input, requestedBytes)
 	effective := make([]byte, requestedBytes)
 	copy(effective, hashBytes[:requestedBytes])
 	maskExcessBits(effective, bits)
@@ -68,12 +62,12 @@ func ID57Generate(input []byte, hashFn HashFunction, length ID57Length) (string,
 
 // ID57GenerateDefault constructs canonical ID57 using HashBLAKE3 + ID57Default (ID57Len128).
 func ID57GenerateDefault(input []byte) (string, error) {
-	return ID57Generate(input, HashBLAKE3, ID57Default)
+	return ID57Generate(input, ID57Default)
 }
 
 // ID57Verify verifies that id57String matches ID57Generate(input, hashFn, length).
-func ID57Verify(input []byte, hashFn HashFunction, id57String string, length ID57Length) bool {
-	expected, err := ID57Generate(input, hashFn, length)
+func ID57Verify(input []byte, id57String string, length ID57Length) bool {
+	expected, err := ID57Generate(input, length)
 	if err != nil {
 		return false
 	}
@@ -82,7 +76,7 @@ func ID57Verify(input []byte, hashFn HashFunction, id57String string, length ID5
 
 // ID57VerifyDefault verifies that id57String matches ID57GenerateDefault(input).
 func ID57VerifyDefault(input []byte, id57String string) bool {
-	return ID57Verify(input, HashBLAKE3, id57String, ID57Default)
+	return ID57Verify(input, id57String, ID57Default)
 }
 
 // ID57IsValid checks whether a candidate ID57 string is valid per B57 rules.
@@ -105,27 +99,6 @@ func resolveID57Length(length ID57Length) (ID57Length, error) {
 	}
 
 	return length, nil
-}
-
-func computeID57HashForLength(input []byte, hashFn HashFunction, requestedBytes int) ([]byte, error) {
-	if hashFn == "" {
-		hashFn = HashBLAKE3
-	}
-
-	if hashFn == HashBLAKE3 {
-		return computeHashBLAKE3XOF(input, requestedBytes), nil
-	}
-
-	hashBytes, err := computeHash(input, hashFn)
-	if err != nil {
-		return nil, err
-	}
-
-	if requestedBytes > len(hashBytes) {
-		return nil, NewEntropyExceededError(requestedBytes, len(hashBytes))
-	}
-
-	return hashBytes, nil
 }
 
 func maskExcessBits(b []byte, bitLength int) {

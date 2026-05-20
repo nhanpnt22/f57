@@ -1,22 +1,7 @@
 package b57
 
 import (
-	"crypto/sha256"
-	"crypto/sha512"
-
 	"lukechampine.com/blake3"
-)
-
-// HashFunction identifies supported cryptographic hash functions for H57.
-type HashFunction string
-
-const (
-	// HashBLAKE3 uses BLAKE3 (32-byte / 256-bit default, XOF for variable lengths - PREFERRED).
-	HashBLAKE3 HashFunction = "blake3"
-	// HashSHA256 uses SHA-256 (32-byte / 256-bit output).
-	HashSHA256 HashFunction = "sha256"
-	// HashSHA512 uses SHA-512 (64-byte / 512-bit output).
-	HashSHA512 HashFunction = "sha512"
 )
 
 // H57Length represents controlled H57 output length modes.
@@ -72,44 +57,27 @@ var h57BitsByLength = map[H57Length]int{
 // Truncation is applied to raw hash bytes before B57 encoding.
 // BLAKE3 (preferred) supports all LENGTH ENUMERATION values via XOF.
 // SHA-512 also supports all LENGTH ENUMERATION values via its 64-byte output.
-func H57Hash(input []byte, hashFn HashFunction, length H57Length) (string, error) {
+func H57Hash(input []byte, length H57Length) (string, error) {
 	var hashBytes []byte
-	var err error
-
-	// Special handling for BLAKE3 XOF to support all length enums
-	if hashFn == HashBLAKE3 {
-		if length == H57HashAuto {
-			// Default 32 bytes (256-bit) for BLAKE3
-			sum := blake3.Sum256(input)
-			hashBytes = sum[:]
-		} else {
-			bits, ok := h57BitsByLength[length]
-			if !ok {
-				return "", NewInvalidLengthEnumError(int(length))
-			}
-			requestedBytes := (bits + 7) / 8
-			hashBytes = computeHashBLAKE3XOF(input, requestedBytes)
-		}
+	if length == H57HashAuto {
+		// Default 32 bytes (256-bit) for BLAKE3
+		sum := blake3.Sum256(input)
+		hashBytes = sum[:]
 	} else {
-		// Standard path for SHA-256/SHA-512
-		hashBytes, err = computeHash(input, hashFn)
-		if err != nil {
-			return "", err
+		bits, ok := h57BitsByLength[length]
+		if !ok {
+			return "", NewInvalidLengthEnumError(int(length))
 		}
-
-		effective, err := selectEffectiveHashBytes(hashBytes, length)
-		if err != nil {
-			return "", err
-		}
-		hashBytes = effective
+		requestedBytes := (bits + 7) / 8
+		hashBytes = computeHashBLAKE3XOF(input, requestedBytes)
 	}
 
 	return Encode(hashBytes), nil
 }
 
 // H57Verify verifies that h57String matches H57Hash(input, hashFn, length).
-func H57Verify(input []byte, h57String string, hashFn HashFunction, length H57Length) bool {
-	expected, err := H57Hash(input, hashFn, length)
+func H57Verify(input []byte, h57String string, length H57Length) bool {
+	expected, err := H57Hash(input, length)
 	if err != nil {
 		return false
 	}
@@ -124,23 +92,6 @@ func H57IsValid(h57String string) bool {
 // H57IsCanonical checks canonical form using B57 canonical rules.
 func H57IsCanonical(h57String string) bool {
 	return IsCanonical(h57String)
-}
-
-func computeHash(input []byte, hashFn HashFunction) ([]byte, error) {
-	switch hashFn {
-	case HashSHA256:
-		sum := sha256.Sum256(input)
-		return sum[:], nil
-	case HashSHA512:
-		sum := sha512.Sum512(input)
-		return sum[:], nil
-	case HashBLAKE3:
-		// BLAKE3 in auto mode: return 32 bytes (256-bit default)
-		sum := blake3.Sum256(input)
-		return sum[:], nil
-	default:
-		return nil, NewInvalidHashFunctionError(string(hashFn))
-	}
 }
 
 // computeHashBLAKE3XOF computes variable-length BLAKE3 output using its native Sum256/Sum512 functions.

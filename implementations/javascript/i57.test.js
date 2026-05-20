@@ -23,7 +23,7 @@ test('i57Encode and i57Decode', () => {
 
 test('i57Hash', () => {
   const input = new Uint8Array([1, 2, 3]);
-  const res = i57Hash(input, 'blake3', 47);
+  const res = i57Hash(input, 47);
   assert.equal(typeof res, 'string');
 });
 
@@ -34,7 +34,7 @@ test('i57Random', () => {
 
 test('i57Id', () => {
   const input = new Uint8Array([1, 2, 3]);
-  const res = i57Id(input, 'blake3', 47);
+  const res = i57Id(input, 47);
   assert.equal(typeof res, 'string');
 });
 

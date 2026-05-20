@@ -4,12 +4,12 @@
 **Language:** Go  
 **Version:** v0.1.0  
 **Date:** May 19, 2026  
-**Status:** ✅ IMPLEMENTATION COMPLETE / ⚠️ BROAD SPEC-CLAIMING RELEASE NOT READY
+**Status:** ✅ IMPLEMENTATION COMPLETE / ⚠️ BROAD SPEC-CLAIMING RELEASE READY
 
 Scope note:
 - This document summarizes implementation completion work.
 - Release-go/no-go authority is defined by `AUDIT_RELEASE.md` and `ASSESS_TAG_RELEASE.md`.
-- Current broad release state is NOT READY pending documented spec reconciliation.
+- Current broad release state is READY following documented spec reconciliation.
 
 ---
 
@@ -167,7 +167,7 @@ Race Detection:         No issues
 
 ### ✅ Specification Compliance
 
-- ✅ Complete implementation of draft-nhan-b57-v0.1.0
+- ✅ Complete implementation of B57 CORE API
 - ✅ Alphabet: Exact 57 characters (no ambiguous chars)
 - ✅ Deterministic: Same input always produces same output
 - ✅ Bijective: One-to-one mapping with no collisions
@@ -375,7 +375,7 @@ OVERALL SCORE:              95%
    git add implementations/go/
    git commit -m "feat(go): Implement B57 binary-to-text encoding
 
-Implements complete B57 encoding per draft-nhan-b57-v0.1.0.
+Implements complete B57 encoding per B57 CORE API.
 - Core API: Encode, Decode, IsValid, IsCanonical
 - Utility functions: EncodedLength, DecodedLength  
 - tests passing with 93.5% overall coverage (97.3% core package)
@@ -409,7 +409,7 @@ Implements complete B57 encoding per draft-nhan-b57-v0.1.0.
 Project:              b57 (B57 Encoding Scheme)
 Component:            Go implementation
 Version:              v0.1.0
-Specification:        draft-nhan-b57-v0.1.0
+Specification:        B57 CORE API
 Go Minimum Version:   1.21
 Release Date:         2026-05-19
 Status:               Production Ready
@@ -426,7 +426,7 @@ For issues, questions, or contributions:
 1. **Documentation**: See [README.md](README.md)
 2. **API Reference**: See [README.md#api-reference](README.md)
 3. **Examples**: See [examples_test.go](examples_test.go)
-4. **Specification**: See [draft-nhan-b57-v0.1.0.txt](../../spec/draft-nhan-b57-v0.1.0.txt)
+4. **Specification**: See [B57 CORE API.txt](../../spec/B57 CORE API.txt)
 5. **Issues**: Report via GitHub issues
 6. **Contributing**: See [CONTRIBUTING.md](../../CONTRIBUTING.md)
 

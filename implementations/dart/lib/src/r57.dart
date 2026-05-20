@@ -2,7 +2,7 @@ library b57_r57;
 
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:crypto/crypto.dart';
+import 'package:blake3_dart/blake3_dart.dart';
 import 'b57.dart' as b57;
 
 enum R57Mode {
@@ -65,8 +65,7 @@ List<int> _mixEntropy(List<List<int>> parts) {
   for (final part in parts) {
     data.addAll(part);
   }
-  final hash = sha256.convert(data).bytes.toList();
-  return hash.sublist(0, 16);
+  return blake3(Uint8List.fromList(data), 16).toList();
 }
 
 String _encodeR57_128(List<int> raw) {

@@ -1,6 +1,6 @@
 use crate::b57::{decode, encode, is_canonical, is_valid};
 use crate::errors::B57Error;
-use crate::h57::{h57_hash, HashFunction, H57Length};
+use crate::h57::{h57_hash, H57Length};
 use crate::id57::{id57_generate, ID57Length};
 use crate::r57::{r57_generate, R57Mode};
 
@@ -12,8 +12,8 @@ pub fn i57_decode(input: &str) -> Result<Vec<u8>, B57Error> {
     decode(input)
 }
 
-pub fn i57_hash(input: &[u8], hash_fn: HashFunction, length: H57Length) -> Result<String, B57Error> {
-    h57_hash(input, hash_fn, length)
+pub fn i57_hash(input: &[u8], length: H57Length) -> Result<String, B57Error> {
+    h57_hash(input, length)
 }
 
 pub fn i57_random(mode: R57Mode) -> Result<String, B57Error> {
@@ -22,10 +22,9 @@ pub fn i57_random(mode: R57Mode) -> Result<String, B57Error> {
 
 pub fn i57_id(
     input: &[u8],
-    hash_fn: Option<HashFunction>,
     length: ID57Length,
 ) -> Result<String, B57Error> {
-    id57_generate(input, hash_fn, length)
+    id57_generate(input, length)
 }
 
 pub fn i57_is_valid(input: &str) -> bool {
@@ -113,10 +112,10 @@ mod tests {
 
     #[test]
     fn hash_and_id() {
-        let h = i57_hash(b"x", HashFunction::Sha256, H57Length::Len128).unwrap();
+        let h = i57_hash(b"x", H57Length::Len128).unwrap();
         assert!(!h.is_empty());
 
-        let id = i57_id(b"x", Some(HashFunction::Sha256), ID57Length::Len128).unwrap();
+        let id = i57_id(b"x", ID57Length::Len128).unwrap();
         assert!(!id.is_empty());
     }
 

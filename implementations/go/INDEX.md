@@ -248,7 +248,7 @@ Failure Rate:         0%
 
 ### Specification Compliance
 
-- ✅ draft-nhan-b57-v0.1.0 specification
+- ✅ B57 CORE API specification
 - ✅ B57 Core API (MINDU)
 - ✅ All mathematical invariants verified
 - ✅ Complete error handling
@@ -408,7 +408,7 @@ Failure Rate:         0%
 
 ### Specifications
 
-- [B57 Specification](../../spec/draft-nhan-b57-v0.1.0.txt)
+- [B57 Specification](../../spec/B57 CORE API.txt)
 - [B57 Core API](../../spec/B57%20CORE%20API%20(MINDU).txt)
 - [Implementation Guide](../../reference/algorithm.txt)
 

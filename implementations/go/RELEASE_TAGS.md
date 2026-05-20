@@ -27,7 +27,7 @@ Project:     b57 (B57 encoding)
 Language:    Go
 Component:   Go implementation
 Version:     v0.1.0-go
-Spec:        draft-nhan-b57-v0.1.0
+Spec:        B57 CORE API
 Go Min:      1.21
 Release Type: Initial release (Alpha)
 Stability:   Stable API
@@ -124,7 +124,7 @@ This is the initial release of the B57 binary-to-text encoding for Go.
 
 ## Specification Compliance
 
-- ✅ Implements: draft-nhan-b57-v0.1.0
+- ✅ Implements: B57 CORE API
 - ✅ Follows: B57 Core API (MINDU)
 - ✅ All invariants verified
 - ✅ Cross-platform tested
@@ -180,7 +180,7 @@ None for v0.1.0 stable release.
 
 ## Links
 
-- [Specification](spec/draft-nhan-b57-v0.1.0.txt)
+- [Specification](spec/B57 CORE API.txt)
 - [Core API](spec/B57%20CORE%20API%20(MINDU).txt)
 - [Implementation README](implementations/go/README.md)
 ```
@@ -202,7 +202,7 @@ git tag -a v0.1.0-go \
 - Go 1.21+ compatible
 - Production ready
 
-Ref: draft-nhan-b57-v0.1.0"
+Ref: B57 CORE API"
 
 # Or with signing (recommended for releases)
 git tag -s v0.1.0-go \
@@ -214,7 +214,7 @@ git tag -s v0.1.0-go \
 - Go 1.21+ compatible
 - Production ready
 
-Ref: draft-nhan-b57-v0.1.0"
+Ref: B57 CORE API"
 ```
 
 ### ✅ Push Tag
@@ -334,7 +334,7 @@ B57 is a binary-to-text encoding scheme providing:
 https://github.com/aco/b57
 
 **Specification:**
-draft-nhan-b57-v0.1.0
+B57 CORE API
 
 **Status:**
 ✅ Stable - Recommended for production use
@@ -424,7 +424,7 @@ git log -1 --format="%H %s"
 git tag -a v0.1.0-go \
   -m "B57 Go v0.1.0 - Initial release
 
-Implements complete B57 encoding per draft-nhan-b57-v0.1.0.
+Implements complete B57 encoding per B57 CORE API.
 Tests passing, 93.5% overall coverage (97.3% core package), production ready."
 
 # Verify tag

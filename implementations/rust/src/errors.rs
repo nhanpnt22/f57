@@ -6,7 +6,6 @@ pub enum ErrorCode {
     NonCanonical,
     InvalidLengthEnum,
     EntropyExceeded,
-    InvalidHashFunction,
     InsufficientEntropy,
     InvalidMode,
     InvalidInput,
@@ -51,14 +50,6 @@ impl B57Error {
                 "requested entropy exceeds hash output ({} bytes requested, {} available)",
                 requested_bytes, available_bytes
             ),
-            index: None,
-        }
-    }
-
-    pub fn invalid_hash_function(hash_fn: &str) -> Self {
-        Self {
-            code: ErrorCode::InvalidHashFunction,
-            message: format!("invalid hash function \"{}\"", hash_fn),
             index: None,
         }
     }

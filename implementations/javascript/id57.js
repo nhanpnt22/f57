@@ -1,87 +1,41 @@
 import { encode, isCanonical, isValid } from './b57.js';
-import {
-  computeHash,
-  computeHashBLAKE3XOF,
-  HashFunction
-} from './h57.js';
-import { newEntropyExceededError, newInvalidLengthEnumError } from './errors.js';
+import { computeHashBLAKE3XOF } from './h57.js';
+import { newInvalidLengthEnumError } from './errors.js';
 
 export const ID57Length = Object.freeze({
   DEFAULT: 0,
-  LEN_8: 8,
-  LEN_16: 16,
-  LEN_23: 23,
-  LEN_29: 29,
-  LEN_32: 32,
-  LEN_47: 47,
-  LEN_64: 64,
-  LEN_70: 70,
-  LEN_93: 93,
-  LEN_128: 128,
-  LEN_186: 186,
-  LEN_256: 256,
-  LEN_373: 373,
-  LEN_512: 512
+  LEN_8: 8, LEN_16: 16, LEN_23: 23, LEN_29: 29, LEN_32: 32, LEN_47: 47,
+  LEN_64: 64, LEN_70: 70, LEN_93: 93, LEN_128: 128, LEN_186: 186,
+  LEN_256: 256, LEN_373: 373, LEN_512: 512
 });
 
 export const id57BitsByLength = new Map([
-  [ID57Length.LEN_8, 8],
-  [ID57Length.LEN_16, 16],
-  [ID57Length.LEN_23, 23],
-  [ID57Length.LEN_29, 29],
-  [ID57Length.LEN_32, 32],
-  [ID57Length.LEN_47, 47],
-  [ID57Length.LEN_64, 64],
-  [ID57Length.LEN_70, 70],
-  [ID57Length.LEN_93, 93],
-  [ID57Length.LEN_128, 128],
-  [ID57Length.LEN_186, 186],
-  [ID57Length.LEN_256, 256],
-  [ID57Length.LEN_373, 373],
-  [ID57Length.LEN_512, 512]
+  [ID57Length.LEN_8, 8], [ID57Length.LEN_16, 16], [ID57Length.LEN_23, 23], [ID57Length.LEN_29, 29],
+  [ID57Length.LEN_32, 32], [ID57Length.LEN_47, 47], [ID57Length.LEN_64, 64], [ID57Length.LEN_70, 70],
+  [ID57Length.LEN_93, 93], [ID57Length.LEN_128, 128], [ID57Length.LEN_186, 186],
+  [ID57Length.LEN_256, 256], [ID57Length.LEN_373, 373], [ID57Length.LEN_512, 512]
 ]);
 
 export function resolveID57Length(length) {
-  if (length === ID57Length.DEFAULT) {
-    return ID57Length.LEN_128;
-  }
-  if (!id57BitsByLength.has(length)) {
-    throw newInvalidLengthEnumError(length);
-  }
+  if (length === ID57Length.DEFAULT) return ID57Length.LEN_128;
+  if (!id57BitsByLength.has(length)) throw newInvalidLengthEnumError(length);
   return length;
 }
 
-export function computeID57HashForLength(input, hashFn, requestedBytes) {
-  const effectiveHashFn = hashFn || HashFunction.BLAKE3;
-  if (effectiveHashFn === HashFunction.BLAKE3) {
-    return computeHashBLAKE3XOF(input, requestedBytes);
-  }
-
-  const hashBytes = computeHash(input, effectiveHashFn);
-  if (requestedBytes > hashBytes.length) {
-    throw newEntropyExceededError(requestedBytes, hashBytes.length);
-  }
-  return hashBytes;
-}
-
 export function maskExcessBits(bytes, bitLength) {
-  if (bytes.length === 0) {
-    return;
-  }
+  if (bytes.length === 0) return;
   const excessBits = bytes.length * 8 - bitLength;
-  if (excessBits <= 0) {
-    return;
-  }
+  if (excessBits <= 0) return;
   const mask = (0xff << excessBits) & 0xff;
   bytes[bytes.length - 1] &= mask;
 }
 
-export function id57Generate(input, hashFn, length) {
+export function id57Generate(input, length = ID57Length.DEFAULT) {
   const effectiveLength = resolveID57Length(length);
   const bits = id57BitsByLength.get(effectiveLength);
   const requestedBytes = Math.ceil(bits / 8);
 
-  const hashBytes = computeID57HashForLength(input, hashFn, requestedBytes);
+  const hashBytes = computeHashBLAKE3XOF(input, requestedBytes);
   const effective = new Uint8Array(requestedBytes);
   effective.set(hashBytes.subarray(0, requestedBytes));
   maskExcessBits(effective, bits);
@@ -90,19 +44,19 @@ export function id57Generate(input, hashFn, length) {
 }
 
 export function id57GenerateDefault(input) {
-  return id57Generate(input, HashFunction.BLAKE3, ID57Length.DEFAULT);
+  return id57Generate(input, ID57Length.DEFAULT);
 }
 
-export function id57Verify(input, hashFn, id57String, length) {
+export function id57Verify(input, id57String, length = ID57Length.DEFAULT) {
   try {
-    return id57Generate(input, hashFn, length) === id57String;
+    return id57Generate(input, length) === id57String;
   } catch {
     return false;
   }
 }
 
 export function id57VerifyDefault(input, id57String) {
-  return id57Verify(input, HashFunction.BLAKE3, id57String, ID57Length.DEFAULT);
+  return id57Verify(input, id57String, ID57Length.DEFAULT);
 }
 
 export function id57IsValid(id57String) {

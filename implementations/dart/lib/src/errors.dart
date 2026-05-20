@@ -54,13 +54,6 @@ class EntropyExceededError extends B57Error {
         );
 }
 
-class InvalidHashFunctionError extends B57Error {
-  InvalidHashFunctionError(String hashFn)
-      : super(
-          code: 'INVALID_HASH_FUNCTION',
-          message: 'invalid hash function "$hashFn"',
-        );
-}
 
 class InsufficientEntropyError extends B57Error {
   InsufficientEntropyError()

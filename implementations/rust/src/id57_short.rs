@@ -1,5 +1,4 @@
 use crate::errors::B57Error;
-use crate::h57::HashFunction;
 use crate::id57::{
     id57_generate, id57_is_canonical, id57_is_valid, ID57Length,
 };
@@ -17,24 +16,22 @@ pub enum ID57ShortLength {
 
 pub fn id57_short_generate(
     input: &[u8],
-    hash_fn: Option<HashFunction>,
     length: ID57ShortLength,
 ) -> Result<String, B57Error> {
     let effective = resolve_id57_short_length(length)?;
-    id57_generate(input, hash_fn, effective)
+    id57_generate(input, effective)
 }
 
 pub fn id57_short_generate_default(input: &[u8]) -> Result<String, B57Error> {
-    id57_short_generate(input, Some(HashFunction::Blake3), ID57ShortLength::Default)
+    id57_short_generate(input, ID57ShortLength::Default)
 }
 
 pub fn id57_short_verify(
     input: &[u8],
-    hash_fn: Option<HashFunction>,
     id57_string: &str,
     length: ID57ShortLength,
 ) -> bool {
-    id57_short_generate(input, hash_fn, length)
+    id57_short_generate(input, length)
         .map(|expected| expected == id57_string)
         .unwrap_or(false)
 }
@@ -42,7 +39,6 @@ pub fn id57_short_verify(
 pub fn id57_short_verify_default(input: &[u8], id57_string: &str) -> bool {
     id57_short_verify(
         input,
-        Some(HashFunction::Blake3),
         id57_string,
         ID57ShortLength::Default,
     )
@@ -78,7 +74,7 @@ mod tests {
 
     #[test]
     fn invalid_len_rejected_by_surface() {
-        let s = id57_short_generate(b"abc", Some(HashFunction::Blake3), ID57ShortLength::Len23).unwrap();
+        let s = id57_short_generate(b"abc", ID57ShortLength::Len23).unwrap();
         assert!(id57_short_is_valid(&s));
         assert!(id57_short_is_canonical(&s));
     }

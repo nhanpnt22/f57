@@ -115,7 +115,7 @@ Cross-Language Records:
 
 | Implementation | Commit Gate | Release Gate | Scoped Release |
 |---|---|---|---|
-| Go | PASS | PARTIAL (core ready) | Not yet released |
+| Go | PASS | PASS | v0.1.0 |
 | JavaScript | PASS | PASS | v0.1.0-js (approved & tagged) |
 | Rust | PASS | PASS | v0.1.0-rust (approved & tagged) |
 | Dart | PASS | PASS | v0.1.0-dart (approved & tagged) |

@@ -136,7 +136,7 @@ implementations/go/
 ### ✅ Commit Message Template
 
 ```
-feat(go): Implement B57 encoding according to draft-nhan-b57-v0.1.0
+feat(go): Implement B57 encoding according to B57 CORE API
 
 - Implement core Encode/Decode functions
 - Implement validation functions (IsValid, IsCanonical)
@@ -155,7 +155,7 @@ Tests verify:
 - Canonical form verification
 - Error handling
 
-Ref: draft-nhan-b57-v0.1.0
+Ref: B57 CORE API
 ```
 
 ### ✅ Branch Readiness
@@ -372,7 +372,7 @@ git status
 ```
 feat(go): Implement B57 binary-to-text encoding
 
-Implements the complete B57 encoding scheme as specified in draft-nhan-b57-v0.1.0.
+Implements the complete B57 encoding scheme as specified in B57 CORE API.
 
 Features:
 - Canonical, bijective encoding/decoding
@@ -398,7 +398,7 @@ Compliance:
 ✅ All invariants verified
 ✅ Cross-platform tested
 
-Ref: draft-nhan-b57-v0.1.0
+Ref: B57 CORE API
 ```
 
 ### ✅ Push Commands
