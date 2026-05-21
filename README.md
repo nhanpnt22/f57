@@ -82,11 +82,13 @@ The protocol is composed of a 6-layer architecture with strict conceptual bounda
 
 The v0.1.0 release provides fully native implementations. All implementations process arrays using native BigInt arithmetic.
 
-- **Go**: [implementations/go](implementations/go)
-- **Rust**: [implementations/rust](implementations/rust)
-- **JavaScript / TypeScript**: [implementations/javascript](implementations/javascript)
-- **Dart**: [implementations/dart](implementations/dart)
-- **Python**: [implementations/python](implementations/python)
+Each language implementation is maintained in its own separate branch:
+
+- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/b57/tree/go)
+- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/b57/tree/rust)
+- **JavaScript / TypeScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/b57/tree/javascript)
+- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/b57/tree/dart)
+- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/b57/tree/python)
 
 All passed the [10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md) proving zero deviation across execution environments.
 
@@ -122,19 +124,26 @@ Verify deterministic compliance locally using standard test runners:
 ```bash
 # Go
 cd implementations/go && go test ./...
+https://github.com/nhanpnt22/b57/tree/go
 
 # JavaScript
 cd implementations/javascript && npm test
+https://github.com/nhanpnt22/b57/tree/javascript
 
 # Rust 
 cd implementations/rust && cargo test
 
+https://github.com/nhanpnt22/b57/tree/rust
+
 # Dart
 cd implementations/dart && dart test
+
+https://github.com/nhanpnt22/b57/tree/dart
 
 # Python
 cd implementations/python && pytest
 ```
+https://github.com/nhanpnt22/b57/tree/python
 
 ## 7. Governance
 
