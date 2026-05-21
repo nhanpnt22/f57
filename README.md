@@ -49,7 +49,7 @@ The B57 protocol eliminates this by enforcing a strict
 57-character alphabet:
  ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789
 
-(Excluded visually ambiguous characters: 0, O, I, l)
+(Excluded 5 visually ambiguous characters: 0, o, O, I, l)
 
 Key System Properties:
 - Bijective & Deterministic: 100% parity across distributed 
