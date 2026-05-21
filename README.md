@@ -1,8 +1,8 @@
 ============================================================
-B57 PROTOCOL STACK (MINDU)
+B57 PROTOCOL STACK
 Canonical Binary-to-Text and Identifier Architecture
 Version: v0.1.0 FINAL
-Status: Informational (RFC-Grade, Production-Ready)
+Status: Official Release (Production-Ready)
 Date: May 2026
 ============================================================
 
@@ -14,7 +14,7 @@ Date: May 2026
 ABSTRACT
 ============================================================
 
-The B57 Protocol Stack (codenamed MINDU) defines a unified, 
+The B57 Protocol Stack defines a unified, 
 layered architecture for binary encoding, hash representation, 
 random identification, and identifier generation.
 
@@ -23,7 +23,7 @@ text encoding scheme designed for human readability and
 unambiguous transcription, enforcing a strict 57-character 
 alphabet that excludes visually ambiguous symbols.
 
-Building upon B57, the MINDU stack establishes a rigorous 
+Building upon B57, the protocol stack establishes a rigorous 
 pipeline for canonical data normalization: 
  input → HASH → prefix truncate → B57 → string
 
@@ -34,7 +34,8 @@ STATUS OF THIS MEMO
 This repository acts as the central standard for the B57 
 specification and its native reference implementations.
 
-Current Status: v0.1.0 FINAL (Repository-wide READY).
+Current Status: Official Release v0.1.0. All implementations
+are verified, formally assessed, and production-ready.
 
 ============================================================
 1. OVERVIEW
@@ -157,6 +158,8 @@ The stack encourages standard integration patterns:
 5. OFFICIAL DOCUMENTATION
 ============================================================
 
+- [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md)
+  Official v0.1.0 release sign-off and validation posture.
 - [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md)
   Proof of absolute deterministic data alignment.
 - [Benchmarks](BENCHMARKS.md)
