@@ -1,0 +1,374 @@
+============================================================
+ID57 IDENTIFIER PROFILE
+One-Way Hash-Based Identifier Representation
+Version: v0.1.0 FINAL
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+ID57 defines a canonical, one-way identifier profile based
+on cryptographic hashing and B57 encoding.
+
+Identifiers are derived from hash outputs, encoded using
+B57, and truncated at the string level to produce compact,
+human-readable identifiers.
+
+ID57 ensures deterministic output, canonical representation,
+and controlled entropy reduction while preventing
+reversibility.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+ID57 defines how identifiers are constructed using a
+deterministic, one-way transformation.
+
+ID57 is not an encoding scheme. It is a usage profile built
+on top of:
+
+- cryptographic hashing
+- B57 encoding
+
+Transformation model:
+
+ input → HASH → B57 → prefix truncate → identifier
+
+Goals:
+
+- deterministic output
+- canonical representation
+- high entropy
+- human readability
+- non-reversible identifiers
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. DEPENDENCIES
+============================================================
+
+ID57 depends on:
+
+- B57 encoding
+- cryptographic hash functions (aligned with H57)
+
+Requirements:
+
+- Encoding MUST comply with the B57 specification
+- ID57 MUST NOT redefine or modify B57 behavior
+- Hash functions MUST be cryptographic and deterministic
+
+Recommended hash functions:
+
+- BLAKE3 (PRIMARY DEFAULT)
+- SHA-256
+- SHA-512
+
+If hash_fn is not provided, implementations MUST use BLAKE3.
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+ID57 MUST be derived using the transformation:
+
+ input → HASH → B57 → prefix truncate
+
+Given:
+
+ input_bytes
+
+Compute:
+
+ hash_bytes = HASH(input_bytes)
+
+ encoded = b57_encode(hash_bytes)
+
+ id57 = prefix_truncate(encoded, length_enum)
+
+Where:
+
+- ID57 MUST NOT encode raw input_bytes directly
+- Truncation MUST occur AFTER encoding
+- Output MUST be canonical B57
+
+============================================================
+5. ONE-WAY PROPERTY
+============================================================
+
+ID57 is a one-way transformation.
+
+Properties:
+
+- Original input_bytes MUST NOT be recoverable
+- id57 MUST NOT be reversible
+- Decoding yields only a truncated hash fragment
+
+Implication:
+
+ id57 ≠ b57_encode(input_bytes)
+
+============================================================
+6. CORE FUNCTION
+============================================================
+
+function id57_generate(input_bytes,
+                       hash_fn = BLAKE3,
+                       length_enum) -> string
+
+Definition:
+
+ hash_bytes = HASH(input_bytes)
+
+ encoded = b57_encode(hash_bytes)
+
+ if length_enum == ID57_LEN_AUTO:
+     id57 = encoded
+ else:
+     id57 = prefix_truncate(encoded, length_enum)
+
+ return id57
+
+Requirements:
+
+- MUST hash input before encoding
+- MUST be deterministic
+- MUST produce canonical B57 output
+- MUST NOT modify input_bytes
+
+- length_enum MUST:
+  - correspond to a valid ID57 length value
+  - define output character length
+
+- MUST fail if requested length exceeds encoded length
+
+============================================================
+7. DEFAULT AND AUTO BEHAVIOR
+============================================================
+
+Default behavior:
+
+- If length_enum is omitted:
+  MUST use ID57_LEN_128 (22 characters)
+
+AUTO mode:
+
+- ID57_LEN_AUTO MUST use full encoded hash
+- MUST NOT truncate
+- MUST preserve full entropy
+
+Examples:
+
+- BLAKE3 / SHA-256 → 44 characters
+- SHA-512 → 88 characters
+
+AUTO MUST be explicitly requested.
+
+============================================================
+8. LENGTH ENUMERATION
+============================================================
+
+------------------------------------------------------------
+MINIMUM SECURITY THRESHOLDS (REQUIRED)
+------------------------------------------------------------
+
+- ID57_LEN_8   → 2 characters
+- ID57_LEN_16  → 3 characters
+- ID57_LEN_32  → 6 characters
+- ID57_LEN_64  → 11 characters
+- ID57_LEN_128 → 22 characters (DEFAULT)
+- ID57_LEN_256 → 44 characters
+- ID57_LEN_512 → 88 characters
+
+------------------------------------------------------------
+INFORMATIONAL VALUES (NON-SECURITY)
+------------------------------------------------------------
+
+- ID57_LEN_23  → 4 characters
+- ID57_LEN_29  → 5 characters
+- ID57_LEN_47  → 8 characters
+- ID57_LEN_70  → 12 characters
+- ID57_LEN_93  → 16 characters
+- ID57_LEN_186 → 32 characters
+- ID57_LEN_373 → 64 characters
+
+Requirements:
+
+- MUST NOT accept arbitrary lengths
+- MUST match defined values
+
+============================================================
+9. TRUNCATION MODEL
+============================================================
+
+function prefix_truncate(encoded_string, length_enum)
+
+Definition:
+
+ required_chars = enum_chars(length_enum)
+
+ return first required_chars of encoded_string
+
+Rules:
+
+- MUST operate on encoded B57 string
+- MUST use prefix truncation
+- MUST be deterministic
+
+Constraint:
+
+ required_chars <= length(encoded_string)
+
+Prohibited:
+
+- truncating raw bytes
+- modifying characters
+- non-prefix truncation
+
+============================================================
+10. INVARIANTS
+============================================================
+
+AUTO mode:
+
+ id57_generate(x, hash_fn, ID57_LEN_AUTO)
+ == b57_encode(HASH(x))
+
+Truncated mode:
+
+ id57_generate(x, hash_fn, L)
+ == prefix_truncate(b57_encode(HASH(x)), L)
+
+Determinism:
+
+ same input → same output
+
+============================================================
+11. VALIDATION AND VERIFICATION
+============================================================
+
+function id57_is_valid(id57_string) -> boolean
+
+- MUST validate characters using B57 rules
+
+------------------------------------------------------------
+
+function id57_is_canonical(id57_string) -> boolean
+
+ decoded = b57_decode(id57_string)
+ reencoded = b57_encode(decoded)
+
+ return (id57_string == reencoded)
+
+------------------------------------------------------------
+
+function id57_verify(input_bytes,
+                     id57_string,
+                     hash_fn,
+                     length_enum) -> boolean
+
+ expected = id57_generate(input_bytes,
+                          hash_fn,
+                          length_enum)
+
+ return constant_time_compare(expected, id57_string)
+
+============================================================
+12. DECODING SEMANTICS
+============================================================
+
+Decoding:
+
+ hash_fragment = b57_decode(id57)
+
+Properties:
+
+- Returns truncated hash bytes only
+- MUST NOT be interpreted as original input
+- MUST NOT imply reversibility
+
+============================================================
+13. ERROR MODEL
+============================================================
+
+Implementations MUST distinguish:
+
+- INVALID_CHAR
+- NON_CANONICAL
+- INVALID_LENGTH_ENUM
+- LENGTH_EXCEEDED
+
+Errors MUST be deterministic.
+
+============================================================
+14. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- encode raw input directly
+- skip hashing step
+- truncate before encoding
+- use non-prefix truncation
+- accept arbitrary lengths
+- normalize identifiers
+- introduce randomness
+- embed metadata
+
+============================================================
+15. SECURITY CONSIDERATIONS
+============================================================
+
+ID57 provides no cryptographic guarantees beyond the
+underlying hash function.
+
+Security depends on:
+
+- hash function strength
+- chosen identifier length
+
+Properties:
+
+- Truncation reduces security proportionally
+- 128-bit (22 chars) is the recommended baseline
+- Encoded length MUST NOT be treated as a guarantee
+
+============================================================
+16. IANA CONSIDERATIONS
+============================================================
+
+This document has no IANA actions.
+
+============================================================
+17. REFERENCES
+============================================================
+
+RFC 2119 - Requirement Levels
+RFC 8174 - Requirement Terminology Clarification
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================

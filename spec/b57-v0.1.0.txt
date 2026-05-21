@@ -1,0 +1,258 @@
+============================================================
+B57 ENCODING SCHEME
+Binary → B57 Canonical Representation
+Version: v0.1.0
+Status: Informational
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+B57 defines a canonical, ASCII-safe encoding scheme for
+representing binary data as human-readable strings.
+
+The encoding preserves entropy, avoids visually ambiguous
+characters, and ensures deterministic, bijective, and
+unbiased output.
+
+B57 is distinct from other encodings referred to as
+"base57" and defines its own canonical alphabet and rules.
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes.
+
+Internet-Drafts are valid for a maximum of six months and
+may be updated, replaced, or obsoleted at any time.
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+B57 is a binary-to-text encoding designed for:
+
+- human readability
+- compact representation
+- unambiguous transcription
+
+B57 eliminates commonly confused characters and enforces
+a single canonical representation for all encoded data.
+
+B57 is not a cryptographic primitive and MUST NOT be used
+for encryption, hashing, or entropy generation.
+
+B57 MAY be used by higher-level specifications such as ID57
+and H57.
+
+============================================================
+2. CONVENTIONS AND TERMINOLOGY
+============================================================
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", and "MAY" are to be
+interpreted as described in RFC 2119 and RFC 8174.
+
+============================================================
+3. ALPHABET
+============================================================
+
+The B57 alphabet is:
+
+"ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789"
+
+Properties:
+
+- ASCII only
+- case-sensitive
+- excludes visually ambiguous characters:
+  '0', 'O', 'I', 'l'
+
+Requirements:
+
+- The alphabet MUST be used exactly as defined
+- Character order MUST NOT be modified
+- No characters may be added or removed
+
+============================================================
+4. CORE DEFINITION
+============================================================
+
+Given:
+
+  input_bytes
+
+Compute:
+
+  encoded_string = b57_encode(input_bytes)
+
+Where:
+
+- Input MUST be raw binary data (sequence of bytes)
+- Output MUST be canonical B57
+
+============================================================
+5. ENCODING MODEL
+============================================================
+
+5.1 Input
+
+- Input MUST be raw binary data
+
+Special case:
+
+- Empty input MUST encode to an empty string
+
+------------------------------------------------------------
+5.2 Output
+------------------------------------------------------------
+
+- Output MUST consist only of B57 alphabet characters
+
+------------------------------------------------------------
+5.3 Determinism and Canonical Form
+------------------------------------------------------------
+
+- Encoding MUST be deterministic
+- Exactly one valid output MUST exist per input
+- Encodings MUST be canonical
+
+------------------------------------------------------------
+5.4 Bijectivity
+------------------------------------------------------------
+
+- Encoding MUST be bijective
+- Each encoded string maps to exactly one byte sequence
+- Each byte sequence maps to exactly one encoded string
+
+------------------------------------------------------------
+5.5 Entropy Preservation
+------------------------------------------------------------
+
+- Encoding MUST preserve all input entropy
+- MUST NOT truncate, pad, or compress data
+- MUST NOT introduce statistical bias
+
+------------------------------------------------------------
+5.6 Byte Interpretation
+------------------------------------------------------------
+
+- Bytes MUST be interpreted as an unsigned integer
+  in big-endian order unless explicitly specified otherwise
+- Implementations MUST be platform-independent
+
+============================================================
+6. DECODING
+============================================================
+
+Decoding:
+
+  output_bytes = b57_decode(input_string)
+
+Requirements:
+
+- MUST validate all characters against the B57 alphabet
+- MUST ensure canonical form
+- MUST be deterministic
+- MUST NOT produce multiple outputs
+
+- MUST fail on:
+  - INVALID_CHAR
+  - NON_CANONICAL
+
+- SHOULD reject non-canonical encodings
+- MUST reject non-canonical encodings in
+  security-sensitive contexts
+
+============================================================
+7. ERROR TYPES
+============================================================
+
+The following error types are defined:
+
+- INVALID_CHAR
+  Input contains one or more characters outside
+  the B57 alphabet.
+
+- NON_CANONICAL
+  Input is a valid B57 string but does not represent
+  the canonical encoding of its decoded byte sequence.
+
+Implementations MUST fail with one of these errors when
+decoding invalid input.
+
+============================================================
+8. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+  b57_decode(b57_encode(x)) == x
+
+  b57_encode(b57_decode(y)) == y
+  (only if y is canonical)
+
+============================================================
+9. PROHIBITED BEHAVIORS
+============================================================
+
+Implementations MUST NOT:
+
+- use modulo-biased mapping
+- sample alphabet characters directly
+- produce multiple encodings for the same input
+- accept characters outside the alphabet
+- normalize or transform input or output
+
+============================================================
+10. IMPLEMENTATION CONSIDERATIONS
+============================================================
+
+- MUST operate on raw bytes, not characters
+- MUST ensure consistent byte ordering
+- SHOULD validate canonical form on decode
+- SHOULD use constant-time logic in
+  security-sensitive environments
+
+============================================================
+11. SECURITY CONSIDERATIONS
+============================================================
+
+B57 provides no cryptographic guarantees.
+
+Security depends entirely on:
+
+- entropy of input data
+- correctness of encoding
+- sufficient input length
+
+Weak randomness, biased encoding, or insufficient entropy
+compromises all guarantees.
+
+Encoded length alone MUST NOT be treated as a guarantee.
+
+============================================================
+12. IANA CONSIDERATIONS
+============================================================
+
+This document has no IANA actions.
+
+============================================================
+13. REFERENCES
+============================================================
+
+RFC 2119 - Requirement Levels
+RFC 8174 - Requirement Terminology Clarification
+
+============================================================
+AUTHOR
+============================================================
+
+  Pham Nhan
+
+============================================================
+END
+============================================================
