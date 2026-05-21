@@ -31,6 +31,16 @@ The v0.1.0 release provides fully native implementations. All implementations pr
 
 All implementations have passed the **[10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md)** proving absolutely zero deviation in output behavior across cryptographic seeds.
 
+## 📜 Legacy Draft Specifications
+
+The following are the original v0.1.0 working drafts. They have been superseded by the `CORE API` documents above but are retained for historical reference:
+* **[B57 Core Suite Framework](spec/b57-cs-v0.1.0.txt)**
+* **[B57 Encoding Draft](spec/b57-v0.1.0.txt)**
+* **[H57 Draft](spec/h57-v0.1.0.txt)**
+* **[ID57 Draft](spec/id57-v0.1.0.txt)**
+* **[R57 Draft](spec/R57-v0.1.0.txt)**
+
+
 ## 🚀 Official Documentation
 
 * **[UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md)**: Proof of absolute deterministic data alignment.
