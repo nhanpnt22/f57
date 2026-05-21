@@ -1,5 +1,5 @@
 ============================================================
-B57 PROTOCOL STACK
+B57 PROTOCOL STACK (MINDU)
 Canonical Binary-to-Text and Identifier Architecture
 Version: v0.1.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
@@ -14,14 +14,18 @@ Date: May 2026
 ABSTRACT
 ============================================================
 
-B57 is a canonical, ASCII-safe binary-to-text encoding 
-scheme. It is specifically designed for human-readability, 
-compact data representation, and unambiguous transcription.
+The B57 Protocol Stack (codenamed MINDU) defines a unified, 
+layered architecture for binary encoding, hash representation, 
+random identification, and identifier generation.
 
-The B57S System defines the unified, layered architecture
-rounding out the B57 ecosystem. It establishes a rigorous 
+At its core, B57 provides a canonical, ASCII-safe binary-to-
+text encoding scheme designed for human readability and 
+unambiguous transcription, enforcing a strict 57-character 
+alphabet that excludes visually ambiguous symbols.
+
+Building upon B57, the MINDU stack establishes a rigorous 
 pipeline for canonical data normalization: 
-  input → HASH → truncate → B57 → string
+ input → HASH → prefix truncate → B57 → string
 
 ============================================================
 STATUS OF THIS MEMO
@@ -42,56 +46,85 @@ platform-specific determinism issues.
 
 The B57 protocol eliminates this by enforcing a strict 
 57-character alphabet:
-  ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789
+ ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789
 
 (Excluded visually ambiguous characters: 0, O, I, l)
 
-Key properties:
+Key System Properties:
 - Bijective & Deterministic: 100% parity across distributed 
-  systems.
+  systems. Exactly one valid output exists per input.
 - Entropy-Preserving: Never truncates, pads, or biases raw
-  input at the encoding layer.
-- Canonical Form: Ensures exactly one valid output 
-  representation for any given input sequence.
+  input at the base encoding layer.
+- One-Way Hash Transformation: Employs BLAKE3 by default 
+  to produce secure cryptographic identifiers.
 
 ============================================================
-2. THE B57S STACK
+2. THE B57S STACK ARCHITECTURE
 ============================================================
 
-The protocol is divided into a 6-layer architecture:
+The protocol is composed of a 6-layer architecture with 
+strict conceptual boundaries:
 
-1. [B57 Core](spec/B57%20CORE%20API.txt) (Encoding Layer)
-   The canonical binary-to-text exact mathematical 
-   primitives (bytes ↔ B57 string).
+------------------------------------------------------------
+2.1 B57 (Encoding Layer)
+------------------------------------------------------------
+Specification: [B57 Core](spec/B57%20CORE%20API.txt)
+The canonical binary-to-text mathematical primitives.
+Pipeline: bytes ↔ B57 string
+Properties: bijective, unambiguous, exact byte representation.
 
-2. [H57](spec/H57%20CORE%20API.txt) (Hash Representation)
-   Wraps arbitrary payloads into deterministic hash outputs, 
-   preserving full internal entropy.
-   (input → BLAKE3 → bytes → B57)
+------------------------------------------------------------
+2.2 H57 (Hash Representation Layer)
+------------------------------------------------------------
+Specification: [H57 Core](spec/H57%20CORE%20API.txt)
+Canonical representation of full cryptographic hash outputs.
+Pipeline: input → BLAKE3 → bytes → B57 string
+Properties: full entropy preservation (e.g., 256-bit hash → 
+44 chars), no truncation, ideal for content integrity.
 
-3. [ID57](spec/ID57%20CORE%20API.txt) (Identity Profile)
-   Generates global identifiers (e.g., 128-bit / 22 chars) 
-   offering extreme collision resistance with intentionally 
-   controlled entropy reduction.
+------------------------------------------------------------
+2.3 ID57 (Identifier Profile)
+------------------------------------------------------------
+Specification: [ID57 Core](spec/ID57%20CORE%20API.txt)
+Generates fixed-length, human-readable identifiers through 
+controlled entropy reduction.
+Pipeline: input → HASH → prefix truncate → B57 string
+Properties: Default 128-bit (22 chars). Ensures prefix-level 
+byte truncation prior to encoding.
 
-4. [ID57-SHORT](spec/ID57-SHORT%20PROFILE.txt) (Ultra-Compact)
-   Generates local identifiers (e.g., 47-bit / 8 chars). 
-   Optimized strictly for QR codes, URLs, and UI brevity.
+------------------------------------------------------------
+2.4 ID57-SHORT (Ultra-Compact Profile)
+------------------------------------------------------------
+Specification: [ID57-SHORT](spec/ID57-SHORT%20PROFILE.txt)
+Generates heavily truncated local identifiers (e.g., 
+47-bit / 8 chars).
+Properties: Optimized strictly for QR codes, UI brevity, and 
+temporary IDs. Requires safe namespace sizing.
 
-5. [R57](spec/R57%20CORE%20API.txt) (Random Profile)
-   Generates high-entropy 128-bit deterministic or CSPRNG 
-   identifiers safely placed into the B57 namespace.
+------------------------------------------------------------
+2.5 R57 (Random Generation Profile)
+------------------------------------------------------------
+Specification: [R57 Core](spec/R57%20CORE%20API.txt)
+Generates high-entropy 128-bit random identifiers securely.
+Pipeline: entropy_source (128-bit) → B57 string
+Properties: Mandates CSPRNG, KDF, or Hybrid generation 
+modes to ensure unpredictable, collision-resistant outputs.
 
-6. [I57](spec/I57%20CORE%20API.txt) (Integration Layer)
-   The top-level facade interface unifying all underlying 
-   profiles into a seamless developer API.
+------------------------------------------------------------
+2.6 I57 (Integration Interface)
+------------------------------------------------------------
+Specification: [I57 Core](spec/I57%20CORE%20API.txt)
+The top-level facade interface unifying all underlying 
+profiles into a seamless developer API.
+Ensures correct composition and safe parameter passing.
 
 ============================================================
 3. NATIVE IMPLEMENTATIONS
 ============================================================
 
 The v0.1.0 release provides fully native implementations.
-All implementations process native BigInt arrays natively.
+All implementations process arrays using native BigInt 
+arithmetic.
 
 - Go: [implementations/go](implementations/go)
 - Rust: [implementations/rust](implementations/rust)
