@@ -124,26 +124,19 @@ Verify deterministic compliance locally using standard test runners:
 ```bash
 # Go
 cd implementations/go && go test ./...
-https://github.com/nhanpnt22/b57/tree/go
 
 # JavaScript
 cd implementations/javascript && npm test
-https://github.com/nhanpnt22/b57/tree/javascript
 
 # Rust 
 cd implementations/rust && cargo test
 
-https://github.com/nhanpnt22/b57/tree/rust
-
 # Dart
 cd implementations/dart && dart test
-
-https://github.com/nhanpnt22/b57/tree/dart
 
 # Python
 cd implementations/python && pytest
 ```
-https://github.com/nhanpnt22/b57/tree/python
 
 ## 7. Governance
 
