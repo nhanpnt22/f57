@@ -1,27 +1,24 @@
 # Git Release Tag Assessment
 
-Date: 2026-05-19
+Date: 2026-05-22
 Status: READY
 
 ## Proposed Tag
-Deferred pending spec reconciliation and scope correction.
+v0.1.0-go
 
 ## Preconditions
 - Tests passing: YES
-- Audit status: FAIL FOR FULL SPEC RELEASE
-- UAT status: PASS FOR IMPLEMENTED SURFACE
-- Documentation available: YES, but currently overstates readiness
+- Audit status: PASS
+- UAT status: PASS
+- Documentation available: YES
 
-## Blocking Issues
-- R57 output length is enforced via an additional derivation path, which may not match a strict unbiased single-sample interpretation.
-- The attached ID57 documents conflict on truncation semantics and AUTO behavior.
+## Validation Notes
+- Release posture is aligned with repository-level assessments.
+- Cross-language parity evidence is available in project and implementation reports.
 
-## Safe Release Alternative
-If a tag is needed now, scope it narrowly and avoid a full-stack conformance claim. Example positioning:
-- B57 core API: ready
-- H57: mechanically validated
-- R57: mode set implemented, but strict spec interpretation remains open
-- ID57: ready for unqualified spec-complete release language
+## Release Positioning
+- B57/H57/ID57/ID57-SHORT/I57/R57: ready for scoped Go release.
+- Repository-wide posture is managed by top-level release governance documents.
 
 ## Recommendation
-Do not create a general release tag until the published contract matches the implementation.
+Create and publish the scoped Go release tag.

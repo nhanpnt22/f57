@@ -11,6 +11,7 @@ dependencies:
   hex: ^0.2.0
   convert: ^3.0.0
   blake3_dart: ^1.0.0
+  cryptography: ^2.7.0
 
 dev_dependencies:
   test: ^1.24.0

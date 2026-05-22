@@ -1,6 +1,6 @@
 ============================================================
 B57S SYSTEM SPECIFICATION (MINDU)
-B57 / H57 / ID57 / R57 / I57 Unified Stack
+B57 / H57 / ID57 / R57 / I57 / S57 Unified Stack
 Version: v0.1.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
@@ -20,6 +20,7 @@ generation based on:
 - ID57-SHORT (ultra-compact identifier profile)
 - R57 (random generation profile)
 - I57 (integration interface)
+- S57 (secure composition layer)
 
 It standardizes deterministic, ASCII-safe, canonical, and
 entropy-consistent transformations from raw input data to
@@ -31,8 +32,13 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
-Internet-Drafts are valid for a maximum of six months and
-may be updated, replaced, or obsoleted at any time.
+This memo is intended for production use.
+
+Implementation coverage note:
+
+- S57 is an optional secure profile within the unified stack.
+- Language runtimes MAY implement only B57/H57/ID57/R57/I57
+   core APIs while remaining conformant to those core profiles.
 
 ============================================================
 1. INTRODUCTION
@@ -60,6 +66,7 @@ Goals:
 - controlled entropy reduction (ID57)
 - secure random identifier generation (R57)
 - safe domain encapsulation (I57)
+- secure keyed composition and AEAD (S57)
 - minimal and consistent API design
 
 ============================================================
@@ -143,9 +150,9 @@ Properties:
  A unified programmatic boundary encapsulating all layers.
  
  I57_encode(input_bytes) = B57(input_bytes)
- I57_hash(input_bytes, hash_fn, length_enum) = H57(input_bytes)
- I57_id(input_bytes, hash_fn, length_enum) = ID57(input_bytes, length_enum)
- I57_random(mode_enum) = B57(random_bytes)
+ I57_hash(input_bytes, length_enum) = H57(input_bytes)
+ I57_id(input_bytes, length_enum) = ID57(input_bytes, length_enum)
+ I57_random(random_profile_param) = B57(random_bytes)
 
 Properties:
 
@@ -153,7 +160,20 @@ Properties:
 - acts as the primary developer interface
 
 ------------------------------------------------------------
-3.6 Relationship
+3.6 S57 (Secure Composition Layer)
+------------------------------------------------------------
+
+S57 profiles secure composition on top of I57 with:
+
+- domain-separated key derivation
+- keyed hash and keyed identifier generation
+- AES-256-GCM authenticated encryption/decryption
+
+S57 is layered above I57 and MUST NOT redefine B57 canonical
+encoding rules.
+
+------------------------------------------------------------
+3.7 Relationship
 ------------------------------------------------------------
 
 - B57 is the foundation governing character mapping
@@ -161,11 +181,13 @@ Properties:
 - ID57 builds on H57 for identifiers
 - R57 builds on B57 using 128-bit constraints
 - I57 exposes B57, H57, ID57, and R57 capabilities natively
+- S57 composes secure-key and AEAD behavior over I57
 
 Constraint:
 
  ID57 ⊂ H57
  I57 ⊃ (B57, H57, ID57, R57)
+ S57 ⊃ I57
 
 ============================================================
 4. CORE TRANSFORMATIONS
@@ -194,9 +216,17 @@ Constraint:
 4.5 Ecosystem Integration (I57):
  
  b57_encode_alias  = i57_encode(input_bytes)
- h57_hash_alias    = i57_hash(input_bytes, hash_fn, length_enum)
- id57_gen_alias    = i57_id(input_bytes, hash_fn, length_enum)
- rand_alias        = i57_random(mode_enum)
+ h57_hash_alias    = i57_hash(input_bytes, length_enum)
+ id57_gen_alias    = i57_id(input_bytes, length_enum)
+ rand_alias        = i57_random(random_profile_param)
+
+4.6 Secure Composition (S57):
+
+ secure_keys       = s57_derive_keys(server_secret_key, environment_salt)
+ secure_hash       = s57_hash(input_bytes, length_enum)
+ secure_id         = s57_id(input_bytes, length_enum)
+ secure_ciphertext = s57_encrypt(plaintext, aad)
+ secure_plaintext  = s57_decrypt(secure_ciphertext, aad)
 
 ============================================================
 5. HASH FUNCTION MODEL
@@ -394,6 +424,7 @@ B57S defines a composable transformation stack:
  ID57 → compact identifier profile
  R57  → random generation profile
  I57  → unified integration interface
+ S57  → secure keyed composition
 
 Each layer serves a distinct purpose and MUST be used
 according to its design constraints.
@@ -500,7 +531,18 @@ Properties:
 - simplifies and standardizes the API
 
 ------------------------------------------------------------
-15.6 SYSTEM-LEVEL USE (B57S STACK)
+15.6 S57 (SECURE COMPOSITION LAYER)
+------------------------------------------------------------
+
+S57 provides secure composition for keyed and encrypted flows.
+
+Typical use cases:
+
+- authenticated encryption of payloads
+- keyed deterministic identifiers
+- domain-separated key management
+
+15.7 SYSTEM-LEVEL USE (B57S STACK)
 ------------------------------------------------------------
 
 B57S enables full pipeline composition:
@@ -529,7 +571,7 @@ Typical system patterns:
    obj_key = R57(mode=CSPRNG)
 
 ------------------------------------------------------------
-15.7 SECURITY-SENSITIVE VS NON-SENSITIVE USE
+15.8 SECURITY-SENSITIVE VS NON-SENSITIVE USE
 ------------------------------------------------------------
 
 Security-sensitive:
@@ -545,19 +587,21 @@ Non-sensitive / UX-focused:
 - MUST implement collision handling
 
 ------------------------------------------------------------
-15.8 NON-GOALS
+15.9 NON-GOALS
 ------------------------------------------------------------
 
-B57S MUST NOT be used for:
+B57, H57, ID57, R57, and I57 core layers MUST NOT be used for:
 
 - encryption
 - reversible encoding of sensitive data
 - explicit symmetric/asymmetric cryptosystems
 
-B57S does not replace cryptographic primitives.
+S57 defines secure composition and uses cryptographic
+primitives, but does not replace independent cryptographic
+review and operational controls.
 
 ------------------------------------------------------------
-15.9 DESIGN SUMMARY
+15.10 DESIGN SUMMARY
 ------------------------------------------------------------
 
 Layer selection:
@@ -567,6 +611,7 @@ Layer selection:
 - ID57 → compact identifiers
 - R57  → random identifiers
 - I57  → outer interface logic
+- S57  → secure keyed and encrypted composition
 
 ============================================================
 16. ID57-SHORT (ULTRA-COMPACT IDENTIFIERS)

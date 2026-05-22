@@ -8,9 +8,9 @@ Spec reference:
 Core API:
 - `i57Encode(input)`
 - `i57Decode(string)`
-- `i57Hash(input, hashFn, length)`
+- `i57Hash(input, length)`
 - `i57Random(mode)`
-- `i57Id(input, hashFn, length)`
+- `i57Id(input, length)`
 - `i57IsValid(string)`
 - `i57IsCanonical(string)`
 - `i57ValidateIdentifier(string)`

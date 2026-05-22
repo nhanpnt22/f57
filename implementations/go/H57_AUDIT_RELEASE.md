@@ -19,7 +19,6 @@ Status: PASS (H57 SCOPED)
 
 ## Notes
 - BLAKE3 is preferred by spec and is supported by this implementation.
-- `ErrInvalidHashFunction` is included for deterministic failure on unsupported hash types.
 
 ## Recommendation
 Ready for commit and release tag after repository-level review.

@@ -1,7 +1,7 @@
 ============================================================
-I57 CORE API (MINDU)
-Integration Interface (B57, H57, R57, ID57)
-Version: v0.1.0 FINAL
+I57 CORE API
+Canonical Integration Interface (B57, H57, R57, ID57)
+Version: v1.0.0
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -10,24 +10,21 @@ Date: May 2026
 ABSTRACT
 ============================================================
 
-I57 Core API defines a minimal, canonical integration layer
-that unifies B57, H57, R57, and ID57 into a single, consistent
-interface.
+I57 defines a canonical integration layer for B57, H57,
+R57, and ID57. It standardizes composition behavior,
+validation semantics, and interoperability invariants.
 
-It standardizes how encoding, hashing, randomness, and
-identifier generation are composed into a deterministic,
-portable, and security-consistent system.
-
-I57 does not redefine primitives. It enforces correct usage.
+I57 keeps the core surface minimal. Secure key-management,
+keyed hashing/identifier generation, and authenticated
+encryption are defined as an optional I57 secure extension
+and are profiled by S57.
 
 ============================================================
 STATUS OF THIS MEMO
 ============================================================
 
-This document is provided for informational purposes.
-
-Internet-Drafts are valid for a maximum of six months and
-may be updated, replaced, or obsoleted at any time.
+This document is provided for informational purposes and is
+intended for production use.
 
 ============================================================
 1. INTRODUCTION
@@ -35,17 +32,17 @@ may be updated, replaced, or obsoleted at any time.
 
 I57 defines the integration contract across:
 
-- B57 → encoding
-- H57 → hash representation
-- R57 → randomness generation
-- ID57 → identifier profile
+- B57 -> encoding
+- H57 -> hash representation
+- R57 -> randomness generation
+- ID57 -> identifier profile
 
-I57 ensures:
+I57 MUST provide:
 
 - canonical composition
 - strict layering
-- zero ambiguity
-- enforcement of invariants
+- unambiguous validation behavior
+- cross-implementation portability
 
 ============================================================
 2. CONVENTIONS AND TERMINOLOGY
@@ -68,33 +65,15 @@ I57 depends on:
 
 Requirements:
 
-- Implementations MUST comply with all underlying specs
 - I57 MUST NOT redefine primitive behavior
 - I57 MUST enforce correct composition
+- Implementations MUST remain canonical with B57
 
 ============================================================
-4. DESIGN PRINCIPLES
+4. CORE FUNCTIONS
 ============================================================
 
-- minimal surface
-- strict composition
-- deterministic outputs
-- canonical representation
-- entropy preservation
-- no hidden transformations
-
-I57 MUST NOT:
-
-- introduce new encoding schemes
-- modify B57 alphabet
-- bypass hash or entropy requirements
-- allow ambiguous flows
-
-============================================================
-5. CORE FUNCTIONS
-============================================================
-
-5.1 i57_encode
+4.1 i57_encode
 
 function i57_encode(input_bytes) -> string
 
@@ -103,7 +82,7 @@ Definition:
 
 ------------------------------------------------------------
 
-5.2 i57_decode
+4.2 i57_decode
 
 function i57_decode(input_string) -> bytes | error
 
@@ -112,36 +91,50 @@ Definition:
 
 ------------------------------------------------------------
 
-5.3 i57_hash
+4.3 i57_hash
 
-function i57_hash(input_bytes, hash_fn, length_enum) -> string
+function i57_hash(input_bytes, length_enum) -> string
 
 Definition:
- return h57_hash(input_bytes, hash_fn, length_enum)
+ return h57_hash(input_bytes, length_enum)
+
+Notes:
+
+- Hash function selection is implementation-defined and SHOULD
+  default to BLAKE3 where available.
 
 ------------------------------------------------------------
 
-5.4 i57_random
+4.4 i57_random
 
-function i57_random(mode_enum) -> string
+function i57_random(random_profile_param) -> string
 
 Definition:
- return r57_generate(mode_enum)
+ return random_b57_output(random_profile_param)
+
+Notes:
+
+- Some implementations expose R57 mode enums.
+- Some implementations expose a profile parameter while still
+  requiring canonical R57-compatible output constraints.
+- Implementations MAY delegate to r57_generate(mode_enum) or
+  MAY generate CSPRNG bytes directly and encode with B57,
+  provided output constraints remain R57-compatible.
 
 ------------------------------------------------------------
 
-5.5 i57_id
+4.5 i57_id
 
-function i57_id(input_bytes, hash_fn, length_enum) -> string
+function i57_id(input_bytes, length_enum) -> string
 
 Definition:
- return id57_generate(input_bytes, hash_fn, length_enum)
+ return id57_generate(input_bytes, length_enum)
 
 ============================================================
-6. VALIDATION FUNCTIONS
+5. VALIDATION FUNCTIONS
 ============================================================
 
-6.1 i57_is_valid
+5.1 i57_is_valid
 
 function i57_is_valid(input_string) -> boolean
 
@@ -150,12 +143,11 @@ Requirements:
 - MUST validate characters using B57 rules
 - MUST reject non-ASCII input
 - MUST reject whitespace
-- MUST reject empty string unless explicitly operating
-  in raw encoding validation mode
+- Integration-layer behavior SHOULD reject empty strings
 
 ------------------------------------------------------------
 
-6.2 i57_is_canonical
+5.2 i57_is_canonical
 
 function i57_is_canonical(input_string) -> boolean
 
@@ -163,12 +155,11 @@ Definition:
 
  decoded = b57_decode(input_string)
  reencoded = b57_encode(decoded)
-
  return (input_string == reencoded)
 
 ------------------------------------------------------------
 
-6.3 i57_validate_identifier
+5.3 i57_validate_identifier
 
 function i57_validate_identifier(input_string) -> boolean
 
@@ -176,13 +167,11 @@ Requirements:
 
 - MUST be valid B57
 - MUST be canonical
-- MUST match expected length (22 chars for 128-bit default)
-- MUST NOT contain whitespace
-- MUST be ASCII-only
+- MUST match expected identifier length policy
 
 ------------------------------------------------------------
 
-6.4 i57_validate_entropy
+5.4 i57_validate_entropy
 
 function i57_validate_entropy(input_string) -> boolean
 
@@ -193,7 +182,44 @@ Purpose:
 Requirements:
 
 - MUST NOT be used for security decisions
-- SHOULD detect obvious low-entropy patterns
+
+------------------------------------------------------------
+
+5.5 i57_validate
+
+function i57_validate(input_string, expected_length_chars?) -> boolean
+
+Requirements:
+
+- MUST enforce valid + canonical behavior
+- MUST enforce expected length when provided
+
+============================================================
+6. OPTIONAL SECURE EXTENSION
+============================================================
+
+Some implementations expose an optional secure extension.
+S57 profiles this extension as a secure composition layer.
+
+Optional functions:
+
+- i57_resolve_keys(config) -> secure_keys | error
+- i57_hash_secure(input_bytes, length_enum, secure_keys) -> string | error
+- i57_id_secure(input_bytes, length_enum, mode_enum, secure_keys) -> string | error
+- i57_encrypt(plaintext, key, key_id, aad?) -> string | error
+- i57_decrypt(encoded, key, expected_key_id, aad?) -> plaintext | error
+
+Binding compatibility note:
+
+- Some language bindings require explicit hash_fn arguments for
+  i57_hash and i57_id (with BLAKE3 as default behavior).
+
+Secure extension requirements:
+
+- key material MUST be domain-separated
+- key material MUST be treated as secret
+- encryption MUST use AES-256-GCM
+- authenticated decryption MUST fail closed
 
 ============================================================
 7. INTEGRATION RULES
@@ -202,23 +228,23 @@ Requirements:
 All outputs MUST follow one of:
 
 Encoding:
- bytes → B57 → string
+ bytes -> B57 -> string
 
 Hash:
- bytes → HASH → bytes → B57 → string
+ bytes -> HASH -> bytes -> B57 -> string
 
 Random:
- entropy → bytes → B57 → string
+ entropy -> bytes -> B57 -> string
 
 Identifier:
- bytes → HASH → truncate → bytes → B57 → string
+ bytes -> HASH -> truncate -> bytes -> B57 -> string
 
 Rules:
 
 - Encoding MUST be B57
 - Hashing MUST precede truncation
-- Truncation MUST occur BEFORE encoding
-- Randomness MUST be ≥128-bit
+- Truncation MUST occur before encoding
+- Randomness MUST be >=128-bit in security-sensitive contexts
 - All outputs MUST be canonical
 
 ============================================================
@@ -232,17 +258,15 @@ The following MUST hold:
  i57_encode(i57_decode(y)) == y
  (only if y is canonical)
 
- i57_hash(x) == b57_encode(HASH(x))
- (AUTO mode)
+ i57_hash(x, L) == b57_encode(truncate_bytes(HASH(x), bits(L)))
 
- i57_id(x) ==
- b57_encode(truncate_bytes(HASH(x), bits(L)))
+ i57_id(x, L) == b57_encode(truncate_bytes(HASH(x), bits(L)))
 
 ============================================================
 9. ERROR MODEL
 ============================================================
 
-Implementations MUST distinguish:
+Core errors:
 
 - INVALID_CHAR
 - NON_CANONICAL
@@ -250,11 +274,17 @@ Implementations MUST distinguish:
 - ENTROPY_FAILURE
 - INVALID_MODE
 
+Secure extension errors (if implemented):
+
+- KEY_UNAVAILABLE
+- KEY_INVALID
+- INVALID_VERSION
+- AUTH_FAILURE
+
 Requirements:
 
-- MUST be deterministic
-- MUST NOT continue after error
-- MUST NOT use ambiguous errors
+- Errors MUST be deterministic
+- Implementations MUST fail closed
 
 ============================================================
 10. PROHIBITED BEHAVIORS
@@ -263,94 +293,31 @@ Requirements:
 Implementations MUST NOT:
 
 - bypass hashing for identifiers
-- generate randomness without CSPRNG
+- generate randomness without CSPRNG or approved derivation
 - truncate after encoding
 - sample B57 alphabet directly
-- introduce modulo bias
-- normalize or transform outputs
-- mix encoding schemes
-- accept non-canonical inputs
+- normalize or transform canonical outputs
+- accept non-canonical inputs in strict validation flows
 
 ============================================================
-11. BOTP INTEGRATION (MANDATORY)
+11. SECURITY CONSIDERATIONS
 ============================================================
 
-I57 defines the REQUIRED interface for BOTP systems.
+I57 core provides no guarantees beyond underlying primitives.
+Security depends on entropy quality, hash function strength,
+and canonical enforcement.
 
-------------------------------------------------------------
-11.1 Identifier Requirements
-------------------------------------------------------------
-
-All identifiers MUST use I57:
-
-- device_id  → i57_random or i57_id
-- nonce      → i57_random (REQUIRED)
-- session_id → i57_random or i57_id
-
-Requirements:
-
-- MUST be ≥128-bit entropy
-- MUST be encoded via B57
-- MUST be canonical
-- MUST NOT use direct alphabet sampling
-
-------------------------------------------------------------
-11.2 Hashing Requirements
-------------------------------------------------------------
-
-- stable_hash    = i57_hash(stable_context_bytes, hash_fn, H57_LEN_128)
-- challenge_hash = i57_hash(challenge_context_bytes, hash_fn, H57_LEN_128)
-- botp_hash      = i57_hash(botp, hash_fn, H57_LEN_128)
-
-------------------------------------------------------------
-11.3 Query Hash
-------------------------------------------------------------
-
-query_hash =
- i57_hash(
-   provider | flow | credential_type | botp_hash,
-   hash_fn,
-   H57_LEN_128
- )
-
-------------------------------------------------------------
-11.4 Validation Enforcement
-------------------------------------------------------------
-
-Implementations MUST:
-
-- validate all identifiers via i57_validate_identifier
-- reject non-canonical values
-- enforce ASCII-only inputs
+For key derivation, keyed hashing, and encryption profiles,
+use S57.
 
 ============================================================
-12. SECURITY CONSIDERATIONS
-============================================================
-
-I57 provides no cryptographic guarantees beyond underlying
-primitives.
-
-Security depends on:
-
-- correct composition
-- entropy quality
-- hash function strength
-- canonical enforcement
-
-Failures:
-
-- bypassing I57 → system invalid
-- weak entropy → full compromise
-- non-canonical acceptance → ambiguity risk
-
-============================================================
-13. IANA CONSIDERATIONS
+12. IANA CONSIDERATIONS
 ============================================================
 
 This document has no IANA actions.
 
 ============================================================
-14. REFERENCES
+13. REFERENCES
 ============================================================
 
 RFC 2119 - Requirement Levels

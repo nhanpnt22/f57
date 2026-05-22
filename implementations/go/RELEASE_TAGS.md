@@ -181,7 +181,7 @@ None for v0.1.0 stable release.
 ## Links
 
 - [Specification](spec/B57 CORE API.txt)
-- [Core API](spec/B57%20CORE%20API%20(MINDU).txt)
+- [Core API](spec/B57%20CORE%20API.txt)
 - [Implementation README](implementations/go/README.md)
 ```
 

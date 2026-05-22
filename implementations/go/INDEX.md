@@ -409,7 +409,7 @@ Failure Rate:         0%
 ### Specifications
 
 - [B57 Specification](../../spec/B57 CORE API.txt)
-- [B57 Core API](../../spec/B57%20CORE%20API%20(MINDU).txt)
+- [B57 Core API](../../spec/B57%20CORE%20API.txt)
 - [Implementation Guide](../../reference/algorithm.txt)
 
 ### Documentation

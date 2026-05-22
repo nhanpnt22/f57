@@ -9,9 +9,9 @@ Specs used:
 
 - `I57Encode(input []byte) string`
 - `I57Decode(input string) ([]byte, error)`
-- `I57Hash(input []byte, hashFn HashFunction, length H57Length) (string, error)`
+- `I57Hash(input []byte, length H57Length) (string, error)`
 - `I57Random(mode R57Mode) (string, error)`
-- `I57Id(input []byte, hashFn HashFunction, length ID57Length) (string, error)`
+- `I57Id(input []byte, length ID57Length) (string, error)`
 - `I57IsValid(input string) bool`
 - `I57IsCanonical(input string) bool`
 - `I57ValidateIdentifier(input string) bool`

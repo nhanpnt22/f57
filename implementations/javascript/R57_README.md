@@ -30,4 +30,4 @@ console.log(r57IsCanonical(id)); // true
 Always utilizes hardware-backed `urandom` or active CSPRNGs from the core OS (via Node `crypto`).
 
 ## Conformance
-This implementation conforms to `R57 CORE API (MINDU)` and `R57 PROFILE` status `v0.1.0 FINAL`.
+This implementation conforms to `R57 CORE API` and `R57 PROFILE` status `v0.1.0 FINAL`.

@@ -14,8 +14,8 @@ Status: PASS
 
 ## Notes
 - Truncation is applied on raw hash bytes before B57 encoding.
-- Supported hash functions: BLAKE3, SHA-256, SHA-512.
-- Error model distinguishes INVALID_CHAR, NON_CANONICAL, INVALID_LENGTH_ENUM, ENTROPY_EXCEEDED, INVALID_HASH_FUNCTION.
+- Supported hash function: BLAKE3.
+- Error model distinguishes INVALID_CHAR, NON_CANONICAL, INVALID_LENGTH_ENUM, INVALID_R57_MODE.
 - Validation includes I57 integration helper surface and R57 mode coverage.
 
 ## Scoped Artifacts

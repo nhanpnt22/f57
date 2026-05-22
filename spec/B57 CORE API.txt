@@ -26,8 +26,7 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
-Internet-Drafts are valid for a maximum of six months and
-may be updated, replaced, or obsoleted at any time.
+This memo is intended for production use.
 
 ============================================================
 1. INTRODUCTION

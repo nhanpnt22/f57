@@ -15,15 +15,13 @@ Status: PASS
 - go test -coverprofile=coverage.out ./...
 
 ## Acceptance Scenarios
-1. `H57Hash` deterministic output for same input/hash/length.
+1. `H57Hash` deterministic output for same input/length.
 2. `H57HashAuto` full entropy lengths:
-   - SHA-256 -> 44 chars
-   - SHA-512 -> 88 chars
-3. Hash-aligned enums equal AUTO for matching hash width.
+   - BLAKE3 (256-bit baseline) -> 44 chars
+3. Hash-aligned enums behave consistently with their mapped bit widths.
 4. Invalid length enum -> `ErrInvalidLengthEnum`.
-5. Entropy exceeded (e.g., SHA-256 with H57Len512) -> `ErrEntropyExceeded`.
-6. Verify/valid/canonical helpers return expected results.
-7. End-to-end suite passes for SHA-256/SHA-512 and multiple enums.
+5. Verify/valid/canonical helpers return expected results.
+6. End-to-end suite passes across supported H57 enums.
 
 ## Result
 UAT decision: ACCEPT

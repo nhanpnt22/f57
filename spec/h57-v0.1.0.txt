@@ -24,6 +24,12 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
+Historical note:
+
+This v0.1.0 file is a historical snapshot. For normative
+current behavior, use H57 CORE API and the related core
+family specifications.
+
 Internet-Drafts are valid for a maximum of six months and
 may be updated, replaced, or obsoleted at any time.
 

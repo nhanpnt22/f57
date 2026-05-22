@@ -1,11 +1,22 @@
 # B57 Benchmarks (v0.1.0)
 
-**Date**: 2026-05-20
+**Date**: 2026-05-22
 **Environment**: Standard ARM64 macOS processing.
 
 The B57 library leverages large integer arithmetic (`BigInt` / `big.Int` / `num_bigint`) for exact conversion formatting coupled with native BLAKE3 hashing limits. Below are the estimated operational throughput expectations per language for the `v0.1.0` release. 
 
 *Note: These benchmarks measure `ID57Generate()` (which includes BLAKE3 hashing + Bitwise Truncation + BIGINT division + Base57 string allocation).*
+
+## S57 Cross-Language Release Benchmark
+
+S57 release validation is tracked separately from ID57 throughput and is currently gated by the 5-language deterministic benchmark artifact:
+
+- `implementations/cross_language_records/s57-benchmark-10000x5-summary.json`
+
+Current benchmark gate status:
+
+- Determinism mismatches: JS=0, Go=0, Rust=0, Dart=0, Python=0
+- Cross-vs-JS mismatches: Go=0, Rust=0, Dart=0, Python=0
 
 ## Estimated ID57 Throughput (Ops / Sec)
 

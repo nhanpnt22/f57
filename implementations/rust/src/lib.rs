@@ -5,6 +5,7 @@ pub mod i57;
 pub mod id57;
 pub mod id57_short;
 pub mod r57;
+pub mod s57;
 
 pub use b57::{decode, encode, is_canonical, is_valid};
 pub use errors::B57Error;
@@ -22,4 +23,5 @@ pub use id57_short::{
     id57_short_verify, id57_short_verify_default, ID57ShortLength,
 };
 pub use r57::{r57_generate, r57_is_canonical, r57_is_valid, R57Mode};
+pub use s57::{s57_is_canonical, s57_is_valid, S57Config, S57Keys, S57, S57_VERSION};
 pub use b57::{encoded_length, decoded_length};

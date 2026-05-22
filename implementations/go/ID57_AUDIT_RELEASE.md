@@ -28,8 +28,7 @@ Coverage evidence (package `github.com/aco/b57`):
 ## Notes
 - ID57 always hashes input before B57 encoding.
 - `ID57Default` resolves to `ID57Len128`.
-- Default hash behavior is BLAKE3 when `hashFn` is empty.
-- Fixed-width hash overflow is reported as `ErrEntropyExceeded`.
+- ID57 generation uses BLAKE3 for hash material.
 - The Go implementation uses byte-level prefix truncation before encoding.
 - The standalone `spec/id57-v0.1.0.txt` document describes post-encoding truncation and explicit AUTO behavior that this implementation does not expose.
 - The current code is closer to the integration and ID57-SHORT documents than to the standalone ID57 profile.

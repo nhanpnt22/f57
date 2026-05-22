@@ -10,6 +10,10 @@ from .errors import (
     InsufficientEntropyError,
     InvalidModeError,
     InvalidInputError,
+    InvalidVersionError,
+    AuthFailureError,
+    KeyInvalidError,
+    KeyUnavailableError,
 )
 from .b57 import encode, decode, is_valid, is_canonical, encoded_length, decoded_length
 from .h57 import h57_hash, h57_verify, h57_is_valid, h57_is_canonical, HashFunction, H57Length
@@ -43,6 +47,7 @@ from .i57 import (
     i57_validate_entropy,
 )
 from .r57 import r57_generate, r57_is_valid, r57_is_canonical, R57Mode
+from .s57 import S57, S57Config, S57Keys, S57_VERSION, s57_is_valid, s57_is_canonical
 
 __all__ = [
     "B57Error",
@@ -54,6 +59,10 @@ __all__ = [
     "InsufficientEntropyError",
     "InvalidModeError",
     "InvalidInputError",
+    "InvalidVersionError",
+    "AuthFailureError",
+    "KeyInvalidError",
+    "KeyUnavailableError",
     "encode",
     "decode",
     "is_valid",
@@ -93,4 +102,10 @@ __all__ = [
     "r57_is_valid",
     "r57_is_canonical",
     "R57Mode",
+    "S57",
+    "S57Config",
+    "S57Keys",
+    "S57_VERSION",
+    "s57_is_valid",
+    "s57_is_canonical",
 ]

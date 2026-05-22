@@ -1,8 +1,11 @@
 # UAT 10K Cross-Language Parity Report
 
-**Date:** 2026-05-20
+**Date:** 2026-05-22
 **Scope:** Core B57, H57, ID57, ID57-SHORT, R57, and I57 specifications.
 **Languages Validated:** Go, Rust, JavaScript, Dart, Python.
+
+**Note:** S57 has a dedicated all-language release benchmark tracked in
+`implementations/cross_language_records/s57-benchmark-10000x5-summary.json`.
 
 ## Executive Summary
 This report formalizes the successful 10,000-dataset User Acceptance Testing (UAT) deterministic parity audit across all five native language implementations of the B57 specification stack.

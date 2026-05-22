@@ -14,12 +14,20 @@ const (
 	ErrInvalidLengthEnum
 	// ErrEntropyExceeded indicates requested entropy exceeds hash output entropy.
 	ErrEntropyExceeded
-		// ErrInsufficientEntropy indicates RNG failed to provide enough entropy.
+	// ErrInsufficientEntropy indicates RNG failed to provide enough entropy.
 	ErrInsufficientEntropy
 	// ErrInvalidMode indicates an unsupported random generation mode.
 	ErrInvalidMode
 	// ErrInvalidInput indicates bad input to random mode wrapper.
 	ErrInvalidInput
+	// ErrInvalidVersion indicates envelope version mismatch.
+	ErrInvalidVersion
+	// ErrAuthFailure indicates authenticated decryption failure.
+	ErrAuthFailure
+	// ErrKeyInvalid indicates invalid key material.
+	ErrKeyInvalid
+	// ErrKeyUnavailable indicates missing key for key_id.
+	ErrKeyUnavailable
 )
 
 // Error represents a B57 error with a specific code and context.
@@ -95,6 +103,42 @@ func NewInvalidInputError(msg string) *Error {
 	return &Error{
 		Code:    ErrInvalidInput,
 		Message: fmt.Sprintf("invalid input: %s", msg),
+		Index:   -1,
+	}
+}
+
+// NewInvalidVersionError creates an error for unsupported envelope versions.
+func NewInvalidVersionError(version byte) *Error {
+	return &Error{
+		Code:    ErrInvalidVersion,
+		Message: fmt.Sprintf("invalid envelope version %d", version),
+		Index:   -1,
+	}
+}
+
+// NewAuthFailureError creates an authenticated decryption failure error.
+func NewAuthFailureError() *Error {
+	return &Error{
+		Code:    ErrAuthFailure,
+		Message: "authentication failed",
+		Index:   -1,
+	}
+}
+
+// NewKeyInvalidError creates an error for invalid key material.
+func NewKeyInvalidError() *Error {
+	return &Error{
+		Code:    ErrKeyInvalid,
+		Message: "invalid key material",
+		Index:   -1,
+	}
+}
+
+// NewKeyUnavailableError creates an error for unavailable key IDs.
+func NewKeyUnavailableError(keyID byte) *Error {
+	return &Error{
+		Code:    ErrKeyUnavailable,
+		Message: fmt.Sprintf("key unavailable for key_id %d", keyID),
 		Index:   -1,
 	}
 }

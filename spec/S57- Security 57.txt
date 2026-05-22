@@ -1,0 +1,397 @@
+============================================================
+S57 - Security 57
+Secure Composition Layer for B57, H57, R57, ID57
+Version: v1.0.0 FINAL (LOCKED)
+Status: Informational (RFC-Grade, Production-Ready)
+Date: May 2026
+============================================================
+
+============================================================
+ABSTRACT
+============================================================
+
+S57 defines a secure, object-oriented composition layer over
+B57 (encoding), H57 (hashing), R57 (randomness), and ID57
+(identifier policy).
+
+It provides a unified interface for:
+
+- deterministic identifiers (ID57)
+- secure randomness (R57)
+- cryptographic hashing (H57)
+- authenticated encryption (AES-256-GCM)
+
+S57 enforces strict separation of concerns:
+
+- ID57 is deterministic only
+- R57 is the only source of randomness
+
+============================================================
+STATUS OF THIS MEMO
+============================================================
+
+This document is provided for informational purposes and is
+intended for production use.
+
+Implementation coverage note:
+
+- S57 is a profile layer over B57/H57/R57/ID57.
+- Runtime availability MAY vary by language implementation.
+- Absence of S57 APIs does not imply non-conformance to
+  B57, H57, R57, ID57, or I57 core profiles.
+
+============================================================
+1. DESIGN PRINCIPLES
+============================================================
+
+S57 MUST:
+
+- enforce strict separation of concerns
+- provide explicit, unambiguous APIs
+- prevent misuse by construction
+- use canonical B57 encoding for all outputs
+- ensure cryptographic safety by default
+
+S57 MUST NOT:
+
+- mix deterministic and random behaviors
+- expose hidden modes
+- allow ambiguous API semantics
+
+============================================================
+2. CONSTRUCTOR
+============================================================
+
+function S57(config)
+
+Required input:
+
+- server_secret_key (≥256-bit entropy)
+- environment_salt
+
+Example:
+
+ s57 = new S57({
+   server_secret_key,
+   environment_salt
+ })
+
+Requirements:
+
+- keys MUST be treated as secret material
+- implementations SHOULD use secure storage
+- derived keys MUST use domain separation
+
+============================================================
+3. KEY DERIVATION (BLAKE3 ONLY)
+============================================================
+
+All keys MUST be derived using BLAKE3 derive_key:
+
+B57_AES_256_KEY = BLAKE3_DERIVE_KEY(server_secret_key, environment_salt, "S57/B57_AES_256/v1", 32)
+H57_KEY         = BLAKE3_DERIVE_KEY(server_secret_key, environment_salt, "S57/H57_KEY/v1", 32)
+ID57_KEY        = BLAKE3_DERIVE_KEY(server_secret_key, environment_salt, "S57/ID57_KEY/v1", 32)
+
+Requirements:
+
+- keys MUST be 32 bytes
+- key domains MUST be isolated
+- raw server_secret_key MUST NOT be used directly
+
+============================================================
+4. IDENTIFIER API (ID57 — DETERMINISTIC ONLY)
+============================================================
+
+function id(data, length_enum?) -> string
+
+Definition:
+
+ digest = BLAKE3_KEYED(ID57_KEY, data)
+ truncated = truncate_left(digest, bits(length_enum))
+ output = b57_encode(truncated)
+
+Requirements:
+
+- MUST be deterministic
+- MUST NOT use randomness
+- same input MUST produce same output
+- MUST be canonical B57
+- MUST enforce length_enum
+- MUST use ID57_KEY only
+
+Prohibited:
+
+- randomness
+- mode parameters
+- dependence on R57
+
+============================================================
+5. RANDOM API (R57 — ONLY SOURCE OF RANDOMNESS)
+============================================================
+
+All functions MUST:
+
+- produce EXACTLY 128-bit entropy
+- return 22-character canonical B57 strings
+- be unbiased
+- use CSPRNG + BLAKE3 only
+- ensure independent entropy per call for non-deterministic modes
+
+------------------------------------------------------------
+5.1 CSPRNG REQUIREMENTS
+------------------------------------------------------------
+
+CSPRNG MUST:
+
+- be cryptographically secure
+- be seeded with sufficient entropy
+- be resistant to prediction
+
+------------------------------------------------------------
+5.2 CORE FUNCTIONS
+------------------------------------------------------------
+
+function random() -> string
+
+function random_time() -> string
+
+function random_counter(counter) -> string
+
+function random_session(session_secret) -> string
+
+function random_device(device_secret) -> string
+
+function random_derived(master_secret, unique_input) -> string
+
+function random_hardened() -> string
+
+function random_hybrid(source1, source2, ...) -> string
+
+------------------------------------------------------------
+5.3 MODE DEFINITIONS
+------------------------------------------------------------
+
+V1:
+ entropy = CSPRNG(128-bit)
+
+V2:
+ entropy = BLAKE3(time_component || random_component)
+ - time_component ≤ 32-bit
+ - MUST be coarse-grained (e.g., seconds or higher)
+ - MUST NOT expose precise timestamps
+ - random_component ≥ 96-bit
+
+V3:
+ entropy = BLAKE3(counter || random_component)
+ - counter ≤ 32-bit
+ - MUST be domain-scoped
+ - MUST NOT repeat within the same domain
+ - random_component ≥ 96-bit
+
+V4:
+ entropy = BLAKE3_KEYED(session_secret, nonce)
+ - nonce MUST be unique
+
+V5:
+ entropy = BLAKE3_KEYED(device_secret, random_nonce)
+
+V6:
+ entropy = BLAKE3_KEYED(master_secret, unique_input)
+ - deterministic derived mode (not CSPRNG-random)
+
+V7:
+ entropy = BLAKE3(CSPRNG(128-bit))
+
+V8:
+ entropy = BLAKE3(source1 || source2 || ...)
+ - total entropy ≥ 128-bit
+
+============================================================
+6. HASH API (H57)
+============================================================
+
+function hash(data, length_enum?) -> string
+
+Definition:
+
+ digest = BLAKE3_KEYED(H57_KEY, data)
+ truncated = truncate_left(digest, bits(length_enum))
+ output = b57_encode(truncated)
+
+Requirements:
+
+- MUST be deterministic
+- MUST produce uniform output
+- MUST be canonical B57
+- MUST use H57_KEY only
+
+============================================================
+7. ENCRYPTION API (AES-256-GCM)
+============================================================
+
+function encrypt(plaintext, aad?) -> string
+
+Definition:
+
+ key    = B57_AES_256_KEY
+ key_id = active_key_id
+ nonce  = CSPRNG(12 bytes)
+
+ (ciphertext, tag) = AES-256-GCM(key, nonce, plaintext, aad)
+
+ version = 0x01
+ envelope = version || key_id || nonce || ciphertext || tag
+
+ output = b57_encode(envelope)
+
+------------------------------------------------------------
+
+function decrypt(b57_string, aad?) -> plaintext | error
+
+Definition:
+
+ envelope = b57_decode(b57_string)
+
+ validate:
+ - version MUST be 0x01
+ - key_id MUST be recognized
+ - envelope length MUST be valid
+
+ extract:
+ - key_id
+ - nonce
+ - ciphertext
+ - tag
+
+ plaintext = AES-256-GCM-DEC(key, nonce, ciphertext, tag, aad)
+
+Requirements:
+
+- MUST fail on authentication failure
+- MUST NOT return plaintext on failure
+- MUST validate all structure before decryption
+- aad MUST be identical for encryption and decryption
+
+============================================================
+8. LENGTH MODEL
+============================================================
+
+Supported lengths:
+
+- 128-bit → 22 chars (DEFAULT ID57)
+- 256-bit → 44 chars (DEFAULT H57)
+- 512-bit → 88 chars
+
+Profile note:
+
+- S57 intentionally restricts length_enum to this security profile subset
+  even if lower-level APIs support additional informational lengths
+
+Requirements:
+
+- MUST enforce exact bit length
+- MUST reject invalid length_enum
+- MUST NOT truncate encoded output
+
+============================================================
+9. VALIDATION RULES
+============================================================
+
+B57 encoding MUST comply with the B57 specification.
+
+All outputs MUST:
+
+- be ASCII
+- use B57 alphabet only
+- contain no whitespace
+- satisfy canonical invariant:
+
+ x == b57_encode(b57_decode(x))
+
+============================================================
+10. TRUNCATION DEFINITION
+============================================================
+
+truncate_left(x, n_bits):
+
+- MUST take the leftmost n_bits
+- MUST NOT introduce bias
+- MUST operate on raw binary output
+
+============================================================
+11. ERROR MODEL
+============================================================
+
+Standard errors:
+
+- INVALID_CHAR
+- NON_CANONICAL
+- INVALID_LENGTH_ENUM
+- INVALID_VERSION
+- AUTH_FAILURE
+- ENTROPY_FAILURE
+- KEY_INVALID
+- KEY_UNAVAILABLE
+
+Requirements:
+
+- MUST be deterministic
+- MUST fail closed
+
+============================================================
+12. SECURITY CONSIDERATIONS
+============================================================
+
+- ID57 is deterministic and MUST NOT be used for unpredictability
+- R57 MUST be used for all random identifiers
+- nonce reuse in AES-GCM is catastrophic
+- server_secret_key compromise compromises all derived keys
+- implementations SHOULD support key rotation
+- secret material MUST NOT be logged
+
+============================================================
+13. INVARIANTS
+============================================================
+
+The following MUST hold:
+
+ b57_decode(b57_encode(x)) == x
+
+Outputs MUST be:
+
+- canonical
+- bijective
+- entropy-preserving
+
+============================================================
+14. RELATIONSHIP TO STACK
+============================================================
+
+- B57 → encoding
+- H57 → hashing
+- R57 → randomness
+- ID57 → identifier policy
+- S57 → secure composition layer
+
+============================================================
+15. IANA CONSIDERATIONS
+============================================================
+
+None.
+
+============================================================
+16. REFERENCES
+============================================================
+
+RFC 2119
+RFC 8174
+
+============================================================
+AUTHOR
+============================================================
+
+ Pham Nhan
+
+============================================================
+END
+============================================================

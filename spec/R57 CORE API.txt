@@ -106,7 +106,8 @@ Requirements:
 
 - MUST produce EXACTLY 128-bit entropy
 - MUST be unbiased
-- MUST ensure independent entropy per invocation
+- MUST ensure independent entropy per invocation for
+	non-deterministic modes
 - Encoding MUST be deterministic
 - Output MUST be canonical B57
 - MUST NOT depend on platform-specific behavior
@@ -224,6 +225,7 @@ Requirements:
 
 - MUST be indistinguishable from random
 - MUST ensure uniqueness via input
+- MUST be deterministic for identical inputs
 
 Use:
 - deterministic secure IDs

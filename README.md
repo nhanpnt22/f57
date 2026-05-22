@@ -13,7 +13,7 @@
 
 The B57 Protocol Stack defines a unified, 
 layered architecture for binary encoding, hash representation, 
-random identification, and identifier generation.
+random identification, secure composition, and identifier generation.
 
 At its core, B57 provides a canonical, ASCII-safe binary-to-text encoding scheme designed for human readability and unambiguous transcription, enforcing a strict 57-character alphabet that excludes visually ambiguous symbols.
 
@@ -42,7 +42,7 @@ The B57 protocol eliminates this by enforcing a strict 57-character alphabet:
 
 ## 2. The B57S Stack Architecture
 
-The protocol is composed of a 6-layer architecture with strict conceptual boundaries:
+The protocol is composed of a 7-layer architecture with strict conceptual boundaries:
 
 ### 2.1 B57 (Encoding Layer)
 * **Specification:** [B57 Core](spec/B57%20CORE%20API.txt)
@@ -78,9 +78,16 @@ The protocol is composed of a 6-layer architecture with strict conceptual bounda
 * The top-level facade interface unifying all underlying profiles into a seamless developer API.
 * Ensures correct composition and safe parameter passing.
 
+### 2.7 S57 (Security Composition Layer)
+* **Specification:** [S57 Security 57](spec/S57-%20Security%2057.txt)
+* Secure composition profile over B57/H57/ID57/R57 with domain-separated key derivation and envelope encryption.
+* **Pipeline:** `data -> keyed hash/id/random profile -> optional AES-256-GCM envelope -> B57 string`
+* **Properties:** deterministic keyed surfaces where required, fail-closed decrypt behavior, cross-language parity validated for release.
+
 ## 3. Native Implementations
 
 The v0.1.0 release provides fully native implementations. All implementations process arrays using native BigInt arithmetic.
+S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, Dart, and Python.
 
 Each language implementation is maintained in its own separate branch:
 
@@ -91,6 +98,7 @@ Each language implementation is maintained in its own separate branch:
 - **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/b57/tree/python)
 
 All passed the [10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md) proving zero deviation across execution environments.
+S57 release gating also passed with zero mismatches in the 5-language benchmark summary at [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json).
 
 ## 4. Recommended System Patterns
 
@@ -99,11 +107,13 @@ The stack encourages standard integration patterns:
 - **Dual-Layer Identity:** Produce a full `H57(data)` internally for database deduplication, while exposing a targeted `ID57(data, 128-bit)` externally via APIs.
 - **Storage vs. Exposure:** Use `ID57-SHORT` for printable offline receipts or tiny URLs, mapped safely to a heavily collision-resistant `H57` hash stored remotely.
 - **Tamper Detection & Content Routing:** Execute exact hash matching without truncation using native length 44-character `H57` outputs.
+- **Confidential Payload Transport:** Use `S57` envelope encryption (`encrypt`/`decrypt`) for authenticated payload exchange where transport-safe B57 strings are required.
 
 ## 5. Official Documentation
 
 - [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md) - Official v0.1.0 release sign-off and validation posture.
 - [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md) - Proof of absolute deterministic data alignment.
+- [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, and JavaScript/Node.js.
 - [Benchmarks](BENCHMARKS.md) - ID processing ops/second across languages.
 - [Security Policy](SECURITY.md) - Collision domains and vulnerability reporting.
 - [Changelog](CHANGELOG.md) - Semantic version tracking.
@@ -136,7 +146,41 @@ cd implementations/dart && dart test
 
 # Python
 cd implementations/python && pytest
+
+# S57 5-language parity benchmark
+cd implementations/javascript && node scripts/s57-benchmark-10000x5.mjs
 ```
+
+### 6.1 S57 Quick Start (Node.js)
+
+```javascript
+import { S57, H57Length, ID57Length } from './implementations/javascript/index.js';
+
+const s57 = new S57({
+	server_secret_key: new TextEncoder().encode('S57_SERVER_SECRET_KEY_MUST_BE_LONG_1234567890'),
+	environment_salt: new TextEncoder().encode('prod-v1'),
+	key_id: 7
+});
+
+const input = new TextEncoder().encode('hello-b57-s57');
+
+const h = s57.hash(input, H57Length.LEN_256);
+const id = s57.id(input, ID57Length.DEFAULT);
+const rd = s57.random_derived(
+	new TextEncoder().encode('master-secret'),
+	new TextEncoder().encode('u-1')
+);
+
+const aad = new TextEncoder().encode('ctx:v1');
+const token = s57.encrypt(input, aad);
+const plain = s57.decrypt(token, aad);
+
+console.log({ h, id, rd, token, plain: new TextDecoder().decode(plain) });
+```
+
+For full release-grade validation evidence, see:
+- [implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md)
+- [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json)
 
 ## 7. Governance
 

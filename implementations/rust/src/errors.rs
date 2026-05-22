@@ -9,6 +9,10 @@ pub enum ErrorCode {
     InsufficientEntropy,
     InvalidMode,
     InvalidInput,
+    InvalidVersion,
+    AuthFailure,
+    KeyInvalid,
+    KeyUnavailable,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -74,6 +78,38 @@ impl B57Error {
         Self {
             code: ErrorCode::InvalidInput,
             message: format!("invalid input: {}", msg),
+            index: None,
+        }
+    }
+
+    pub fn invalid_version(version: u8) -> Self {
+        Self {
+            code: ErrorCode::InvalidVersion,
+            message: format!("invalid envelope version {}", version),
+            index: None,
+        }
+    }
+
+    pub fn auth_failure() -> Self {
+        Self {
+            code: ErrorCode::AuthFailure,
+            message: "authentication failed".to_string(),
+            index: None,
+        }
+    }
+
+    pub fn key_invalid() -> Self {
+        Self {
+            code: ErrorCode::KeyInvalid,
+            message: "invalid key material".to_string(),
+            index: None,
+        }
+    }
+
+    pub fn key_unavailable(key_id: u8) -> Self {
+        Self {
+            code: ErrorCode::KeyUnavailable,
+            message: format!("key unavailable for key_id {}", key_id),
             index: None,
         }
     }

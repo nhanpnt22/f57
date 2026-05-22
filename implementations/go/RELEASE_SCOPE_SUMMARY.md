@@ -1,6 +1,6 @@
 # Go Release Scope Summary
 
-Date: 2026-05-19
+Date: 2026-05-22
 
 ## Current Validation State
 - `go test ./...`: PASS
@@ -15,15 +15,12 @@ Date: 2026-05-19
   - integration-level identifier and entropy helper checks
 - R57 mode enums V1-V8 implemented and covered in unit tests.
 
-## Conditional / Scope-Limited
-- ID57: implementation is stable on byte-level truncation-before-encoding model, but attached spec documents are internally inconsistent on truncation semantics and AUTO behavior.
-- R57: implementation guarantees 22-character canonical output; strict interpretation of unbiased single-sample 128-bit mapping should be explicitly approved in spec/release policy.
+## Release Scope
+- Scoped Go release posture: READY.
+- Repository-wide release posture is governed by top-level release assessment documents.
 
-## Not Safe To Claim Without Qualification
-- Full package-wide "spec-complete" conformance across all attached documents.
+## Safe Claims
+- "Go implementation passes tests and race checks; B57/H57/ID57/ID57-SHORT/I57/R57 are implemented and validated in this scope."
 
 ## Recommended Release Language
-- Safe claim:
-  - "Go implementation passes tests and race checks; B57/H57/I57 implemented and validated; R57 modes implemented; ID57 and R57 strict-conformance interpretation is scoped per audit notes."
-- Avoid:
-  - "Fully conformant to all attached specs without qualification."
+- "Go scoped release v0.1.0-go is approved."

@@ -19,7 +19,7 @@ Severity: HIGH
 The R57 spec requires unbiased output derived from exactly 128-bit entropy and fixed 22-character output. The Go implementation now supports all declared mode enums, but still enforces 22-character output through an additional derivation step when direct encoding of 16 bytes is shorter than 22 characters.
 
 Evidence:
-- Spec: `spec/R57 CORE API (MINDU).txt`
+- Spec: `spec/R57 CORE API.txt`
 - Implementation: `r57.go`
 - Tests: `r57_test.go`
 
@@ -30,11 +30,11 @@ Release impact:
 ### 2. ID57 documents are internally inconsistent with the implementation
 Severity: MEDIUM
 
-The standalone ID57 profile specifies truncation after B57 encoding and defines an explicit AUTO mode. The Go implementation performs byte-level prefix truncation before encoding and exposes no AUTO enum. That implementation does align with `I57 - INTEGRATION.txt` and `ID57-SHORT PROFILE.txt`, so the inconsistency appears to be within the spec set rather than a purely local code defect.
+The standalone ID57 profile specifies truncation after B57 encoding and defines an explicit AUTO mode. The Go implementation performs byte-level prefix truncation before encoding and exposes no AUTO enum. That implementation does align with `I57 CORE API.txt` and `ID57-SHORT PROFILE.txt`, so the inconsistency appears to be within the spec set rather than a purely local code defect.
 
 Evidence:
 - Standalone profile: `spec/id57-v0.1.0.txt`
-- Stack/integration specs: `spec/I57 - INTEGRATION.txt`, `spec/ID57-SHORT PROFILE.txt`
+- Stack/integration specs: `spec/I57 CORE API.txt`, `spec/ID57-SHORT PROFILE.txt`
 - Implementation: `id57.go`, `id57_short.go`
 
 Release impact:

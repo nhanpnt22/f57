@@ -9,18 +9,14 @@ Specs used:
 
 ## API
 
-- `H57Hash(input []byte, hashFn HashFunction, length H57Length) (string, error)`
-- `H57Verify(input []byte, h57String string, hashFn HashFunction, length H57Length) bool`
+- `H57Hash(input []byte, length H57Length) (string, error)`
+- `H57Verify(input []byte, h57String string, length H57Length) bool`
 - `H57IsValid(h57String string) bool`
 - `H57IsCanonical(h57String string) bool`
 
-## Supported Hash Functions
+## Hash Behavior
 
-- `HashSHA256`
-- `HashSHA512`
-
-Notes:
-- BLAKE3 is preferred by spec, but not in Go standard library. This implementation uses SHA-256 and SHA-512 without external dependencies.
+- This implementation uses BLAKE3 for H57 output generation.
 
 ## Length Modes
 
@@ -36,8 +32,6 @@ Truncation occurs at byte level before B57 encoding using deterministic prefix t
 - `ErrInvalidChar`
 - `ErrNonCanonical`
 - `ErrInvalidLengthEnum`
-- `ErrEntropyExceeded`
-- `ErrInvalidHashFunction`
 
 ## Validation
 

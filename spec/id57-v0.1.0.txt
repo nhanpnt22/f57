@@ -27,6 +27,11 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
+Historical note:
+
+This v0.1.0 file is a historical snapshot. For normative
+current behavior, use ID57 CORE API and I57 CORE API.
+
 ============================================================
 1. INTRODUCTION
 ============================================================

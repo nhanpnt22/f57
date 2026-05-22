@@ -1,0 +1,119 @@
+{
+  "date": "2026-05-21T14:36:09.553Z",
+  "datasetSize": 1000,
+  "runsPerLanguage": 3,
+  "profile": "S57",
+  "languages": [
+    "go",
+    "rust",
+    "dart",
+    "python"
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "determinism": {
+        "go": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      },
+      "crossVsGo": {
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      }
+    },
+    {
+      "run": 2,
+      "determinism": {
+        "go": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      },
+      "crossVsGo": {
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      }
+    },
+    {
+      "run": 3,
+      "determinism": {
+        "go": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      },
+      "crossVsGo": {
+        "rust": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "dart": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        },
+        "python": {
+          "mismatchCount": 0,
+          "mismatchIndexes": []
+        }
+      }
+    }
+  ]
+}

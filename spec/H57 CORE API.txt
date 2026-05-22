@@ -27,8 +27,7 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
-Internet-Drafts are valid for a maximum of six months and
-may be updated, replaced, or obsoleted at any time.
+This memo is intended for production use.
 
 ============================================================
 1. INTRODUCTION
@@ -99,7 +98,16 @@ Where:
 
 5.1 h57_hash
 
+function h57_hash(input_bytes, length_enum) -> string
+
+Optional extension:
+
 function h57_hash(input_bytes, hash_fn, length_enum) -> string
+
+Binding compatibility note:
+
+- Some language bindings require the hash_fn argument and treat
+  BLAKE3 as the effective default when unspecified by caller.
 
 Definition:
 
@@ -117,6 +125,8 @@ Requirements:
 - HASH MUST be cryptographic
 - HASH MUST be deterministic
 - HASH MUST produce fixed-length output
+- Implementations SHOULD default to BLAKE3 where available
+- If hash_fn is exposed, it MUST be cryptographic and deterministic
 - Encoding MUST be canonical B57
 - Output MUST be deterministic
 - Input MUST NOT be modified
@@ -257,9 +267,13 @@ Implementations MUST NOT infer hash function from output.
 
 10.1 h57_verify
 
+function h57_verify(input_bytes, h57_string, length_enum) -> boolean
+
+Optional extension:
+
 function h57_verify(input_bytes, h57_string, hash_fn, length_enum) -> boolean
 
- expected = h57_hash(input_bytes, hash_fn, length_enum)
+ expected = h57_hash(input_bytes, length_enum)
 
  return (expected == h57_string)
 

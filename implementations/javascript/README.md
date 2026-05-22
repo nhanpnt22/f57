@@ -7,14 +7,20 @@ This folder provides JavaScript parity with the Go implementation for:
 - ID57 core profile
 - ID57-SHORT profile
 - R57 random identifier profile
+- S57 secure composition profile (JavaScript implementation)
+
+Runtime notes:
+- Node.js 20+ supported
+- TypeScript projects can consume ESM exports directly
 
 ## Specs
 - [B57 CORE API](../../spec/B57%20CORE%20API.txt)
 - [H57 CORE API](../../spec/H57%20CORE%20API.txt)
 - [I57 CORE API](../../spec/I57%20CORE%20API.txt)
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API%20(MINDU).txt)
+- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
 - [ID57-SHORT PROFILE](../../spec/ID57-SHORT%20PROFILE.txt)
-- [R57 CORE API (MINDU)](../../spec/R57%20CORE%20API%20(MINDU).txt)
+- [R57 CORE API (MINDU)](../../spec/R57%20CORE%20API.txt)
+- [S57 - Security 57](../../spec/S57-%20Security%2057.txt)
 - [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
 
 ## Install
@@ -34,13 +40,14 @@ npm run test:coverage
 ## API
 
 - `encode(bytes)`, `decode(string)`, `isValid(string)`, `isCanonical(string)`
-- `h57Hash(input, hashFn, length)`, `h57Verify(...)`
-- `i57Encode(input)`, `i57Decode(string)`, `i57Hash(input, hashFn, length)`
-- `i57Random(mode)`, `i57Id(input, hashFn, length)`, `i57IsValid(string)`, `i57IsCanonical(string)`
+- `h57Hash(input, length)`, `h57Verify(input, h57String, length)`
+- `i57Encode(input)`, `i57Decode(string)`, `i57Hash(input, length)`
+- `i57Random(mode)`, `i57Id(input, length)`, `i57IsValid(string)`, `i57IsCanonical(string)`
 - `i57ValidateIdentifier(string)`, `i57ValidateEntropy(string)`
-- `id57Generate(input, hashFn, length)`, `id57GenerateDefault(input)`
-- `id57ShortGenerate(input, hashFn, length)`, `id57ShortGenerateDefault(input)`
+- `id57Generate(input, length)`, `id57GenerateDefault(input)`
+- `id57ShortGenerate(input, length)`, `id57ShortGenerateDefault(input)`
 - `r57Generate(mode)`, `r57IsValid(string)`, `r57IsCanonical(string)`, `R57Mode`
+- `S57` class secure APIs (`hash/id/random*/encrypt/decrypt`)
 
 Exports are available from [index.js](index.js).
 

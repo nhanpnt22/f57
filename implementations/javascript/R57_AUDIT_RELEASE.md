@@ -1,7 +1,7 @@
 # R57 AUDIT RELEASE
 
 **Module:** `r57.js` (JavaScript)
-**Target Spec:** `R57 CORE API (MINDU)` and `R57 PROFILE` v0.1.0 FINAL
+**Target Spec:** `R57 CORE API` and `R57 PROFILE` v0.1.0 FINAL
 
 ## Audit Scope
 - Code inspection for missing edge-cases during entropy derivation.

@@ -75,3 +75,31 @@ class InvalidInputError(B57Error):
 
     def __init__(self, msg: str):
         super().__init__("INVALID_INPUT", f"invalid input: {msg}")
+
+
+class InvalidVersionError(B57Error):
+    """Invalid envelope version."""
+
+    def __init__(self, version: int):
+        super().__init__("INVALID_VERSION", f"invalid envelope version {version}")
+
+
+class AuthFailureError(B57Error):
+    """Authenticated decryption failure."""
+
+    def __init__(self):
+        super().__init__("AUTH_FAILURE", "authentication failed")
+
+
+class KeyInvalidError(B57Error):
+    """Invalid key material."""
+
+    def __init__(self):
+        super().__init__("KEY_INVALID", "invalid key material")
+
+
+class KeyUnavailableError(B57Error):
+    """Unavailable key id."""
+
+    def __init__(self, key_id: int):
+        super().__init__("KEY_UNAVAILABLE", f"key unavailable for key_id {key_id}")

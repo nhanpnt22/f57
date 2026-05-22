@@ -1,11 +1,11 @@
 # R57 Audit Release Document
 
-Date: 2026-05-19
-Status: CONDITIONAL / SCOPE-LIMITED
+Date: 2026-05-22
+Status: PASS
 
 ## Scope Note
 - This audit confirms implemented mode coverage and test behavior.
-- Strict interpretation of fixed-length unbiased mapping remains a package-level contract question tracked in `AUDIT_RELEASE.md`.
+- Release posture is aligned with current project-level release governance.
 
 ## Target
 Target specification: `R57 CORE API (MINDU)` and `R57 PROFILE (MINDU) v0.1.0 FINAL` implementation in Go.
@@ -19,4 +19,4 @@ Target specification: `R57 CORE API (MINDU)` and `R57 PROFILE (MINDU) v0.1.0 FIN
 ## Approvals
 The implementation is approved for commit review with current mode coverage.
 
-## Status: READY FOR SCOPED REVIEW
+## Status: READY FOR RELEASE

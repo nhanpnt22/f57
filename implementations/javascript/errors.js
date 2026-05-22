@@ -13,7 +13,11 @@ export const ErrorCode = Object.freeze({
   NON_CANONICAL: 'NON_CANONICAL',
   INVALID_LENGTH_ENUM: 'INVALID_LENGTH_ENUM',
   ENTROPY_EXCEEDED: 'ENTROPY_EXCEEDED',
-  INVALID_MODE: 'INVALID_MODE'
+  INVALID_MODE: 'INVALID_MODE',
+  INVALID_VERSION: 'INVALID_VERSION',
+  AUTH_FAILURE: 'AUTH_FAILURE',
+  KEY_INVALID: 'KEY_INVALID',
+  KEY_UNAVAILABLE: 'KEY_UNAVAILABLE'
 });
 
 export class InvalidCharError extends B57Error {
@@ -48,6 +52,31 @@ export class InvalidModeError extends B57Error {
   }
 }
 
+export class InvalidVersionError extends B57Error {
+  constructor(version) {
+    super(ErrorCode.INVALID_VERSION, `invalid envelope version ${version}`);
+  }
+}
+
+export class AuthFailureError extends B57Error {
+  constructor() {
+    super(ErrorCode.AUTH_FAILURE, 'authentication failed');
+  }
+}
+
+export class KeyInvalidError extends B57Error {
+  constructor() {
+    super(ErrorCode.KEY_INVALID, 'invalid key material');
+  }
+}
+
+export class KeyUnavailableError extends B57Error {
+  constructor(keyId) {
+    super(ErrorCode.KEY_UNAVAILABLE, `key unavailable for key_id ${keyId}`);
+    this.keyId = keyId;
+  }
+}
+
 export function newInvalidCharError(char, index = -1) {
   return new InvalidCharError(char, index);
 }
@@ -66,4 +95,20 @@ export function newEntropyExceededError(requested, available) {
 
 export function newInvalidR57ModeError(mode) {
   return new InvalidModeError(mode);
+}
+
+export function newInvalidVersionError(version) {
+  return new InvalidVersionError(version);
+}
+
+export function newAuthFailureError() {
+  return new AuthFailureError();
+}
+
+export function newKeyInvalidError() {
+  return new KeyInvalidError();
+}
+
+export function newKeyUnavailableError(keyId) {
+  return new KeyUnavailableError(keyId);
 }

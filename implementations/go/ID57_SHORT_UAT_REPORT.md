@@ -20,9 +20,8 @@ Status: PASS
 2. `ID57ShortDefault` resolves to `ID57ShortLen47` with compact output (typically 8 chars).
 3. Only short-profile enums are accepted (`23, 29, 32, 47, 70`).
 4. Non-profile lengths return `ErrInvalidLengthEnum`.
-5. Invalid hash function returns `ErrInvalidHashFunction`.
-6. Verify/valid/canonical helpers return expected results.
-7. End-to-end suite passes across all supported short-profile enums.
+5. Verify/valid/canonical helpers return expected results.
+6. End-to-end suite passes across all supported short-profile enums.
 
 ## Result
 UAT decision: ACCEPT

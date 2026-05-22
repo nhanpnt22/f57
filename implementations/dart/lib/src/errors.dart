@@ -78,3 +78,35 @@ class InvalidInputError extends B57Error {
           message: 'invalid input: $msg',
         );
 }
+
+class InvalidVersionError extends B57Error {
+  InvalidVersionError(int version)
+      : super(
+          code: 'INVALID_VERSION',
+          message: 'invalid envelope version $version',
+        );
+}
+
+class AuthFailureError extends B57Error {
+  AuthFailureError()
+      : super(
+          code: 'AUTH_FAILURE',
+          message: 'authentication failed',
+        );
+}
+
+class KeyInvalidError extends B57Error {
+  KeyInvalidError()
+      : super(
+          code: 'KEY_INVALID',
+          message: 'invalid key material',
+        );
+}
+
+class KeyUnavailableError extends B57Error {
+  KeyUnavailableError(int keyId)
+      : super(
+          code: 'KEY_UNAVAILABLE',
+          message: 'key unavailable for key_id $keyId',
+        );
+}

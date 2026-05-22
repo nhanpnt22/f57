@@ -8,16 +8,16 @@ Scope note:
 - It does not currently expose a standalone `ID57_LEN_AUTO` mode from the standalone `id57-v0.1.0.txt` profile.
 
 Specs used:
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API%20(MINDU).txt)
+- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
 - [id57-v0.1.0](../../spec/id57-v0.1.0.txt)
 - [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
 - [B57 CORE API](../../spec/B57%20CORE%20API.txt)
 
 ## API
 
-- `ID57Generate(input []byte, hashFn HashFunction, length ID57Length) (string, error)`
+- `ID57Generate(input []byte, length ID57Length) (string, error)`
 - `ID57GenerateDefault(input []byte) (string, error)`
-- `ID57Verify(input []byte, hashFn HashFunction, id57String string, length ID57Length) bool`
+- `ID57Verify(input []byte, id57String string, length ID57Length) bool`
 - `ID57VerifyDefault(input []byte, id57String string) bool`
 - `ID57IsValid(id57String string) bool`
 - `ID57IsCanonical(id57String string) bool`
@@ -35,11 +35,9 @@ Rules:
 
 This means the Go implementation matches the byte-truncation model, not the post-encoding prefix truncation language in the standalone `id57-v0.1.0.txt` profile.
 
-## Hash Functions
+## Hash Behavior
 
-- `HashBLAKE3` (default when `hashFn` is empty)
-- `HashSHA256`
-- `HashSHA512`
+- This implementation uses BLAKE3 for ID57 output generation.
 
 ## Length Modes
 
@@ -48,7 +46,7 @@ This means the Go implementation matches the byte-truncation model, not the post
 - Informational: `ID57Len23`, `ID57Len29`, `ID57Len47`, `ID57Len70`, `ID57Len93`, `ID57Len186`, `ID57Len373`
 
 Default profile:
-- `ID57GenerateDefault` uses `HashBLAKE3 + ID57Default` (22-char baseline).
+- `ID57GenerateDefault` uses `ID57Default` (22-char baseline).
 
 Compatibility note:
 - The implementation provides `ID57Default`, not an explicit AUTO/full-hash enum.
@@ -65,8 +63,6 @@ For non-byte-aligned lengths (e.g., 23-bit), excess bits in the final byte are m
 - `ErrInvalidChar`
 - `ErrNonCanonical`
 - `ErrInvalidLengthEnum`
-- `ErrEntropyExceeded` (e.g., requesting 512-bit ID with SHA-256)
-- `ErrInvalidHashFunction`
 
 ## Validation
 

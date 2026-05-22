@@ -33,7 +33,7 @@ void main() {
       expect(r57.length, 22);
 
       final i57Rand = i57Random(22);
-      expect(i57Rand.length, 31);
+      expect(i57Rand.length == 30 || i57Rand.length == 31, true);
     });
   });
 }

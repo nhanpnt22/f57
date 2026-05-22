@@ -1,13 +1,14 @@
 {
   "name": "@aco/b57-js",
   "version": "0.1.0",
-  "description": "JavaScript implementation of B57/H57/ID57/ID57-SHORT",
+  "description": "JavaScript/TypeScript (Node.js) implementation of B57/H57/ID57/ID57-SHORT/R57/I57/S57",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage",
-    "test:cross-language": "node ./scripts/cross-language-e2e.mjs"
+    "test:cross-language": "node ./scripts/cross-language-e2e.mjs",
+    "test:s57-cross-language-1000x3": "node ./scripts/s57-cross-language-1000x3.mjs"
   },
   "engines": {
     "node": ">=20"

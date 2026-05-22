@@ -4,14 +4,14 @@ This package implements the ID57-SHORT profile from the attached specs.
 
 Specs used:
 - [ID57-SHORT PROFILE](../../spec/ID57-SHORT%20PROFILE.txt)
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API%20(MINDU).txt)
+- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
 - [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
 
 ## API
 
-- `ID57ShortGenerate(input []byte, hashFn HashFunction, length ID57ShortLength) (string, error)`
+- `ID57ShortGenerate(input []byte, length ID57ShortLength) (string, error)`
 - `ID57ShortGenerateDefault(input []byte) (string, error)`
-- `ID57ShortVerify(input []byte, hashFn HashFunction, id57String string, length ID57ShortLength) bool`
+- `ID57ShortVerify(input []byte, id57String string, length ID57ShortLength) bool`
 - `ID57ShortVerifyDefault(input []byte, id57String string) bool`
 - `ID57ShortIsValid(id57String string) bool`
 - `ID57ShortIsCanonical(id57String string) bool`

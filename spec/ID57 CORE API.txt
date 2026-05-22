@@ -28,8 +28,7 @@ STATUS OF THIS MEMO
 
 This document is provided for informational purposes.
 
-Internet-Drafts are valid for a maximum of six months and
-may be updated, replaced, or obsoleted at any time.
+This memo is intended for production use.
 
 ============================================================
 1. INTRODUCTION
@@ -105,11 +104,20 @@ Where:
 
 5.1 id57_generate
 
+function id57_generate(input_bytes, length_enum) -> string
+
+Optional extension:
+
 function id57_generate(input_bytes, hash_fn, length_enum) -> string
+
+Binding compatibility note:
+
+- Some language bindings require the hash_fn argument and treat
+  BLAKE3 as the effective default when unspecified by caller.
 
 Definition:
 
- hash_bytes = hash_fn(input_bytes)
+ hash_bytes = HASH(input_bytes)
 
  if length_enum == ID57_DEFAULT:
      effective_bytes = truncate_bytes(hash_bytes, bits(ID57_LEN_128))
@@ -120,9 +128,10 @@ Definition:
 
 Requirements:
 
-- hash_fn MUST be cryptographic
-- hash_fn MUST be deterministic
+- HASH MUST be cryptographic
+- HASH MUST be deterministic
 - BLAKE3 SHOULD be the primary default
+- If hash_fn is exposed, it MUST be cryptographic and deterministic
 - Truncation MUST be prefix-based
 - Truncation MUST occur BEFORE encoding
 - Encoding MUST be canonical B57
@@ -227,9 +236,13 @@ Security depends on hash function properties.
 
 10.1 id57_verify
 
+function id57_verify(input_bytes, id57_string, length_enum) -> boolean
+
+Optional extension:
+
 function id57_verify(input_bytes, hash_fn, id57_string, length_enum) -> boolean
 
- expected = id57_generate(input_bytes, hash_fn, length_enum)
+ expected = id57_generate(input_bytes, length_enum)
 
  return (expected == id57_string)
 
@@ -259,12 +272,12 @@ function id57_is_canonical(id57_string) -> boolean
 
 The following MUST hold:
 
- id57_generate(x, h, L) ==
- b57_encode(truncate_bytes(h(x), bits(L)))
+ id57_generate(x, L) ==
+ b57_encode(truncate_bytes(HASH(x), bits(L)))
 
 Determinism:
 
- same input + same hash_fn + same length → same output
+ same input + same configured hash + same length -> same output
 
 Canonical constraint:
 

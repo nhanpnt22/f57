@@ -124,11 +124,20 @@ ID57S_DEFAULT:
 
 4.1 id57s_generate
 
+function id57s_generate(input_bytes, length_enum) -> string
+
+Optional extension:
+
 function id57s_generate(input_bytes, hash_fn, length_enum) -> string
+
+Binding compatibility note:
+
+- Some language bindings require the hash_fn argument and treat
+  BLAKE3 as the effective default when unspecified by caller.
 
 Definition:
 
- hash_bytes = hash_fn(input_bytes)
+ hash_bytes = HASH(input_bytes)
 
  length_enum MUST be one of:
   ID57_LEN_23, ID57_LEN_29, ID57_LEN_32,
@@ -145,9 +154,10 @@ Definition:
 
 Requirements:
 
-- hash_fn MUST be cryptographic
-- hash_fn MUST be deterministic
+- HASH MUST be cryptographic
+- HASH MUST be deterministic
 - BLAKE3 SHOULD be the primary default
+- If hash_fn is exposed, it MUST be cryptographic and deterministic
 - truncation MUST be prefix-based
 - truncation MUST occur BEFORE encoding
 - truncate_bytes_prefix MUST preserve big-endian ordering
@@ -174,13 +184,13 @@ If bit_length is not byte-aligned:
 
 The following MUST hold:
 
- id57s_generate(x, h, L) ==
- b57_encode(truncate_bytes_prefix(h(x),
+ id57s_generate(x, L) ==
+ b57_encode(truncate_bytes_prefix(HASH(x),
  ceil(bits(L)/8)))
 
 Determinism:
 
- same input + same hash_fn + same length → same output
+ same input + same configured hash + same length -> same output
 
 ============================================================
 6. COLLISION MODEL
