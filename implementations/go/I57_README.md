@@ -3,7 +3,7 @@
 This package implements I57 Core API on top of the MINDU stack.
 
 Specs used:
-- [I57 CORE API (MINDU)](../../spec/I57%20CORE%20API.txt)
+- [I57 CORE API (MINDU)](../../spec/i57-core-api.txt)
 
 ## API
 

@@ -408,9 +408,9 @@ Failure Rate:         0%
 
 ### Specifications
 
-- [B57 Specification](../../spec/B57 CORE API.txt)
-- [B57 Core API](../../spec/B57%20CORE%20API.txt)
-- [Implementation Guide](../../reference/algorithm.txt)
+- [B57 Specification](../../spec/b57-core-api.txt)
+- [B57 Core API](../../spec/b57-core-api.txt)
+- [Implementation Guide](../../spec/b57-core-api.txt)
 
 ### Documentation
 
@@ -421,7 +421,7 @@ Failure Rate:         0%
 
 ### Related Files
 
-- [Repository Structure](../../B57%20REPOSITORY%20STRUCTURE.txt)
+- [Repository Structure](../../b57-repository-structure.txt)
 - [Contributing Guide](../../CONTRIBUTING.md)
 - [License](../../LICENSE)
 

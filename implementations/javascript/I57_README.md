@@ -3,7 +3,7 @@
 Implements the I57 Integration/Unified Interface (MINDU) providing unified access to B57, H57, R57, and ID57 functionality.
 
 Spec reference:
-- `spec/I57 CORE API.txt`
+- `spec/i57-core-api.txt`
 
 Core API:
 - `i57Encode(input)`

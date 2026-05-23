@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Currently, the `v0.1.0` branch is the only officially supported and maintained version of the B57 specification stack.
+Currently, the `v0.1.0` branch is the only officially supported and maintained version of the F57 specification family (with B57 as the base layer).
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -11,7 +11,7 @@ Currently, the `v0.1.0` branch is the only officially supported and maintained v
 
 ## Cryptographic Considerations
 
-The B57 system focuses on encoding efficiency and deterministic identifier generation. Note the following security parameters:
+The F57 system focuses on encoding efficiency, deterministic identifier generation, and secure composition. Note the following security parameters:
 
 ### Hashing Standard
 The primary hashing algorithm required for B57 (`H57`, `ID57`) is **BLAKE3**. While users can inject custom hashers via the API, deterministic cross-language parity guarantees only apply when utilizing the BLAKE3 XOF functions. BLAKE3 is highly secure against collision, preimage, and second-preimage attacks.

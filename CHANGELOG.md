@@ -1,11 +1,17 @@
 # Changelog
 
-All notable changes to the B57 specification stack and its associated native implementations will be documented in this file.
+All notable changes to the F57 specification family and its associated native implementations will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.1] - 2026-05-23
+
+### Changed
+- Repository rename alignment and documentation consistency updates for the F57 umbrella naming.
+- Top-level release/assessment documents clarified to distinguish protocol release version (`v0.1.0`) from latest repository tag (`v0.1.1`).
 
 ### Changed
 - Documentation synchronized for finalized S57 release posture across all top-level governance and release documents.
@@ -20,13 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Core Standard**: Finalized the `v0.1.0 FINAL` specification architecture acting directly beneath the `MINDU` design parameters.
 - **Specification Suite**: Fully mapped the protocol stack in the `spec/` directory:
-  - `B57 CORE API.txt` (Base57 canonical encoding)
-  - `H57 CORE API.txt` (Hashed Base57)
-  - `ID57 CORE API.txt` (128-bit Identity Generation)
-  - `ID57-SHORT PROFILE.txt` (47-bit human-readable IDs)
-  - `R57 CORE API.txt` (Random generators)
-  - `I57 CORE API.txt` (Unified facade)
-  - `S57- Security 57.txt` (Secure composition profile)
+  - `b57-core-api.txt` (Base57 canonical encoding)
+  - `h57-core-api.txt` (Hashed Base57)
+  - `id57-core-api.txt` (128-bit Identity Generation)
+  - `id57-short-profile.txt` (47-bit human-readable IDs)
+  - `r57-core-api.txt` (Random generators)
+  - `i57-core-api.txt` (Unified facade)
+  - `s57-security-57.txt` (Secure composition profile)
 - **Language Support**: Released completely native, zero-dependency (other than hashing/math primitives) implementations for:
   - Go
   - Rust

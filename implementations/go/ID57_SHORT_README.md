@@ -3,9 +3,9 @@
 This package implements the ID57-SHORT profile from the attached specs.
 
 Specs used:
-- [ID57-SHORT PROFILE](../../spec/ID57-SHORT%20PROFILE.txt)
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
-- [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
+- [ID57-SHORT PROFILE](../../spec/id57-short-profile.txt)
+- [ID57 CORE API (MINDU)](../../spec/id57-core-api.txt)
+- [B57S-v0.1.0](../../spec/b57s-v0.1.0.txt)
 
 ## API
 

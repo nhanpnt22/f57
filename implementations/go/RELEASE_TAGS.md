@@ -159,7 +159,7 @@ decoded, err := b57.Decode(encoded)
 
 ## Documentation
 
-See [README.md](implementations/go/README.md) for full documentation.
+See [README.md](README.md) for full documentation.
 
 ## Testing
 
@@ -180,9 +180,9 @@ None for v0.1.0 stable release.
 
 ## Links
 
-- [Specification](spec/B57 CORE API.txt)
-- [Core API](spec/B57%20CORE%20API.txt)
-- [Implementation README](implementations/go/README.md)
+- [Specification](../../spec/b57-core-api.txt)
+- [Core API](../../spec/b57-core-api.txt)
+- [Implementation README](README.md)
 ```
 
 ---

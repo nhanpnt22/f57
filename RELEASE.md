@@ -1,10 +1,18 @@
 # Release Guide
 
+**F57:** A unified family of secure, deterministic 57-series encodings.
+
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, Dart, and Python.
+
+**Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
+
+**Base Layer Note:** B57 remains the canonical base encoding layer within F57.
+
 This document defines repository-level release decisions and safe release flow.
 
 ## Current Release Posture (2026-05-22)
 
-- Repository-wide unqualified release: **READY (v0.1.0)**
+- Repository-wide unqualified release: **READY (protocol v0.1.0, latest repository tag v0.1.1)**
 - Go scoped release (`v0.1.0-go`): READY
 - JavaScript scoped release (`v0.1.0-js`): READY
 - Rust scoped release (`v0.1.0-rust`): READY
@@ -42,10 +50,10 @@ Before any release action:
 
 1. Confirm `PROJECT_ASSESS_RELEASE.md` is READY.
 2. Confirm S57 all-language benchmark parity is zero-mismatch in `implementations/cross_language_records/s57-benchmark-10000x5-summary.json`.
-3. Tag the repository globally:
+3. Tag the repository globally with the next available repository patch tag (protocol remains `v0.1.0`):
 
 ```bash
-git tag -a v0.1.0 -m "B57 Spec and Universal Implementations v0.1.0"
+git tag -a v0.1.1 -m "F57 Family Repository Release v0.1.1 (protocol v0.1.0)"
 ```
 
 ### Scoped Language Tags (Optional)
@@ -82,15 +90,15 @@ Parity confirmation from `implementations/cross_language_records/s57-benchmark-1
 
 ```bash
 git add -A
-git commit -m "chore(release): finalize v0.1.0 docs, parity evidence, and release posture"
+git commit -m "chore(release): finalize release docs, parity evidence, and release posture"
 ```
 
 3. Create and push umbrella tag:
 
 ```bash
-git tag -a v0.1.0 -m "B57 Spec and Universal Implementations v0.1.0"
+git tag -a v0.1.1 -m "F57 Family Repository Release v0.1.1 (protocol v0.1.0)"
 git push origin HEAD
-git push origin v0.1.0
+git push origin v0.1.1
 ```
 
 4. Optionally push scoped tags (`v0.1.0-go`, `v0.1.0-js`, `v0.1.0-rust`, `v0.1.0-dart`, `v0.1.0-python`) if your distribution workflow requires them.

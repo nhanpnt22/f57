@@ -1,7 +1,15 @@
-# FINAL RELEASE ASSESSMENT - B57 Protocol
+# FINAL RELEASE ASSESSMENT - F57 (57 Family)
+
+**Tagline:** A unified family of secure, deterministic 57-series encodings.
+
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, Dart, and Python.
+
+**Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
+
+**Base Layer Note:** B57 remains the canonical base encoding layer within F57.
 
 **Date:** May 22, 2026
-**Status:** PASS / READY FOR RELEASE
+**Status:** PASS / READY FOR RELEASE (protocol v0.1.0, latest repository tag v0.1.1)
 
 ## Assessment Scopes
 
@@ -28,4 +36,4 @@
 ## Conclusion
 The project is strictly compliant with the finalized protocol specifications. There are no blocking issues, testing failures, or static analysis infractions.
 
-**Recommendation:** Proceed with the global `v0.1.0` release.
+**Recommendation:** Protocol release `v0.1.0` is approved; repository release is published at `v0.1.1`.

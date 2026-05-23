@@ -296,7 +296,7 @@ B57 provides **no cryptographic guarantees**:
 
 This implementation complies with:
 - [b57-v0.1.0](../../spec/b57-v0.1.0.txt) specification
-- [B57 CORE API](../../spec/B57%20CORE%20API.txt) reference
+- [B57 CORE API](../../spec/b57-core-api.txt) reference
 
 ## Related APIs
 
@@ -366,7 +366,7 @@ See [LICENSE](../../LICENSE)
 ## References
 
 - [B57 Specification](../../spec/b57-v0.1.0.txt)
-- [B57 Core API](../../spec/B57%20CORE%20API.txt)
-- [H57 Core API](../../spec/H57%20CORE%20API.txt)
-- [ID57 Core API](../../spec/ID57%20CORE%20API.txt)
-- [Implementation Guide](../../reference/algorithm.txt)
+- [B57 Core API](../../spec/b57-core-api.txt)
+- [H57 Core API](../../spec/h57-core-api.txt)
+- [ID57 Core API](../../spec/id57-core-api.txt)
+- [Implementation Guide](../../spec/b57-core-api.txt)

@@ -10,4 +10,4 @@ Criteria verified:
 - Tests and E2E pass (`npm test`)
 - Coverage run completed (`npm run test:coverage`)
 - All types accurately represented and unified
-- Follows I57 core spec shape from `spec/I57 CORE API.txt`
+- Follows I57 core spec shape from `spec/i57-core-api.txt`

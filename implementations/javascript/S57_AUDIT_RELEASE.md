@@ -6,7 +6,7 @@ Status: PASS
 ## Scope
 
 - Module: `s57.js`
-- Target spec: `spec/S57- Security 57.txt`
+- Target spec: `spec/s57-security-57.txt`
 - Runtime target: Node.js (TypeScript-compatible ESM imports)
 
 ## Implementation Findings

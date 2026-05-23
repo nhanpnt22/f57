@@ -1,8 +1,16 @@
-# B57 Protocol Stack
+# F57 - 57 Family
+
+**Tagline:** A unified family of secure, deterministic 57-series encodings.
+
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) delivered across Go, Rust, JavaScript/Node.js, Dart, and Python.
+
+**Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
+
+## B57 Protocol Stack (Base Layer)
 
 **Canonical Binary-to-Text and Identifier Architecture**  
 **Version:** v0.1.0 FINAL  
-**Status:** Official Release (Production-Ready)  
+**Status:** Official Release (Production-Ready, repository tag v0.1.1)  
 **Date:** May 2026  
 
 [![Version](https://img.shields.io/badge/version-v0.1.0_FINAL-blue.svg)](CHANGELOG.md)
@@ -24,7 +32,7 @@ Building upon B57, the protocol stack establishes a rigorous pipeline for canoni
 
 This repository acts as the central standard for the B57 specification and its native reference implementations.
 
-**Current Status:** Official Release v0.1.0. All implementations are verified, formally assessed, and production-ready.
+**Current Status:** Official protocol release v0.1.0 (repository release tag: v0.1.1). All implementations are verified, formally assessed, and production-ready.
 
 ## 1. Overview
 
@@ -45,41 +53,41 @@ The B57 protocol eliminates this by enforcing a strict 57-character alphabet:
 The protocol is composed of a 7-layer architecture with strict conceptual boundaries:
 
 ### 2.1 B57 (Encoding Layer)
-* **Specification:** [B57 Core](spec/B57%20CORE%20API.txt)
+* **Specification:** [B57 Core](spec/b57-core-api.txt)
 * The canonical binary-to-text mathematical primitives.
 * **Pipeline:** `bytes ↔ B57 string`
 * **Properties:** bijective, unambiguous, exact byte representation.
 
 ### 2.2 H57 (Hash Representation Layer)
-* **Specification:** [H57 Core](spec/H57%20CORE%20API.txt)
+* **Specification:** [H57 Core](spec/h57-core-api.txt)
 * Canonical representation of full cryptographic hash outputs.
 * **Pipeline:** `input → BLAKE3 → bytes → B57 string`
 * **Properties:** full entropy preservation (e.g., 256-bit hash → 44 chars), no truncation, ideal for content integrity.
 
 ### 2.3 ID57 (Identifier Profile)
-* **Specification:** [ID57 Core](spec/ID57%20CORE%20API.txt)
+* **Specification:** [ID57 Core](spec/id57-core-api.txt)
 * Generates fixed-length, human-readable identifiers through controlled entropy reduction.
 * **Pipeline:** `input → HASH → prefix truncate → B57 string`
 * **Properties:** Default 128-bit (22 chars). Ensures prefix-level byte truncation prior to encoding.
 
 ### 2.4 ID57-SHORT (Ultra-Compact Profile)
-* **Specification:** [ID57-SHORT](spec/ID57-SHORT%20PROFILE.txt)
+* **Specification:** [ID57-SHORT](spec/id57-short-profile.txt)
 * Generates heavily truncated local identifiers (e.g., 47-bit / 8 chars).
 * **Properties:** Optimized strictly for QR codes, UI brevity, and temporary IDs. Requires safe namespace sizing.
 
 ### 2.5 R57 (Random Generation Profile)
-* **Specification:** [R57 Core](spec/R57%20CORE%20API.txt)
+* **Specification:** [R57 Core](spec/r57-core-api.txt)
 * Generates high-entropy 128-bit random identifiers securely.
 * **Pipeline:** `entropy_source (128-bit) → B57 string`
 * **Properties:** Mandates CSPRNG, KDF, or Hybrid generation modes to ensure unpredictable, collision-resistant outputs.
 
 ### 2.6 I57 (Integration Interface)
-* **Specification:** [I57 Core](spec/I57%20CORE%20API.txt)
+* **Specification:** [I57 Core](spec/i57-core-api.txt)
 * The top-level facade interface unifying all underlying profiles into a seamless developer API.
 * Ensures correct composition and safe parameter passing.
 
 ### 2.7 S57 (Security Composition Layer)
-* **Specification:** [S57 Security 57](spec/S57-%20Security%2057.txt)
+* **Specification:** [S57 Security 57](spec/s57-security-57.txt)
 * Secure composition profile over B57/H57/ID57/R57 with domain-separated key derivation and envelope encryption.
 * **Pipeline:** `data -> keyed hash/id/random profile -> optional AES-256-GCM envelope -> B57 string`
 * **Properties:** deterministic keyed surfaces where required, fail-closed decrypt behavior, cross-language parity validated for release.
@@ -91,11 +99,11 @@ S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, Da
 
 Each language implementation is maintained in its own separate branch:
 
-- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/b57/tree/go)
-- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/b57/tree/rust)
-- **JavaScript / TypeScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/b57/tree/javascript)
-- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/b57/tree/dart)
-- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/b57/tree/python)
+- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/f57/tree/go)
+- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/f57/tree/rust)
+- **JavaScript / TypeScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/f57/tree/javascript)
+- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/f57/tree/dart)
+- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/f57/tree/python)
 
 All passed the [10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md) proving zero deviation across execution environments.
 S57 release gating also passed with zero mismatches in the 5-language benchmark summary at [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json).
@@ -125,7 +133,7 @@ Original v0.1.0 working drafts, retained for reference:
 - [B57 Encoding Draft](spec/b57-v0.1.0.txt)
 - [H57 Draft](spec/h57-v0.1.0.txt)
 - [ID57 Draft](spec/id57-v0.1.0.txt)
-- [R57 Draft](spec/R57-v0.1.0.txt)
+- [R57 Draft](spec/r57-v0.1.0.txt)
 
 ## 6. Getting Started & Testing
 

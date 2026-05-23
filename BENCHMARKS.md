@@ -1,9 +1,9 @@
-# B57 Benchmarks (v0.1.0)
+# F57 Benchmarks (v0.1.0)
 
 **Date**: 2026-05-22
 **Environment**: Standard ARM64 macOS processing.
 
-The B57 library leverages large integer arithmetic (`BigInt` / `big.Int` / `num_bigint`) for exact conversion formatting coupled with native BLAKE3 hashing limits. Below are the estimated operational throughput expectations per language for the `v0.1.0` release. 
+The F57 family benchmark suite uses B57 base-layer arithmetic (`BigInt` / `big.Int` / `num_bigint`) for exact conversion formatting, coupled with native BLAKE3 hashing limits. Below are the estimated operational throughput expectations per language for the `v0.1.0` release.
 
 *Note: These benchmarks measure `ID57Generate()` (which includes BLAKE3 hashing + Bitwise Truncation + BIGINT division + Base57 string allocation).*
 

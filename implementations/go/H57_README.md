@@ -3,9 +3,9 @@
 This package implements H57 Core API on top of the B57 encoder.
 
 Specs used:
-- [H57 CORE API](../../spec/H57%20CORE%20API.txt)
+- [H57 CORE API](../../spec/h57-core-api.txt)
 - [h57-v0.1.0](../../spec/h57-v0.1.0.txt)
-- [B57 CORE API](../../spec/B57%20CORE%20API.txt)
+- [B57 CORE API](../../spec/b57-core-api.txt)
 
 ## API
 

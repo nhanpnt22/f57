@@ -1,5 +1,5 @@
 ============================================================
-B57 REPOSITORY STRUCTURE
+F57 REPOSITORY STRUCTURE
 ============================================================
 
 b57/
@@ -16,13 +16,13 @@ b57/
 ├── LICENSE.md
 │
 ├── spec/
-│   ├── B57S-v0.1.0.txt       (Master Unified Stack)
-│   ├── B57 CORE API.txt
-│   ├── H57 CORE API.txt
-│   ├── ID57 CORE API.txt
-│   ├── ID57-SHORT PROFILE.txt
-│   ├── R57 CORE API.txt
-│   └── I57 CORE API.txt
+│   ├── b57s-v0.1.0.txt       (Master Unified Stack)
+│   ├── b57-core-api.txt
+│   ├── h57-core-api.txt
+│   ├── id57-core-api.txt
+│   ├── id57-short-profile.txt
+│   ├── r57-core-api.txt
+│   └── i57-core-api.txt
 │
 └── implementations/
     ├── go/         (Native Go 1.20+)
@@ -35,7 +35,7 @@ b57/
 NOTES
 ============================================================
 
-- /spec is the immutable source of truth for the 6-layer architecture (MINDU).
+- /spec is the immutable source of truth for the 7-layer architecture (MINDU + S57).
 - /implementations contains 5 natively compiled, mathematically identical implementations.
 - All languages enforce perfect cross-language determinism verified against 10,000 datasets.
 - Governance docs (PROJECT_ASSESS_*) track the global release state.

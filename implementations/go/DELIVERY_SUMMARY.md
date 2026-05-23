@@ -426,7 +426,7 @@ For issues, questions, or contributions:
 1. **Documentation**: See [README.md](README.md)
 2. **API Reference**: See [README.md#api-reference](README.md)
 3. **Examples**: See [examples_test.go](examples_test.go)
-4. **Specification**: See [B57 CORE API.txt](../../spec/B57 CORE API.txt)
+4. **Specification**: See [b57-core-api.txt](../../spec/b57-core-api.txt)
 5. **Issues**: Report via GitHub issues
 6. **Contributing**: See [CONTRIBUTING.md](../../CONTRIBUTING.md)
 

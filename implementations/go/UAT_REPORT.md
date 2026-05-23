@@ -4,7 +4,7 @@ Date: 2026-05-19
 Implementation: implementations/go
 Spec Baseline:
 - spec/b57-v0.1.0.txt
-- spec/B57 CORE API.txt
+- spec/b57-core-api.txt
 
 ## Scope
 - Core API behavior

@@ -14,14 +14,14 @@ Runtime notes:
 - TypeScript projects can consume ESM exports directly
 
 ## Specs
-- [B57 CORE API](../../spec/B57%20CORE%20API.txt)
-- [H57 CORE API](../../spec/H57%20CORE%20API.txt)
-- [I57 CORE API](../../spec/I57%20CORE%20API.txt)
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
-- [ID57-SHORT PROFILE](../../spec/ID57-SHORT%20PROFILE.txt)
-- [R57 CORE API (MINDU)](../../spec/R57%20CORE%20API.txt)
-- [S57 - Security 57](../../spec/S57-%20Security%2057.txt)
-- [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
+- [B57 CORE API](../../spec/b57-core-api.txt)
+- [H57 CORE API](../../spec/h57-core-api.txt)
+- [I57 CORE API](../../spec/i57-core-api.txt)
+- [ID57 CORE API (MINDU)](../../spec/id57-core-api.txt)
+- [ID57-SHORT PROFILE](../../spec/id57-short-profile.txt)
+- [R57 CORE API (MINDU)](../../spec/r57-core-api.txt)
+- [S57 - Security 57](../../spec/s57-security-57.txt)
+- [B57S-v0.1.0](../../spec/b57s-v0.1.0.txt)
 
 ## Install
 

@@ -17,7 +17,7 @@
 5. **Canonical Enforcement (`r57IsCanonical`)** - Correctly validates constraints corresponding directly to strict canonical B57.
 
 ## Acceptance Criteria
-- [x] Conforms to specs `R57 CORE API.txt` and `R57-v0.1.0.txt`.
+- [x] Conforms to specs `r57-core-api.txt` and `r57-v0.1.0.txt`.
 - [x] All documented R57 mode enums implemented and tested.
 - [x] Successfully deployed within test environment.
 

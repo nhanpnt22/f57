@@ -8,10 +8,10 @@ Scope note:
 - It does not currently expose a standalone `ID57_LEN_AUTO` mode from the standalone `id57-v0.1.0.txt` profile.
 
 Specs used:
-- [ID57 CORE API (MINDU)](../../spec/ID57%20CORE%20API.txt)
+- [ID57 CORE API (MINDU)](../../spec/id57-core-api.txt)
 - [id57-v0.1.0](../../spec/id57-v0.1.0.txt)
-- [B57S-v0.1.0](../../spec/B57S-v0.1.0.txt)
-- [B57 CORE API](../../spec/B57%20CORE%20API.txt)
+- [B57S-v0.1.0](../../spec/b57s-v0.1.0.txt)
+- [B57 CORE API](../../spec/b57-core-api.txt)
 
 ## API
 

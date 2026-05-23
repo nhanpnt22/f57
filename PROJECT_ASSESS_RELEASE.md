@@ -1,8 +1,16 @@
 # Project Release Assessment
 
+**Tagline:** A unified family of secure, deterministic 57-series encodings.
+
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, Dart, and Python.
+
+**Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
+
+**Base Layer Note:** B57 remains the canonical base encoding layer within F57.
+
 Date: 2026-05-22
-Scope: B57 project - all implementations (Go, JavaScript, Rust, Dart, Python)
-Status: READY (v0.1.0)
+Scope: F57 family project - all implementations (Go, JavaScript, Rust, Dart, Python)
+Status: READY (protocol v0.1.0, latest repository tag v0.1.1)
 
 S57 release gate update:
 - All-language S57 parity (JS/Go/Rust/Dart/Python) validated with 10,000-dataset benchmark and zero mismatches.
