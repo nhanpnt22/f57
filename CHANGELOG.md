@@ -7,13 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- TypeScript package release hardening in `implementations/ts`:
+  - distributable build output (`dist/` with JS + `.d.ts`)
+  - package export metadata (`main`, `types`, `exports`, `files`)
+  - release rehearsal command (`npm run verify:all`) and successful `npm pack` packaging flow
+
+### Changed
+- Top-level release governance docs updated to include TypeScript package release posture and validation evidence.
+
 ## [0.1.1] - 2026-05-23
 
 ### Changed
 - Repository rename alignment and documentation consistency updates for the F57 umbrella naming.
 - Top-level release/assessment documents clarified to distinguish protocol release version (`v0.1.0`) from latest repository tag (`v0.1.1`).
-
-### Changed
 - Documentation synchronized for finalized S57 release posture across all top-level governance and release documents.
 - README/changelog language updated to reflect the current 7-layer stack model (including S57).
 
@@ -36,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Language Support**: Released completely native, zero-dependency (other than hashing/math primitives) implementations for:
   - Go
   - Rust
-  - JavaScript / TypeScript
+  - JavaScript/TypeScript
   - Dart
   - Python
 - **Validation**: Added the `.10k UAT Parity Report` confirming 0 calculation variants across all 5 languages when computing truncations and generating IDs.

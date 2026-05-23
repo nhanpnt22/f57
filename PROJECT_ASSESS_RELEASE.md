@@ -2,14 +2,14 @@
 
 **Tagline:** A unified family of secure, deterministic 57-series encodings.
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, Dart, and Python.
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
 **Base Layer Note:** B57 remains the canonical base encoding layer within F57.
 
 Date: 2026-05-23
-Scope: F57 family project - all implementations (Go, JavaScript, Rust, Dart, Python)
+Scope: F57 family project - all implementations (Go, JavaScript, TypeScript package, Rust, Dart, Python)
 Status: READY (protocol v0.1.0, latest repository tag v0.1.1)
 
 S57 release gate update:
@@ -42,6 +42,16 @@ Scoped branch/tag verification (2026-05-23):
 
 **Confidence Level**: HIGH
 **Scope**: Full B57 stack (B57, H57, ID57, ID57-SHORT, I57, R57) deterministic surfaces verified
+
+### TypeScript Package
+**Status**: READY (npm packaging rehearsal passed)
+**Evidence**:
+- `implementations/ts` package verification passed (`npm run verify:all`)
+- Build output and type declarations emitted to `implementations/ts/dist`
+- Packaging rehearsal passed (`npm pack`) with dist-only publish contents
+
+**Confidence Level**: HIGH
+**Scope**: TypeScript-distributed Node.js package over the full B57 stack exports
 
 ### Rust Implementation
 **Status**: READY (v0.1.0-rust)
@@ -103,17 +113,19 @@ Scoped branch/tag verification (2026-05-23):
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Unit tests (all langs) | 174 | PASS |
+| Unit tests (all langs) | 174+ | PASS |
 | E2E integration tests | 5 | PASS |
 | Cross-language parity tests (core) | 16 (3 runs × 4 langs + Python) | PASS (0 mismatches) |
 | S57 parity benchmark | 1 run (10000 datasets, 5 languages) | PASS (0 mismatches) |
-| **Total Test Runs** | **195+** | **PASS** |
+| TypeScript package release rehearsal (`verify:all` + `pack`) | 1 | PASS |
+| **Total Test Runs** | **196+** | **PASS** |
 
 ## Release Recommendation
 
 ### Immediate (Approved & Tagged)
 - ✅ **Go v0.1.0-go** - SHIP IT
 - ✅ **JavaScript v0.1.0-js** - SHIP IT
+- ✅ **TypeScript package (`implementations/ts`)** - SHIP IT
 - ✅ **Rust v0.1.0-rust** - SHIP IT
 - ✅ **Dart v0.1.0-dart** - SHIP IT
 - ✅ **Python v0.1.0-python** - SHIP IT
@@ -121,15 +133,16 @@ Scoped branch/tag verification (2026-05-23):
 
 ### Optional Umbrella
 - 🔄 Create a future repository-level umbrella tag from `main` if a new cross-repo publication point is needed
-- Scope: "Go, JavaScript, Rust, Dart, Python implementations fully verified"
+- Scope: "Go, JavaScript, TypeScript package, Rust, Dart, Python surfaces fully verified"
 
 ## Release Confidence Summary
 
 **Overall Project Confidence**: HIGH ✅
 
-- 5 of 5 implementations fully release-ready (Go, JS, Rust, Dart, Python)
+- 5 language implementations fully release-ready (Go, JS, Rust, Dart, Python)
+- TypeScript npm package release path validated (`implementations/ts`)
 - Deterministic parity verified across 10,000 datasets with 0 mismatches
-- Test suite comprehensive (195+ tests)
+- Test suite comprehensive (196+ checks including package release rehearsal)
 - Governance documentation complete
 - All governance checks passing for all scoped releases
 

@@ -2,16 +2,16 @@
 
 **Tagline:** A unified family of secure, deterministic 57-series encodings.
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) delivered across Go, Rust, JavaScript/Node.js, Dart, and Python.
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) delivered across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
 ## B57 Protocol Stack (Base Layer)
 
-**Canonical Binary-to-Text and Identifier Architecture**  
-**Version:** v0.1.0 FINAL  
-**Status:** Official Release (Production-Ready, repository tag v0.1.1)  
-**Date:** May 2026  
+**Canonical Binary-to-Text and Identifier Architecture**
+**Version:** v0.1.0 FINAL
+**Status:** Official Release (Production-Ready, repository tag v0.1.1)
+**Date:** May 2026
 
 [![Version](https://img.shields.io/badge/version-v0.1.0_FINAL-blue.svg)](CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-Production_Ready-success.svg)](PROJECT_ASSESS_RELEASE.md)
@@ -19,13 +19,13 @@
 
 ## Abstract
 
-The B57 Protocol Stack defines a unified, 
-layered architecture for binary encoding, hash representation, 
+The B57 Protocol Stack defines a unified,
+layered architecture for binary encoding, hash representation,
 random identification, secure composition, and identifier generation.
 
 At its core, B57 provides a canonical, ASCII-safe binary-to-text encoding scheme designed for human readability and unambiguous transcription, enforcing a strict 57-character alphabet that excludes visually ambiguous symbols.
 
-Building upon B57, the protocol stack establishes a rigorous pipeline for canonical data normalization: 
+Building upon B57, the protocol stack establishes a rigorous pipeline for canonical data normalization:
 `input → HASH → prefix truncate → B57 → string`
 
 ## Status of This Memo
@@ -36,7 +36,7 @@ This repository acts as the central standard for the B57 specification and its n
 
 ## 1. Overview
 
-Most identifiers and text-encodings (like Base64 or standard Base58) suffer from visually ambiguous characters or platform-specific determinism issues. 
+Most identifiers and text-encodings (like Base64 or standard Base58) suffer from visually ambiguous characters or platform-specific determinism issues.
 
 The B57 protocol eliminates this by enforcing a strict 57-character alphabet:
 `ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789`
@@ -48,7 +48,7 @@ The B57 protocol eliminates this by enforcing a strict 57-character alphabet:
 - **Entropy-Preserving:** Never truncates, pads, or biases raw input at the base encoding layer.
 - **One-Way Hash Transformation:** Employs BLAKE3 by default to produce secure cryptographic identifiers.
 
-## 2. The B57S Stack Architecture
+## 2. The F57 Stack Architecture
 
 The protocol is composed of a 7-layer architecture with strict conceptual boundaries:
 
@@ -95,13 +95,14 @@ The protocol is composed of a 7-layer architecture with strict conceptual bounda
 ## 3. Native Implementations
 
 The v0.1.0 release provides fully native implementations. All implementations process arrays using native BigInt arithmetic.
-S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, Dart, and Python.
+S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 Each language implementation is maintained in its own separate branch:
 
 - **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/f57/tree/go)
 - **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/f57/tree/rust)
-- **JavaScript / TypeScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/f57/tree/javascript)
+- **JavaScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/f57/tree/javascript)
+- **TypeScript (npm-ready package)**: [implementations/ts](implementations/ts)
 - **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/f57/tree/dart)
 - **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/f57/tree/python)
 
@@ -122,7 +123,7 @@ The stack encourages standard integration patterns:
 - [F57 Overview](F57.md) - Umbrella family definition, architecture, and versioning policy.
 - [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md) - Official v0.1.0 release sign-off and validation posture.
 - [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md) - Proof of absolute deterministic data alignment.
-- [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, and JavaScript/Node.js.
+- [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, JavaScript/Node.js, and TypeScript/Node.js.
 - [Benchmarks](BENCHMARKS.md) - ID processing ops/second across languages.
 - [Security Policy](SECURITY.md) - Collision domains and vulnerability reporting.
 - [Changelog](CHANGELOG.md) - Semantic version tracking.
@@ -147,7 +148,10 @@ cd implementations/go && go test ./...
 # JavaScript
 cd implementations/javascript && npm test
 
-# Rust 
+# TypeScript package verification
+cd implementations/ts && npm run verify:all
+
+# Rust
 cd implementations/rust && cargo test
 
 # Dart

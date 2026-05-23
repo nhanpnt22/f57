@@ -2,7 +2,7 @@
 
 **F57:** A unified family of secure, deterministic 57-series encodings.
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, Dart, and Python.
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
@@ -15,6 +15,7 @@ This document defines repository-level release decisions and safe release flow.
 - Repository-wide unqualified release: **READY (protocol v0.1.0, latest repository tag v0.1.1)**
 - Go scoped release (`v0.1.0-go`): READY
 - JavaScript scoped release (`v0.1.0-js`): READY
+- TypeScript package (`implementations/ts`): READY (package build, verify, and pack rehearsals passed)
 - Rust scoped release (`v0.1.0-rust`): READY
 - Dart scoped release (`v0.1.0-dart`): READY
 - Python scoped release (`v0.1.0-python`): READY
@@ -53,6 +54,7 @@ Before any release action:
 
 - Go tests pass in `implementations/go`.
 - JavaScript tests pass in `implementations/javascript`.
+- TypeScript package verification passes in `implementations/ts` (`npm run verify:all`, `npm pack`).
 - Cross-language deterministic parity report is current:
   - `UAT_10K_PARITY_REPORT.md`
   - `implementations/cross_language_records/s57-benchmark-10000x5-summary.json`
@@ -89,6 +91,8 @@ Final validation run summary:
 - `dart test` -> PASS
 - `pytest -q` -> PASS
 - `npm test` -> PASS
+- `cd implementations/ts && npm run verify:all` -> PASS
+- `cd implementations/ts && npm pack` -> PASS
 - `node scripts/s57-benchmark-10000x5.mjs` -> PASS
 
 Parity confirmation from `implementations/cross_language_records/s57-benchmark-10000x5-summary.json`:
