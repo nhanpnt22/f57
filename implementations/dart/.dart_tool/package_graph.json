@@ -10,6 +10,7 @@
         "blake3_dart",
         "convert",
         "crypto",
+        "cryptography",
         "hex"
       ],
       "devDependencies": [
@@ -51,6 +52,17 @@
         "web_socket_channel",
         "webkit_inspection_protocol",
         "yaml"
+      ]
+    },
+    {
+      "name": "cryptography",
+      "version": "2.9.0",
+      "dependencies": [
+        "collection",
+        "crypto",
+        "ffi",
+        "meta",
+        "typed_data"
       ]
     },
     {
@@ -326,6 +338,16 @@
       ]
     },
     {
+      "name": "meta",
+      "version": "1.18.2",
+      "dependencies": []
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
+      "dependencies": []
+    },
+    {
       "name": "string_scanner",
       "version": "1.4.1",
       "dependencies": [
@@ -369,11 +391,6 @@
         "source_maps",
         "stack_trace"
       ]
-    },
-    {
-      "name": "meta",
-      "version": "1.18.2",
-      "dependencies": []
     },
     {
       "name": "glob",

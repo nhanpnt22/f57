@@ -68,6 +68,18 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "cryptography",
+      "rootUri": "file:///Users/brian/.pub-cache/hosted/pub.dev/cryptography-2.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "ffi",
+      "rootUri": "file:///Users/brian/.pub-cache/hosted/pub.dev/ffi-2.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "file",
       "rootUri": "file:///Users/brian/.pub-cache/hosted/pub.dev/file-7.0.1",
       "packageUri": "lib/",
