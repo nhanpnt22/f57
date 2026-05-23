@@ -8,7 +8,7 @@
 
 **Base Layer Note:** B57 remains the canonical base encoding layer within F57.
 
-Date: 2026-05-22
+Date: 2026-05-23
 Scope: F57 family project - all implementations (Go, JavaScript, Rust, Dart, Python)
 Status: READY (protocol v0.1.0, latest repository tag v0.1.1)
 
@@ -17,12 +17,19 @@ S57 release gate update:
 - Source: `implementations/cross_language_records/s57-benchmark-10000x5-summary.json`
 - Consolidated release report: `implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md`
 
+Scoped branch/tag verification (2026-05-23):
+- `go` at `2f49c4d` -> `v0.1.0-go`
+- `javascript` at `e6ad237` -> `v0.1.0-js`
+- `rust` at `47ec620` -> `v0.1.0-rust`
+- `dart` at `f3d1e79` -> `v0.1.0-dart`
+- `python` at `2253885` -> `v0.1.0-python`
+
 ## Per-Implementation Release Posture
 
 ### Go Implementation
-**Status**: READY
+**Status**: READY (v0.1.0-go)
 **Reason**: Core B57/H57/ID57/ID57-SHORT/I57/R57 completely align with the finalized MINDU specification suite. The BLAKE3 implementation is proven robust and cross-language deterministic parity achieved at the 10,000 UAT dataset scale.
-**Release Readiness**: Approved for global v0.1.0 release.
+**Release Readiness**: Approved and tagged as `v0.1.0-go`.
 
 ### JavaScript Implementation
 **Status**: READY (v0.1.0-js)
@@ -113,8 +120,8 @@ S57 release gate update:
 
 
 ### Optional Umbrella
-- 🔄 **v0.1.0 (multi-language)** - Create umbrella tag covering all 5 implementations
-  - Scope: "Go, JavaScript, Rust, Dart, Python implementations fully verified"
+- 🔄 Create a future repository-level umbrella tag from `main` if a new cross-repo publication point is needed
+- Scope: "Go, JavaScript, Rust, Dart, Python implementations fully verified"
 
 ## Release Confidence Summary
 

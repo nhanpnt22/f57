@@ -8,13 +8,20 @@
 
 **Base Layer Note:** B57 remains the canonical base encoding layer within F57.
 
-Date: 2026-05-22
+Date: 2026-05-23
 Scope: F57 family project - all implementations (Go, JavaScript, Rust, Dart, Python)
 Status: READY
 
 S57 release alignment update:
 - `implementations/cross_language_records/s57-benchmark-10000x5-summary.json` reports zero mismatches across JS/Go/Rust/Dart/Python.
 - `implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md` marks S57 release recommendation as APPROVED.
+
+Current scoped tag assessment:
+- `go` branch head `2f49c4d` matches `v0.1.0-go`
+- `javascript` branch head `e6ad237` matches `v0.1.0-js`
+- `rust` branch head `47ec620` matches `v0.1.0-rust`
+- `dart` branch head `f3d1e79` matches `v0.1.0-dart`
+- `python` branch head `2253885` matches `v0.1.0-python`
 
 ## Commit Gate Checklist
 
@@ -129,7 +136,7 @@ Cross-Language Records:
 
 | Implementation | Commit Gate | Release Gate | Scoped Release |
 |---|---|---|---|
-| Go | PASS | PASS | v0.1.0 |
+| Go | PASS | PASS | v0.1.0-go (approved & tagged) |
 | JavaScript | PASS | PASS | v0.1.0-js (approved & tagged) |
 | Rust | PASS | PASS | v0.1.0-rust (approved & tagged) |
 | Dart | PASS | PASS | v0.1.0-dart (approved & tagged) |
@@ -152,6 +159,6 @@ feat(project): implement b57 in go, javascript, rust, dart, python with cross-la
 
 ## Next Steps (Optional)
 
-1. **Umbrella release**: Create v0.1.0 or v0.0.4 tag covering all implementations
+1. **Umbrella release**: If needed, create a new repository-level umbrella tag from `main`; do not reuse the implementation-scoped `v0.1.0-*` tags
 2. **Documentation**: Publish parity and release evidence docs to wiki
 3. **Package registry**: Publish each language to its respective registry (npm, crates.io, pub.dev)
