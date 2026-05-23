@@ -19,16 +19,18 @@ This document defines repository-level release decisions and safe release flow.
 - Dart scoped release (`v0.1.0-dart`): READY
 - Python scoped release (`v0.1.0-python`): READY
 
-Exact published release snapshot:
+Exact published release tags:
 
-| Branch | Head | Published tag |
+| Tag | Scope | Target |
 | --- | --- | --- |
-| `main` | `6c55fd8` | `v0.1.1` |
-| `go` | `2f49c4d` | `v0.1.0-go` |
-| `javascript` | `e6ad237` | `v0.1.0-js` |
-| `rust` | `47ec620` | `v0.1.0-rust` |
-| `dart` | `f3d1e79` | `v0.1.0-dart` |
-| `python` | `2253885` | `v0.1.0-python` |
+| `v0.1.1` | Repository release on `main` | `6c55fd8` |
+| `v0.1.0-go` | Go scoped release | `2f49c4d` |
+| `v0.1.0-js` | JavaScript scoped release | `e6ad237` |
+| `v0.1.0-rust` | Rust scoped release | `47ec620` |
+| `v0.1.0-dart` | Dart scoped release | `f3d1e79` |
+| `v0.1.0-python` | Python scoped release | `2253885` |
+
+`main` may move after tag publication for documentation-only follow-up commits; the repository release target remains the commit referenced by `v0.1.1`.
 
 Authoritative assessment sources:
 
