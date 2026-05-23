@@ -8,8 +8,32 @@
 
 **Base Layer Note:** B57 remains the canonical base encoding layer within F57.
 
-**Date:** May 22, 2026
+**Date:** May 23, 2026
 **Status:** PASS / READY FOR RELEASE (protocol v0.1.0, latest repository tag v0.1.1)
+
+## Release Snapshot (2026-05-23)
+
+Published remote branch heads:
+
+| Branch | Head |
+| --- | --- |
+| `main` | `6c55fd8` |
+| `go` | `2f49c4d` |
+| `rust` | `47ec620` |
+| `javascript` | `e6ad237` |
+| `dart` | `f3d1e79` |
+| `python` | `2253885` |
+
+Published tags aligned to the verified release heads:
+
+| Tag | Scope | Head |
+| --- | --- | --- |
+| `v0.1.1` | Repository release on `main` | `6c55fd8` |
+| `v0.1.0-go` | Go scoped release | `2f49c4d` |
+| `v0.1.0-js` | JavaScript scoped release | `e6ad237` |
+| `v0.1.0-rust` | Rust scoped release | `47ec620` |
+| `v0.1.0-dart` | Dart scoped release | `f3d1e79` |
+| `v0.1.0-python` | Python scoped release | `2253885` |
 
 ## Assessment Scopes
 

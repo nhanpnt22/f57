@@ -10,7 +10,7 @@
 
 This document defines repository-level release decisions and safe release flow.
 
-## Current Release Posture (2026-05-22)
+## Current Release Posture (2026-05-23)
 
 - Repository-wide unqualified release: **READY (protocol v0.1.0, latest repository tag v0.1.1)**
 - Go scoped release (`v0.1.0-go`): READY
@@ -18,6 +18,17 @@ This document defines repository-level release decisions and safe release flow.
 - Rust scoped release (`v0.1.0-rust`): READY
 - Dart scoped release (`v0.1.0-dart`): READY
 - Python scoped release (`v0.1.0-python`): READY
+
+Exact published release snapshot:
+
+| Branch | Head | Published tag |
+| --- | --- | --- |
+| `main` | `6c55fd8` | `v0.1.1` |
+| `go` | `2f49c4d` | `v0.1.0-go` |
+| `javascript` | `e6ad237` | `v0.1.0-js` |
+| `rust` | `47ec620` | `v0.1.0-rust` |
+| `dart` | `f3d1e79` | `v0.1.0-dart` |
+| `python` | `2253885` | `v0.1.0-python` |
 
 Authoritative assessment sources:
 
