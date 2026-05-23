@@ -119,6 +119,7 @@ The stack encourages standard integration patterns:
 
 ## 5. Official Documentation
 
+- [F57 Overview](F57.md) - Umbrella family definition, architecture, and versioning policy.
 - [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md) - Official v0.1.0 release sign-off and validation posture.
 - [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md) - Proof of absolute deterministic data alignment.
 - [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, and JavaScript/Node.js.
