@@ -2,6 +2,14 @@
   "name": "@aco/f57-ts",
   "version": "0.1.0",
   "description": "TypeScript (Node.js) implementation of F57/H57/ID57/ID57-SHORT/R57/I57/S57",
+  "license": "UNLICENSED",
+  "keywords": [
+    "f57",
+    "encoding",
+    "identifier",
+    "crypto",
+    "typescript"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

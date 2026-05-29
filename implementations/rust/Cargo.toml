@@ -5,6 +5,11 @@ edition = "2021"
 description = "F57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, and R57 profiles"
 repository = "https://github.com/aco/f57"
 homepage = "https://github.com/aco/f57"
+documentation = "https://github.com/aco/f57/tree/main/implementations/rust"
+readme = "README.md"
+license-file = "../../LICENSE"
+keywords = ["f57", "encoding", "identifier", "crypto"]
+categories = ["encoding", "cryptography", "algorithms"]
 
 [dependencies]
 aes-gcm = "0.10"
