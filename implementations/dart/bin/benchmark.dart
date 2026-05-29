@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:b57/b57.dart';
+import 'package:f57/b57.dart';
 
 void main() {
   const iterations = 100000;

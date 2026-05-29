@@ -24,7 +24,7 @@ package main
 
 import (
 	"fmt"
-	b57 "github.com/aco/b57"
+	b57 "github.com/aco/f57"
 )
 
 func main() {

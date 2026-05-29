@@ -19,7 +19,7 @@ Status: PASS
 - `go test -cover ./...`
 - `i57_e2e_test.go` integration scenarios pass.
 
-Coverage evidence (package `github.com/aco/b57`):
+Coverage evidence (package `github.com/aco/f57`):
 - Package and race checks pass after I57/R57 refactor.
 
 ## Notes

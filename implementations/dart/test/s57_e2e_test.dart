@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:b57/b57.dart';
+import 'package:f57/b57.dart';
 
 void main() {
   test('S57 e2e secure composition flow', () async {

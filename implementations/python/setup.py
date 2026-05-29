@@ -1,10 +1,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="b57",
+    name = "f57",
     version="0.1.0",
-    description="B57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, R57 profiles",
-    author="B57 Project",
+    description="F57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, R57 profiles",
+    author="F57 Project",
+    url="https://github.com/aco/f57",
+    project_urls={
+        "Source": "https://github.com/aco/f57",
+        "Issues": "https://github.com/aco/f57/issues",
+    },
     license="All rights reserved",
     packages=find_packages(where="src"),
     package_dir={"": "src"},

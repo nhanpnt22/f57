@@ -1,4 +1,4 @@
-use b57::{H57Length, ID57Length, S57Config, S57};
+use f57::{H57Length, ID57Length, S57Config, S57};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::env;

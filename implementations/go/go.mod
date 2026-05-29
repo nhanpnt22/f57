@@ -1,4 +1,4 @@
-module github.com/aco/b57
+module github.com/aco/f57
 
 go 1.22
 

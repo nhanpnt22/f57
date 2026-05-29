@@ -1,7 +1,7 @@
 """R57 random generation tests."""
 
 import pytest
-from b57 import r57_generate, r57_is_valid, r57_is_canonical, R57Mode
+from f57 import r57_generate, r57_is_valid, r57_is_canonical, R57Mode
 
 
 def test_mode_values():

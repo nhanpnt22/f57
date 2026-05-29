@@ -115,7 +115,6 @@ pub fn id57_bits_by_length(length: ID57Length) -> Result<usize, B57Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::errors::ErrorCode;
 
     #[test]
     fn deterministic() {

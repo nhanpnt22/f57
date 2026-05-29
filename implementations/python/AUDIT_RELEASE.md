@@ -11,7 +11,7 @@ Status: PASS (SCOPED)
 - 10,000-dataset deterministic parity test against Go/Rust/Dart present and passing
 
 ## Evidence
-- `src/b57/*.py` (8 modules)
+- `src/f57/*.py` (8 modules)
 - `tests/test_*.py` (8 test files)
 - Unit tests: 6 files covering B57, H57, ID57, ID57-SHORT, I57, R57
 - Integration: 1 E2E test

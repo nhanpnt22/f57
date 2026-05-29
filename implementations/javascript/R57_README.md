@@ -13,7 +13,7 @@ This is the standard JavaScript implementation of the **R57 Core API** and **R57
 ## Usage
 
 ```javascript
-import { R57Mode, r57Generate, r57IsValid, r57IsCanonical } from '@aco/b57';
+import { R57Mode, r57Generate, r57IsValid, r57IsCanonical } from '@aco/f57';
 
 // Generate a new 128-bit securely random identifier
 const id = r57Generate(R57Mode.R57_1_CSPRNG);

@@ -1,7 +1,7 @@
 """End-to-end integration test."""
 
 import pytest
-from b57 import (
+from f57 import (
     encode, decode, h57_hash, h57_verify, id57_generate_default, id57_short_generate_default,
     i57_encode, i57_decode, i57_hash, i57_id, i57_random,
     HashFunction, H57Length, ID57Length, R57Mode

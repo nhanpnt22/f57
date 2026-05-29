@@ -1,7 +1,7 @@
 """I57 integration API tests."""
 
 import pytest
-from b57 import (
+from f57 import (
     i57_encode, i57_decode, i57_hash, i57_id, i57_random,
     i57_is_valid, i57_is_canonical, i57_validate_identifier, i57_validate_entropy,
     HashFunction, H57Length, ID57Length, R57Mode

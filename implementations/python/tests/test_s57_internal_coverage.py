@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from b57 import (
+from f57 import (
     S57,
     S57Config,
     H57Length,
@@ -13,7 +13,7 @@ from b57 import (
     InvalidLengthEnumError,
     KeyInvalidError,
 )
-from b57 import i57 as i57_mod
+from f57 import i57 as i57_mod
 
 
 def _s57() -> S57:

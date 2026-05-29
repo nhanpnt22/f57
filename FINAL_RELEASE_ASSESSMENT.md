@@ -31,7 +31,7 @@ Note: `main` may advance after tag publication for documentation-only follow-up 
 ### 1. Go Validation
 * **Testing:** Ran `go test -v -cover ./...`.
   * **Result:** PASS.
-  * **Coverage:** 63.4% block coverage across the `github.com/aco/b57` module. Tested empty payloads, random bijectivity, hash mappings, canonical strictness checks.
+  * **Coverage:** 63.4% block coverage across the `github.com/aco/f57` module. Tested empty payloads, random bijectivity, hash mappings, canonical strictness checks.
 * **Static Analysis:** Ran `go vet ./...`. 
   * **Result:** PASS (0 issues found).
 

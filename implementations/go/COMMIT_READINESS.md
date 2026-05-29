@@ -301,7 +301,7 @@ Branches:           80%+
 ```
 Version: v0.1.0
 Go Min Version: 1.21
-Module: github.com/aco/b57
+Module: github.com/aco/f57
 Package: b57 (implementations/go)
 Status: Historical snapshot (superseded)
 ```

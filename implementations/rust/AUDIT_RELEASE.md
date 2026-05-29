@@ -11,7 +11,7 @@ Status: PASS (SCOPED)
 - 10,000-dataset deterministic parity test against Go present and passing
 
 ## Evidence
-- `src/b57.rs`, `src/h57.rs`, `src/id57.rs`, `src/id57_short.rs`, `src/i57.rs`, `src/r57.rs`
+- `src/f57.rs`, `src/h57.rs`, `src/id57.rs`, `src/id57_short.rs`, `src/i57.rs`, `src/r57.rs`
 - `tests/e2e_test.rs`
 - `tests/cross_language_10000_test.rs`
 - `UAT_REPORT.md`

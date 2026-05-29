@@ -1,10 +1,10 @@
 import pytest
 
-from b57 import b57 as b57_mod
-from b57 import h57 as h57_mod
-from b57 import i57 as i57_mod
-from b57 import r57 as r57_mod
-from b57 import errors as err_mod
+from f57 import b57 as b57_mod
+from f57 import h57 as h57_mod
+from f57 import i57 as i57_mod
+from f57 import r57 as r57_mod
+from f57 import errors as err_mod
 
 
 def test_error_constructors_and_messages():

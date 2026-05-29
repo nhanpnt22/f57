@@ -1,7 +1,7 @@
 """ID57-SHORT constrained ID tests."""
 
 import pytest
-from b57 import (
+from f57 import (
     id57_short_generate, id57_short_generate_default, id57_short_verify, id57_short_verify_default,
     id57_short_is_valid, id57_short_is_canonical,
     HashFunction, ID57ShortLength

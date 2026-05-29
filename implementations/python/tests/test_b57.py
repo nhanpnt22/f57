@@ -1,8 +1,8 @@
 """B57 core tests."""
 
 import pytest
-from b57 import encode, decode, is_valid, is_canonical, encoded_length, decoded_length
-from b57 import InvalidCharError, NonCanonicalError
+from f57 import encode, decode, is_valid, is_canonical, encoded_length, decoded_length
+from f57 import InvalidCharError, NonCanonicalError
 
 
 def test_encode_decode_roundtrip():

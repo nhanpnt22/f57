@@ -1,6 +1,6 @@
 """S57 end-to-end flow test."""
 
-from b57 import S57, S57Config, H57Length, ID57Length
+from f57 import S57, S57Config, H57Length, ID57Length
 
 
 def test_s57_e2e_secure_composition_flow():

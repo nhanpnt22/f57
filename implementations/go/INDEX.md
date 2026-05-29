@@ -54,7 +54,7 @@ ID57-SHORT profile for Go is now implemented and validated.
 Validation evidence:
 - `go test -v -run "TestID57" ./...` -> PASS
 - `go test -race ./...` -> PASS
-- `go test -coverprofile=coverage_b57.out .` + `go tool cover -func=coverage_b57.out` -> 97.3% (package `github.com/aco/b57`)
+- `go test -coverprofile=coverage_b57.out .` + `go tool cover -func=coverage_b57.out` -> 97.3% (package `github.com/aco/f57`)
 
 ---
 
@@ -108,13 +108,13 @@ Validation evidence:
 ### Installation
 
 ```bash
-go get github.com/aco/b57/implementations/go
+go get github.com/aco/f57/implementations/go
 ```
 
 ### Basic Usage
 
 ```go
-import b57 "github.com/aco/b57/implementations/go"
+import b57 "github.com/aco/f57/implementations/go"
 
 // Encode
 data := []byte{0x01, 0x02, 0x03}

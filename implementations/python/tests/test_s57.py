@@ -2,7 +2,7 @@
 
 import pytest
 
-from b57 import (
+from f57 import (
     S57,
     S57Config,
     S57_VERSION,

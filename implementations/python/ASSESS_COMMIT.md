@@ -11,7 +11,7 @@ Status: READY
 
 ## Included Surface
 - `setup.py`
-- `src/b57/*.py` (8 modules)
+- `src/f57/*.py` (8 modules)
 - `tests/*.py` (8 test files)
 - `README.md`
 - `UAT_REPORT.md`

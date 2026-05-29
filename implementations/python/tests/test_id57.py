@@ -1,7 +1,7 @@
 """ID57 deterministic ID tests."""
 
 import pytest
-from b57 import (
+from f57 import (
     id57_generate, id57_generate_default, id57_verify, id57_verify_default,
     id57_is_valid, id57_is_canonical,
     HashFunction, ID57Length

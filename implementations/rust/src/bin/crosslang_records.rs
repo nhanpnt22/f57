@@ -1,4 +1,4 @@
-use b57::{encoded_length, decoded_length, 
+use f57::{encoded_length, decoded_length, 
     decode,   h57_hash, h57_verify, i57_decode, i57_encode, i57_hash,
     i57_id, i57_is_canonical, i57_is_valid, i57_validate_entropy, i57_validate_identifier,
     id57_generate, id57_generate_default, id57_short_generate, id57_short_generate_default,
@@ -262,7 +262,7 @@ fn dataset_at(index: usize) -> Vec<u8> {
 fn build_rust_record(index: usize) -> Result<Record, Box<dyn std::error::Error>> {
     let input = dataset_at(index);
 
-    let b57_encode = b57::encode(&input);
+    let b57_encode = f57::encode(&input);
     let b57_decode_hex = hex::encode(decode(&b57_encode)?);
 
     let h57_blake3_len128 = h57_hash(&input, H57Length::Len128)?;

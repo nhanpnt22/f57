@@ -29,7 +29,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/aco/b57"
+	"github.com/aco/f57"
 )
 
 func main() {

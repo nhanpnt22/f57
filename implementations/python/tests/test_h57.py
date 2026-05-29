@@ -1,7 +1,7 @@
 """H57 hash-to-text tests."""
 
 import pytest
-from b57 import (
+from f57 import (
     h57_hash, h57_verify, h57_is_valid, h57_is_canonical,
     HashFunction, H57Length
 )

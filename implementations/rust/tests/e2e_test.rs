@@ -1,4 +1,4 @@
-use b57::{encoded_length, decoded_length, 
+use f57::{
     decode, encode, h57_hash, i57_decode, i57_encode, i57_hash, i57_id, i57_random, id57_generate_default,
     id57_short_generate_default, r57_generate,  H57Length, ID57Length, R57Mode,
 };

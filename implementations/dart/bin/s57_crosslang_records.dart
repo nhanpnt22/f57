@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-import 'package:b57/b57.dart';
+import 'package:f57/b57.dart';
 import 'package:crypto/crypto.dart';
 
 final int datasetSize = _datasetSizeFromEnv(1000);

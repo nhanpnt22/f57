@@ -132,13 +132,13 @@ This is the initial release of the B57 binary-to-text encoding for Go.
 ## Installation
 
 ```bash
-go get github.com/aco/b57/implementations/go
+go get github.com/aco/f57/implementations/go
 ```
 
 ## Quick Start
 
 ```go
-import b57 "github.com/aco/b57/implementations/go"
+import b57 "github.com/aco/f57/implementations/go"
 
 // Encode
 data := []byte{0x01, 0x02, 0x03}
@@ -314,7 +314,7 @@ Subject: B57 Go Implementation v0.1.0 Released
 The B57 Go implementation v0.1.0 is now available.
 
 **Download:**
-go get github.com/aco/b57/implementations/go
+go get github.com/aco/f57/implementations/go
 
 **What is B57?**
 B57 is a binary-to-text encoding scheme providing:
@@ -331,7 +331,7 @@ B57 is a binary-to-text encoding scheme providing:
 - Go 1.21+ compatible
 
 **Documentation:**
-https://github.com/aco/b57
+https://github.com/aco/f57
 
 **Specification:**
 B57 CORE API
@@ -444,7 +444,7 @@ git push origin v0.1.0-go
 git tag -l -n1  | grep v0.1.0-go
 
 # Check GitHub releases (if using GitHub)
-# https://github.com/aco/b57/releases/tag/v0.1.0-go
+# https://github.com/aco/f57/releases/tag/v0.1.0-go
 ```
 
 ### ✅ Post-Release Actions
@@ -592,7 +592,7 @@ git checkout v0.1.0-go
 ```
 Primary Artifact:     implementations/go/
 Tag:                  v0.1.0-go
-Module:               github.com/aco/b57
+Module:               github.com/aco/f57
 Package:              b57
 Go Version Min:       1.21
 Status:               Historical (see superseded notice)

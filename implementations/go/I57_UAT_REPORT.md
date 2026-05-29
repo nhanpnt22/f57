@@ -30,5 +30,5 @@ Status: PASS
 ## Result
 UAT decision: ACCEPT
 
-Coverage evidence (package `github.com/aco/b57`):
+Coverage evidence (package `github.com/aco/f57`):
 - Full package and race runs pass.

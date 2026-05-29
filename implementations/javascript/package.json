@@ -1,9 +1,18 @@
 {
-  "name": "@aco/b57-js",
+  "name": "@aco/f57-js",
   "version": "0.1.0",
-  "description": "JavaScript/TypeScript (Node.js) implementation of B57/H57/ID57/ID57-SHORT/R57/I57/S57",
+  "description": "JavaScript/TypeScript (Node.js) implementation of F57/H57/ID57/ID57-SHORT/R57/I57/S57",
   "type": "module",
   "main": "index.js",
+  "homepage": "https://github.com/aco/f57",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aco/f57.git",
+    "directory": "implementations/javascript"
+  },
+  "bugs": {
+    "url": "https://github.com/aco/f57/issues"
+  },
   "scripts": {
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage",

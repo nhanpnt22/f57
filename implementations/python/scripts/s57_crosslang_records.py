@@ -5,7 +5,7 @@ import json
 import os
 from hashlib import sha256
 
-from b57 import S57, S57Config, H57Length, ID57Length
+from f57 import S57, S57Config, H57Length, ID57Length
 
 DEFAULT_DATASET_SIZE = 1000
 

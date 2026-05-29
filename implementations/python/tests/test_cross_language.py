@@ -3,7 +3,7 @@
 import json
 import subprocess
 from hashlib import sha256
-from b57 import (
+from f57 import (
     encode, decode, h57_hash, id57_generate_default, id57_short_generate_default,
     id57_generate, id57_short_generate, id57_verify_default, id57_short_verify_default,
     i57_encode, i57_decode, i57_hash, i57_id, i57_random, i57_is_valid, i57_is_canonical,

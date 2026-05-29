@@ -1,4 +1,4 @@
-use b57::{B57Error, H57Length, ID57Length, S57Config, S57};
+use f57::{B57Error, H57Length, ID57Length, S57Config, S57};
 
 fn create_s57() -> S57 {
     S57::new(S57Config {
@@ -64,21 +64,21 @@ fn s57_encrypt_decrypt_roundtrip_and_failures() {
     assert_eq!(opened, plaintext);
 
     let bad_aad = s.decrypt(&sealed, b"bad-aad", None).unwrap_err();
-    assert_eq!(bad_aad.code, b57::errors::ErrorCode::AuthFailure);
+    assert_eq!(bad_aad.code, f57::errors::ErrorCode::AuthFailure);
 
     let wrong_key = s.decrypt(&sealed, aad, Some(1)).unwrap_err();
-    assert_eq!(wrong_key.code, b57::errors::ErrorCode::KeyUnavailable);
+    assert_eq!(wrong_key.code, f57::errors::ErrorCode::KeyUnavailable);
 }
 
 #[test]
 fn s57_invalid_version_fails() {
     let s = create_s57();
     let sealed = s.encrypt(b"hello", b"").unwrap();
-    let mut raw = b57::decode(&sealed).unwrap();
+    let mut raw = f57::decode(&sealed).unwrap();
     raw[0] = 0xff;
-    let tampered = b57::encode(&raw);
+    let tampered = f57::encode(&raw);
     let err: B57Error = s.decrypt(&tampered, b"", None).unwrap_err();
-    assert_eq!(err.code, b57::errors::ErrorCode::InvalidVersion);
+    assert_eq!(err.code, f57::errors::ErrorCode::InvalidVersion);
 }
 
 #[test]
@@ -102,10 +102,10 @@ fn s57_decrypt_structural_errors_fail() {
     assert!(s.decrypt("A", b"", None).is_err());
 
     let short_payload = {
-        let mut env = vec![b57::S57_VERSION, 7u8];
+        let mut env = vec![f57::S57_VERSION, 7u8];
         env.extend_from_slice(&[0u8; 12]);
         env.extend_from_slice(&[1u8; 8]);
-        b57::encode(&env)
+        f57::encode(&env)
     };
     assert!(s.decrypt(&short_payload, b"", None).is_err());
 }
@@ -115,13 +115,13 @@ fn s57_key_id_and_helper_validity_paths() {
     let s = create_s57();
     let sealed = s.encrypt(b"hello", b"").unwrap();
 
-    let mut raw = b57::decode(&sealed).unwrap();
+    let mut raw = f57::decode(&sealed).unwrap();
     raw[1] = 8;
-    let wrong_key_envelope = b57::encode(&raw);
+    let wrong_key_envelope = f57::encode(&raw);
     let err = s.decrypt(&wrong_key_envelope, b"", None).unwrap_err();
-    assert_eq!(err.code, b57::errors::ErrorCode::KeyUnavailable);
+    assert_eq!(err.code, f57::errors::ErrorCode::KeyUnavailable);
 
     let random = s.random().unwrap();
-    assert!(b57::s57_is_valid(&random));
-    assert!(b57::s57_is_canonical(&random));
+    assert!(f57::s57_is_valid(&random));
+    assert!(f57::s57_is_canonical(&random));
 }

@@ -22,7 +22,7 @@ Status: READY
 - `go tool cover -func=coverage_b57.out`
 - `id57_e2e_test.go` scenarios pass
 
-Coverage evidence (package `github.com/aco/b57`):
+Coverage evidence (package `github.com/aco/f57`):
 - Total statements covered: **97.3%**
 
 ## Notes

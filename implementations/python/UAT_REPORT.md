@@ -17,5 +17,5 @@ Status: PASS
 - Unit test coverage target: >90%
 - Numeric coverage verification can be run via:
   ```bash
-  pytest --cov=src/b57 --cov-report=term-missing
+  pytest --cov=src/f57 --cov-report=term-missing
   ```

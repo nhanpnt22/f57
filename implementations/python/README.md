@@ -30,7 +30,7 @@ cd implementations/python
 pip install -e .
 pip install pytest pytest-cov
 pytest
-pytest --cov=src/b57 --cov-report=html
+pytest --cov=src/f57 --cov-report=html
 ```
 
 ## Coverage (Target >90%)
@@ -38,5 +38,5 @@ pytest --cov=src/b57 --cov-report=html
 Run with:
 
 ```bash
-pytest --cov=src/b57 --cov-report=term-missing
+pytest --cov=src/f57 --cov-report=term-missing
 ```

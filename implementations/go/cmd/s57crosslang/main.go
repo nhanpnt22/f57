@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	b57 "github.com/aco/b57"
+	b57 "github.com/aco/f57"
 )
 
 const defaultDatasetSize = 1000

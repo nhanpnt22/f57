@@ -1,5 +1,5 @@
 import time
-from b57 import encode, decode, id57_generate_default
+from f57 import encode, decode, id57_generate_default
 import sys
 
 def run_benchmark():

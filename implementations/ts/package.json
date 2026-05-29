@@ -1,10 +1,19 @@
 {
-  "name": "@aco/b57-ts",
+  "name": "@aco/f57-ts",
   "version": "0.1.0",
-  "description": "TypeScript (Node.js) implementation of B57/H57/ID57/ID57-SHORT/R57/I57/S57",
+  "description": "TypeScript (Node.js) implementation of F57/H57/ID57/ID57-SHORT/R57/I57/S57",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/aco/f57",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aco/f57.git",
+    "directory": "implementations/ts"
+  },
+  "bugs": {
+    "url": "https://github.com/aco/f57/issues"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

@@ -1,4 +1,4 @@
-use b57::{encoded_length, decoded_length, 
+use f57::{encoded_length, decoded_length, 
     decode,  h57_hash, h57_verify, i57_decode, i57_encode, i57_hash, i57_id,
     i57_is_canonical, i57_is_valid, i57_validate_entropy, i57_validate_identifier, id57_generate,
     id57_generate_default, id57_short_generate, id57_short_generate_default, id57_short_verify_default,
@@ -94,7 +94,7 @@ fn compare_10000_datasets_with_go() {
         let input = dataset_at(i);
         let input_hex = hex::encode(&input);
 
-        let b57_encode = b57::encode(&input);
+        let b57_encode = f57::encode(&input);
         let b57_decode_hex = hex::encode(decode(&b57_encode).expect("decode should pass"));
 
         let h57_blake3_len128 =
