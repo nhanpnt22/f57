@@ -1,202 +1,245 @@
-# F57 - 57 Family
+# F57 - JavaScript Implementation
 
-**Tagline:** A unified family of secure, deterministic 57-series encodings.
+**F57 for JavaScript/Node.js**
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) delivered across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
+This branch contains the JavaScript implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57, ID57-SHORT, R57, and S57.
 
-**Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
-
-## B57 Protocol Stack (Base Layer)
-
-**Canonical Binary-to-Text and Identifier Architecture**
-**Version:** v0.1.0 FINAL
-**Status:** Official Release (Production-Ready, repository tag v0.1.1)
-**Date:** May 2026
-
-[![Version](https://img.shields.io/badge/version-v0.1.0_FINAL-blue.svg)](CHANGELOG.md)
-[![Status](https://img.shields.io/badge/status-Production_Ready-success.svg)](PROJECT_ASSESS_RELEASE.md)
-[![Parity](https://img.shields.io/badge/Cross--Language_Parity-10k_Datasets_Passed-success.svg)](UAT_10K_PARITY_REPORT.md)
-
-## Abstract
-
-The B57 Protocol Stack defines a unified,
-layered architecture for binary encoding, hash representation,
-random identification, secure composition, and identifier generation.
-
-At its core, B57 provides a canonical, ASCII-safe binary-to-text encoding scheme designed for human readability and unambiguous transcription, enforcing a strict 57-character alphabet that excludes visually ambiguous symbols.
-
-Building upon B57, the protocol stack establishes a rigorous pipeline for canonical data normalization:
-`input → HASH → prefix truncate → B57 → string`
-
-## Status of This Memo
-
-This repository acts as the central standard for the B57 specification and its native reference implementations.
-
-**Current Status:** Official protocol release v0.1.0 (repository release tag: v0.1.1). All implementations are verified, formally assessed, and production-ready.
-
-## 1. Overview
-
-Most identifiers and text-encodings (like Base64 or standard Base58) suffer from visually ambiguous characters or platform-specific determinism issues.
-
-The B57 protocol eliminates this by enforcing a strict 57-character alphabet:
-`ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789`
-
-(Excluded 5 visually ambiguous characters: `0`, `o`, `O`, `I`, `l`)
-
-### Key System Properties:
-- **Bijective & Deterministic:** 100% parity across distributed systems. Exactly one valid output exists per input.
-- **Entropy-Preserving:** Never truncates, pads, or biases raw input at the base encoding layer.
-- **One-Way Hash Transformation:** Employs BLAKE3 by default to produce secure cryptographic identifiers.
-
-## 2. The F57 Stack Architecture
-
-The protocol is composed of a 7-layer architecture with strict conceptual boundaries:
-
-### 2.1 B57 (Encoding Layer)
-* **Specification:** [B57 Core](spec/b57-core-api.txt)
-* The canonical binary-to-text mathematical primitives.
-* **Pipeline:** `bytes ↔ B57 string`
-* **Properties:** bijective, unambiguous, exact byte representation.
-
-### 2.2 H57 (Hash Representation Layer)
-* **Specification:** [H57 Core](spec/h57-core-api.txt)
-* Canonical representation of full cryptographic hash outputs.
-* **Pipeline:** `input → BLAKE3 → bytes → B57 string`
-* **Properties:** full entropy preservation (e.g., 256-bit hash → 44 chars), no truncation, ideal for content integrity.
-
-### 2.3 ID57 (Identifier Profile)
-* **Specification:** [ID57 Core](spec/id57-core-api.txt)
-* Generates fixed-length, human-readable identifiers through controlled entropy reduction.
-* **Pipeline:** `input → HASH → prefix truncate → B57 string`
-* **Properties:** Default 128-bit (22 chars). Ensures prefix-level byte truncation prior to encoding.
-
-### 2.4 ID57-SHORT (Ultra-Compact Profile)
-* **Specification:** [ID57-SHORT](spec/id57-short-profile.txt)
-* Generates heavily truncated local identifiers (e.g., 47-bit / 8 chars).
-* **Properties:** Optimized strictly for QR codes, UI brevity, and temporary IDs. Requires safe namespace sizing.
-
-### 2.5 R57 (Random Generation Profile)
-* **Specification:** [R57 Core](spec/r57-core-api.txt)
-* Generates high-entropy 128-bit random identifiers securely.
-* **Pipeline:** `entropy_source (128-bit) → B57 string`
-* **Properties:** Mandates CSPRNG, KDF, or Hybrid generation modes to ensure unpredictable, collision-resistant outputs.
-
-### 2.6 I57 (Integration Interface)
-* **Specification:** [I57 Core](spec/i57-core-api.txt)
-* The top-level facade interface unifying all underlying profiles into a seamless developer API.
-* Ensures correct composition and safe parameter passing.
-
-### 2.7 S57 (Security Composition Layer)
-* **Specification:** [S57 Security 57](spec/s57-security-57.txt)
-* Secure composition profile over B57/H57/ID57/R57 with domain-separated key derivation and envelope encryption.
-* **Pipeline:** `data -> keyed hash/id/random profile -> optional AES-256-GCM envelope -> B57 string`
-* **Properties:** deterministic keyed surfaces where required, fail-closed decrypt behavior, cross-language parity validated for release.
-
-## 3. Native Implementations
-
-The v0.1.0 release provides fully native implementations. All implementations process arrays using native BigInt arithmetic.
-S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
-
-Each language implementation is maintained in its own separate branch:
-
-- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/f57/tree/go)
-- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/f57/tree/rust)
-- **JavaScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/f57/tree/javascript)
-- **TypeScript (npm-ready package)**: [implementations/ts](implementations/ts)
-- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/f57/tree/dart)
-- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/f57/tree/python)
-
-All passed the [10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md) proving zero deviation across execution environments.
-S57 release gating also passed with zero mismatches in the 5-language benchmark summary at [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json).
-
-## 4. Recommended System Patterns
-
-The stack encourages standard integration patterns:
-
-- **Dual-Layer Identity:** Produce a full `H57(data)` internally for database deduplication, while exposing a targeted `ID57(data, 128-bit)` externally via APIs.
-- **Storage vs. Exposure:** Use `ID57-SHORT` for printable offline receipts or tiny URLs, mapped safely to a heavily collision-resistant `H57` hash stored remotely.
-- **Tamper Detection & Content Routing:** Execute exact hash matching without truncation using native length 44-character `H57` outputs.
-- **Confidential Payload Transport:** Use `S57` envelope encryption (`encrypt`/`decrypt`) for authenticated payload exchange where transport-safe B57 strings are required.
-
-## 5. Official Documentation
-
-- [F57 Overview](F57.md) - Umbrella family definition, architecture, and versioning policy.
-- [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md) - Official v0.1.0 release sign-off and validation posture.
-- [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md) - Proof of absolute deterministic data alignment.
-- [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, JavaScript/Node.js, and TypeScript/Node.js.
-- [Benchmarks](BENCHMARKS.md) - ID processing ops/second across languages.
-- [Security Policy](SECURITY.md) - Collision domains and vulnerability reporting.
-- [Changelog](CHANGELOG.md) - Semantic version tracking.
-
-### 5.1 Legacy Draft Specifications
-
-Original v0.1.0 working drafts, retained for reference:
-- [B57 Core Suite Framework](spec/b57-cs-v0.1.0.txt)
-- [B57 Encoding Draft](spec/b57-v0.1.0.txt)
-- [H57 Draft](spec/h57-v0.1.0.txt)
-- [ID57 Draft](spec/id57-v0.1.0.txt)
-- [R57 Draft](spec/r57-v0.1.0.txt)
-
-## 6. Getting Started & Testing
-
-Verify deterministic compliance locally using standard test runners:
+## Quick Start
 
 ```bash
-# Go
-cd implementations/go && go test ./...
+# Install dependencies
+npm install
 
-# JavaScript
-cd implementations/javascript && npm test
+# Run all tests
+npm test
 
-# TypeScript package verification
-cd implementations/ts && npm run verify:all
+# Run specific tests
+npm test -- b57.test.js
 
-# Rust
-cd implementations/rust && cargo test
-
-# Dart
-cd implementations/dart && dart test
-
-# Python
-cd implementations/python && pytest
-
-# S57 5-language parity benchmark
-cd implementations/javascript && node scripts/s57-benchmark-10000x5.mjs
+# Run benchmarks
+npm run benchmark
 ```
 
-### 6.1 S57 Quick Start (Node.js)
+## Project Structure
+
+```
+javascript/
+├── src/
+│   ├── index.js         # Main export
+│   ├── b57.js           # B57 encoding
+│   ├── h57.js           # H57 hash representation
+│   ├── i57.js           # I57 identifiers
+│   ├── id57.js          # ID57 profiles
+│   ├── id57_short.js    # ID57-SHORT (compact)
+│   ├── r57.js           # R57 random generation
+│   ├── s57.js           # S57 security composition
+│   └── errors.js        # Error types
+├── test/
+│   ├── b57.test.js
+│   ├── h57.test.js
+│   ├── i57.test.js
+│   ├── id57.test.js
+│   ├── id57_short.test.js
+│   ├── r57.test.js
+│   ├── s57.test.js
+│   └── e2e.test.js
+├── dist/                # Compiled output
+├── package.json
+├── package-lock.json
+└── README.md
+```
+
+## Key Files
+
+- **[package.json](package.json)** - Package manifest and scripts
+- **[src/index.js](src/index.js)** - Main B57 module (public API)
+- **[src/s57.js](src/s57.js)** - S57 security layer
+- **[test/b57.test.js](test/b57.test.js)** - B57 unit tests
+- **[test/e2e.test.js](test/e2e.test.js)** - End-to-end tests
+
+## API Overview
+
+### B57 - Binary-to-Text Encoding
 
 ```javascript
-import { S57, H57Length, ID57Length } from './implementations/javascript/index.js';
+import { B57 } from './src/index.js';
 
-const s57 = new S57({
-	server_secret_key: new TextEncoder().encode('S57_SERVER_SECRET_KEY_MUST_BE_LONG_1234567890'),
-	environment_salt: new TextEncoder().encode('prod-v1'),
-	key_id: 7
-});
+// Encode bytes to B57 string
+const bytes = new Uint8Array([1, 2, 3, 4]);
+const encoded = B57.encode(bytes);
+console.log(encoded); // B57 string
 
-const input = new TextEncoder().encode('hello-b57-s57');
-
-const h = s57.hash(input, H57Length.LEN_256);
-const id = s57.id(input, ID57Length.DEFAULT);
-const rd = s57.random_derived(
-	new TextEncoder().encode('master-secret'),
-	new TextEncoder().encode('u-1')
-);
-
-const aad = new TextEncoder().encode('ctx:v1');
-const token = s57.encrypt(input, aad);
-const plain = s57.decrypt(token, aad);
-
-console.log({ h, id, rd, token, plain: new TextDecoder().decode(plain) });
+// Decode B57 string to bytes
+const decoded = B57.decode(encoded);
+console.log(decoded); // Uint8Array
 ```
 
-For full release-grade validation evidence, see:
-- [implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md)
-- [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json)
+### H57 - Hash Representation
 
-## 7. Governance
+```javascript
+// Hash input to full-length B57 representation
+const input = new Uint8Array([1, 2, 3]);
+const hash = H57.hash(input); // 44-character B57 string (256-bit)
+console.log(hash);
+```
 
-For detailed maintainer release assessment gates, see [PROJECT_ASSESS_RELEASE.md](PROJECT_ASSESS_RELEASE.md).
+### ID57 - Identifiers
 
-**License:** Internal Restricted via [LICENSE](LICENSE) and [LICENSE.md](LICENSE.md).
+```javascript
+// Generate deterministic 22-character identifier
+const id = ID57.id(input, ID57Length.DEFAULT);
+console.log(id); // 22-character B57 string
+```
+
+### ID57-SHORT - Compact Identifiers
+
+```javascript
+// Generate 8-character compact identifier
+const shortId = ID57Short.id(input, ID57ShortLength.DEFAULT);
+console.log(shortId); // 8-character B57 string
+```
+
+### R57 - Random Generation
+
+```javascript
+// Generate cryptographically secure random identifier
+const random = R57.random();
+console.log(random); // 128-bit random string
+```
+
+### S57 - Security Composition
+
+```javascript
+import { S57, H57Length, ID57Length } from './src/index.js';
+
+const s57 = new S57({
+  server_secret_key: new TextEncoder().encode('SECRET_KEY_LONG_ENOUGH_32_BYTES'),
+  environment_salt: new TextEncoder().encode('prod-v1'),
+  key_id: 7,
+});
+
+// Hash with S57
+const hash = s57.hash(new Uint8Array([1, 2, 3]), H57Length.LEN_256);
+
+// ID with S57
+const id = s57.id(new Uint8Array([1, 2, 3]), ID57Length.DEFAULT);
+
+// Encryption/Decryption
+const aad = new TextEncoder().encode('additional data');
+const encrypted = s57.encrypt(new Uint8Array([1, 2, 3]), aad);
+const decrypted = s57.decrypt(encrypted, aad);
+
+console.log({ hash, id, encrypted, decrypted });
+```
+
+## Running Tests
+
+```bash
+# All tests
+npm test
+
+# Specific test file
+npm test b57.test.js
+
+# Watch mode
+npm test -- --watch
+
+# Coverage
+npm run test:coverage
+
+# Benchmarks
+npm run benchmark
+
+# S57 cross-language benchmark
+npm run benchmark:s57-5lang
+```
+
+## Scripts
+
+```bash
+# Run tests
+npm test
+
+# Build distribution
+npm run build
+
+# Run benchmarks
+npm run benchmark
+
+# S57 5-language parity benchmark
+npm run benchmark:s57-5lang
+
+# Coverage report
+npm run test:coverage
+
+# Lint code (if configured)
+npm run lint
+```
+
+## Dependencies
+
+- **crypto** (Node.js built-in) - BLAKE3 and AES-256-GCM
+- Development: **jest**, **@types/node**
+
+See [package.json](package.json) for complete dependency list.
+
+## Building
+
+```bash
+# Transpile to distribution
+npm run build
+
+# Output in dist/ directory
+ls -la dist/
+```
+
+## Specification References
+
+- **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
+- **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
+- **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
+- **ID57-SHORT:** [spec/id57-short-profile.txt](../spec/id57-short-profile.txt)
+- **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
+- **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
+
+## Branch Information
+
+- **Branch:** `javascript` (JavaScript-only implementation)
+- **Version:** v0.2.0
+- **Release Branch:** `release/javascript-v0.2.0`
+- **Status:** Production Ready
+- **Last Updated:** June 2026
+
+## Multi-Language Support
+
+This repository provides implementations in multiple languages with **guaranteed cross-language parity**:
+
+- **JavaScript** (this branch)
+- **Go** - [View `go` branch](../../../tree/go)
+- **Rust** - [View `rust` branch](../../../tree/rust)
+- **Dart** - [View `dart` branch](../../../tree/dart)
+- **TypeScript** - [View `ts` branch](../../../tree/ts)
+- **Python** - [View `python` branch](../../../tree/python)
+- **All** - [View `main` branch](../../../tree/main)
+
+Clone only this language:
+```bash
+git clone --branch javascript https://github.com/your-org/f57.git
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.
+
+## Security
+
+See [SECURITY.md](../../SECURITY.md) for vulnerability reporting and security policies.
+
+## License
+
+Internal Restricted - See [LICENSE](../../LICENSE) and [LICENSE.md](../../LICENSE.md)
+
+---
+
+**Version:** v0.2.0  
+**Last Updated:** June 2026
