@@ -6,6 +6,41 @@
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
+---
+
+## 🌍 Multi-Language Repository Structure
+
+This repository uses **language-specific branches** to keep clones focused and lightweight:
+
+### Quick Start by Language
+
+| Language | Branch | Clone Command |
+|----------|--------|---------------|
+| **Dart** | `dart` | `git clone --branch dart https://github.com/your-org/f57.git` |
+| **Go** | `go` | `git clone --branch go https://github.com/your-org/f57.git` |
+| **JavaScript** | `javascript` | `git clone --branch javascript https://github.com/your-org/f57.git` |
+| **Python** | `python` | `git clone --branch python https://github.com/your-org/f57.git` |
+| **Rust** | `rust` | `git clone --branch rust https://github.com/your-org/f57.git` |
+| **TypeScript** | `ts` | `git clone --branch ts https://github.com/your-org/f57.git` |
+| **All Languages** | `main` | `git clone https://github.com/your-org/f57.git` |
+
+### Branch Information
+
+- **Language Branches** (`dart`, `go`, `javascript`, `python`, `rust`, `ts`): Each contains only that language's implementation, plus shared specs and documentation
+- **Release Branches** (`release/{language}-v{version}`): Version-specific branches for each language
+- **Main Branch** (`main`): Contains all 6 language implementations
+- **Documentation**: See [LANGUAGE_BRANCHES.md](LANGUAGE_BRANCHES.md) for complete branching strategy
+
+Each language branch includes:
+- ✅ Language-specific implementation code
+- ✅ Language-specific README
+- ✅ Shared F57 specifications (`spec/`)
+- ✅ Common documentation (LICENSE, CONTRIBUTING, SECURITY, etc.)
+- ❌ **NO** other language implementations
+- ❌ **NO** cross-language benchmarks or multi-language test data
+
+---
+
 ## B57 Protocol Stack (Base Layer)
 
 **Canonical Binary-to-Text and Identifier Architecture**
@@ -97,14 +132,30 @@ The protocol is composed of a 7-layer architecture with strict conceptual bounda
 The v0.1.0 release provides fully native implementations. All implementations process arrays using native BigInt arithmetic.
 S57 is implemented and release-validated across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
-Each language implementation is maintained in its own separate branch:
+### 3.1 Available on Main Branch (This Branch)
 
-- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/nhanpnt22/f57/tree/go)
-- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/nhanpnt22/f57/tree/rust)
-- **JavaScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/nhanpnt22/f57/tree/javascript)
-- **TypeScript (npm-ready package)**: [implementations/ts](implementations/ts)
-- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/nhanpnt22/f57/tree/dart)
-- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/nhanpnt22/f57/tree/python)
+Each language implementation is maintained in its own separate branch and included here on `main`:
+
+- **Go**: [implementations/go](implementations/go) — [View `go` branch](https://github.com/your-org/f57/tree/go)
+- **Rust**: [implementations/rust](implementations/rust) — [View `rust` branch](https://github.com/your-org/f57/tree/rust)
+- **JavaScript**: [implementations/javascript](implementations/javascript) — [View `javascript` branch](https://github.com/your-org/f57/tree/javascript)
+- **TypeScript (npm-ready package)**: [implementations/ts](implementations/ts) — [View `ts` branch](https://github.com/your-org/f57/tree/ts)
+- **Dart**: [implementations/dart](implementations/dart) — [View `dart` branch](https://github.com/your-org/f57/tree/dart)
+- **Python**: [implementations/python](implementations/python) — [View `python` branch](https://github.com/your-org/f57/tree/python)
+
+### 3.2 For Language-Specific Work
+
+If you only need one language, clone its dedicated branch instead:
+
+```bash
+# Work on only Dart
+git clone --branch dart https://github.com/your-org/f57.git f57-dart
+
+# Work on only Go
+git clone --branch go https://github.com/your-org/f57.git f57-go
+
+# etc. for python, rust, typescript, javascript
+```
 
 All passed the [10,000 Dataset Cross-Language Parity Audit](UAT_10K_PARITY_REPORT.md) proving zero deviation across execution environments.
 S57 release gating also passed with zero mismatches in the 5-language benchmark summary at [implementations/cross_language_records/s57-benchmark-10000x5-summary.json](implementations/cross_language_records/s57-benchmark-10000x5-summary.json).
@@ -121,6 +172,8 @@ The stack encourages standard integration patterns:
 ## 5. Official Documentation
 
 - [F57 Overview](F57.md) - Umbrella family definition, architecture, and versioning policy.
+- [Language Branches Guide](LANGUAGE_BRANCHES.md) - Detailed branching strategy and per-language quickstart.
+- [Branch Setup Summary](BRANCH_SETUP_SUMMARY.md) - Complete branch structure documentation.
 - [Final Release Assessment](FINAL_RELEASE_ASSESSMENT.md) - Official v0.1.0 release sign-off and validation posture.
 - [UAT 10K Parity Report](UAT_10K_PARITY_REPORT.md) - Proof of absolute deterministic data alignment.
 - [S57 Final Release Report (All Languages)](implementations/FINAL_RELEASE_REPORT_S57_ALL_LANGUAGES.md) - S57 release validation across Go, Rust, Dart, Python, JavaScript/Node.js, and TypeScript/Node.js.
@@ -139,32 +192,48 @@ Original v0.1.0 working drafts, retained for reference:
 
 ## 6. Getting Started & Testing
 
-Verify deterministic compliance locally using standard test runners:
+### 6.1 Clone and Run on Main Branch (All Languages)
 
 ```bash
+git clone https://github.com/your-org/f57.git f57
+cd f57
+
 # Go
 cd implementations/go && go test ./...
 
 # JavaScript
-cd implementations/javascript && npm test
+cd ../javascript && npm test
 
 # TypeScript package verification
-cd implementations/ts && npm run verify:all
+cd ../ts && npm run verify:all
 
 # Rust
-cd implementations/rust && cargo test
+cd ../rust && cargo test
 
 # Dart
-cd implementations/dart && dart test
+cd ../dart && dart test
 
 # Python
-cd implementations/python && pytest
+cd ../python && pytest
+```
 
-# S57 5-language parity benchmark
+### 6.2 Clone and Run on Language Branch (Single Language)
+
+```bash
+# Example: Dart only
+git clone --branch dart https://github.com/your-org/f57.git f57-dart
+cd f57-dart/implementations/dart
+pubspec get
+dart test
+```
+
+### 6.3 S57 5-language Parity Benchmark
+
+```bash
 cd implementations/javascript && node scripts/s57-benchmark-10000x5.mjs
 ```
 
-### 6.1 S57 Quick Start (Node.js)
+### 6.4 S57 Quick Start (Node.js)
 
 ```javascript
 import { S57, H57Length, ID57Length } from './implementations/javascript/index.js';
@@ -200,3 +269,8 @@ For full release-grade validation evidence, see:
 For detailed maintainer release assessment gates, see [PROJECT_ASSESS_RELEASE.md](PROJECT_ASSESS_RELEASE.md).
 
 **License:** Internal Restricted via [LICENSE](LICENSE) and [LICENSE.md](LICENSE.md).
+
+---
+
+**Current Version:** v0.2.0  
+**Last Updated:** June 2026
