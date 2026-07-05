@@ -115,18 +115,24 @@ Binding compatibility note:
 - Some language bindings require the hash_fn argument and treat
   BLAKE3 as the effective default when unspecified by caller.
 
-Definition:
+The SIGN of length_enum selects the generation mode:
 
- hash_bytes = HASH(input_bytes)
+ length_enum == ID57_DEFAULT (0):
+     treated as ID57_LEN_128 (bit-length mode below)
 
- if length_enum == ID57_DEFAULT:
-     effective_bytes = truncate_bytes(hash_bytes, bits(ID57_LEN_128))
- else:
+ length_enum > 0  — BIT-LENGTH MODE (security/standard, 7.1):
+     hash_bytes = HASH(input_bytes)
      effective_bytes = truncate_bytes(hash_bytes, bits(length_enum))
+     output = b57_encode(effective_bytes)
+     // variable width within [min_chars, max_chars] (7.3)
 
- output = b57_encode(effective_bytes)
+ length_enum < 0  — FIXED-WIDTH MODE (informational, 7.2):
+     k = -length_enum                       // target character count
+     full = id57_generate(input_bytes, ID57_LEN_128)
+     output = first k characters of full     // exactly k characters
+     // see 5.2
 
-Requirements:
+Requirements (bit-length mode):
 
 - HASH MUST be cryptographic
 - HASH MUST be deterministic
@@ -142,62 +148,48 @@ Requirements:
 
 ------------------------------------------------------------
 
-5.2 id57_generate_fixed4
+5.2 Fixed-Width Generation (negative length_enum)
 
-function id57_generate_fixed4(input_bytes) -> string
-
-Optional extension:
-
-function id57_generate_fixed4(input_bytes, hash_fn) -> string
-
-This is the sole fixed-width ID57 output (7.2.1): always
-exactly 4 characters, never a range. It intentionally departs
-from the standard pipeline (5.1) in two ways: it reduces the
-truncated value modulo 57^4 before encoding, and it zero-pads
-the result to a fixed width. Both are prohibited for every
-other ID57 length_enum (8 TRUNCATION MODEL, 14 PROHIBITED
-BEHAVIORS) and MUST NOT be applied there; they are permitted
-here only because this function is explicitly, separately
-specified and never defines a decoding interface (9).
+For any negative length_enum FIXED_k (value -k), ID57 produces
+an identifier of EXACTLY k characters - not a bound, a fixed
+width. This is the one place ID57 permits post-encoding string
+truncation ("cut"), which is otherwise prohibited (8, 14); it
+is allowed here only for negative length_enum values.
 
 Definition:
 
- hash_bytes = HASH(input_bytes)
+ k    = -length_enum
+ full = id57_generate(input_bytes, ID57_LEN_128)  // canonical B57
+ output = full[0 : k]                             // first k characters
 
- truncated_bytes = truncate_bytes(hash_bytes, 32)
-                    // same 32-bit/4-byte truncation as ID57_LEN_32
+Why this always yields exactly k characters:
 
- value = bytes_to_uint_be(truncated_bytes)   // 0 .. 2^32-1
-
- reduced = value mod 57^4                     // 0 .. 57^4-1 (10,556,001 buckets)
-
- digits = to_base57_digits(reduced)           // minimal digits, no leading zero digit
- output = ALPHABET[0] * (4 - length(digits)) + digits
-                    // left-pad with the zero-value alphabet character to width 4
-
- return output   // length(output) == 4, always
+- ID57_LEN_128 output is always 16-22 characters (its
+  min_chars is 16, the all-leading-zero case; see 7.3)
+- every defined FIXED_k has k <= 12 < 16, so `full` always has
+  at least k characters to cut
 
 Requirements:
 
-- HASH MUST be cryptographic and deterministic
-- truncated_bytes MUST be derived via prefix truncation, as in 8
-- the modulo reduction MUST use the full 32-bit truncated value
-  (not a bit-level pre-truncation to fewer bits)
-- output MUST always be exactly 4 characters
-- output MUST use only B57 alphabet characters
+- The source identifier MUST be the ID57_LEN_128 output of the
+  SAME input and hash function (determinism)
+- output MUST be exactly the first k characters (prefix), in
+  order; no reordering, re-encoding, or padding
+- k MUST be one of the defined FIXED_k values (7.2)
 
 Security / entropy notes:
 
-- Effective output space is 57^4 (~23.33 bits), smaller than
-  the 32-bit truncation it is derived from; ~8.7 bits are
-  discarded by the modulo reduction
-- 2^32 is not an exact multiple of 57^4, so the reduction has
-  a small modulo bias (some outputs are marginally more likely
-  than others); this is acceptable for a non-security,
-  informational identifier but MUST NOT be used where unbiased
-  output is required
-- Collision guidance for this function follows the ~23-bit row
-  in 10.1 (~2^11-2^12 entries), same as ID57_LEN_24
+- A fixed-width identifier is a PREFIX of a bignum (base-57)
+  encoding. It is therefore NOT a canonical B57 string and
+  MUST NOT be decoded or validated as one (see 11.5)
+- FIXED_j output is always a prefix of FIXED_k output (j < k)
+  for the same input; the widths are nested, not independent
+- Effective entropy is approximately k * log2(57) bits, with a
+  mild reduction from leading-digit skew (the most-significant
+  base-57 digits of a 128-bit value are not perfectly uniform).
+  Measured: FIXED_2 ~= 11.3 bits, FIXED_3 ~= 17 bits
+- Collision guidance follows the birthday bound on ~57^k; see
+  10.1. These are NON-SECURITY identifiers only
 
 ============================================================
 6. DEFAULT BEHAVIOR
@@ -218,16 +210,21 @@ Default pipeline:
 7. LENGTH MODEL
 ============================================================
 
-Implementations MUST support:
+Implementations MUST support two kinds of length_enum,
+distinguished by SIGN:
 
-Character length is a BOUND, NOT a guarantee. B57 is a
-bignum-style positional encoding: the exact number of
-characters produced for a given length_enum depends on the
-numeric value of the truncated hash, and MAY be shorter than
-the maximum shown below. Implementations MUST NOT generate,
-reject, or validate an identifier by requiring an exact
-character count. See 7.3 for the normative bounds formula
-and 11.4/11.5 for the required range/validation functions.
+- POSITIVE values (7.1) select a BIT length. Character width
+  is then a BOUND, not a guarantee: B57 is a bignum-style
+  positional encoding, so the exact width depends on the
+  numeric value of the truncated hash and MAY be shorter than
+  the maximum shown. Exact-width checks are WRONG here.
+
+- NEGATIVE values (7.2) select a FIXED character width. The
+  magnitude is the exact output width, always. Exact-width
+  checks are REQUIRED here.
+
+See 7.3 for the normative rules per sign and 11.4/11.5 for
+the required range/validation functions.
 
 ------------------------------------------------------------
 7.1 Security Lengths (REQUIRED)
@@ -241,66 +238,82 @@ and 11.4/11.5 for the required range/validation functions.
 - ID57_LEN_256 → 32-44 chars
 - ID57_LEN_512 → 64-88 chars
 
-------------------------------------------------------------
-7.2 Informational Lengths (NON-SECURITY)
-------------------------------------------------------------
-
-- ID57_LEN_24  → 3-5 chars
-- ID57_LEN_48  → 6-9 chars
-- ID57_LEN_96  → 12-17 chars
-- ID57_LEN_192 → 24-33 chars
-- ID57_LEN_384 → 48-66 chars
-
-All five are byte-aligned (3/6/12/24/48 bytes) and form a
-doubling sequence. None of them share a byte_length with any
-7.1 security length (1/2/4/8/16/32/64 bytes), so - unlike the
-prior informational set - no informational length_enum's
-range or decoded shape can be confused with a security one.
+Note: adjacent ranges MAY touch (e.g. ID57_LEN_8 and
+ID57_LEN_16 both admit a 2-char output), and a larger bit
+length near its minimum MAY be shorter than a smaller bit
+length near its maximum. Character width MUST NOT be used to
+infer which length_enum produced a string; id57_is_length
+(11.5) distinguishes them by decoded byte length instead.
 
 ------------------------------------------------------------
-7.2.1 Fixed-Width Special Case: id57_generate_fixed4
+7.2 Fixed Lengths (NON-SECURITY)
 ------------------------------------------------------------
 
-One additional, explicitly special-cased identifier exists
-outside the length_enum model above: id57_generate_fixed4
-(5.2). It is the only ID57 output that is a truly fixed
-4 characters, always - not a [min_chars, max_chars] bound.
+Fixed lengths are identified by NEGATIVE length_enum values.
+The sign distinguishes them unambiguously from the positive
+bit-length values in 7.1, and the magnitude IS the exact
+character count. Each produces a hard-fixed width (min == max),
+generated by cutting the ID57_LEN_128 output to k characters
+(5.2).
 
-This is NOT achievable by picking a smaller length_enum and
-applying 7.3's normal formula: max_chars computed from any
-whole byte_length never lands on exactly 4 (2 bytes -> max 3,
-3 bytes -> max 5; 4 is unreachable). Achieving an exact 4
-requires a different mechanism - see 5.2 for the algorithm
-(modulo reduction into 57^4 plus fixed-width zero-padding).
-id57_generate_fixed4 MUST NOT be confused with, or treated as
-interchangeable with, ID57_LEN_24 (3-5 chars) - they have
-different algorithms and different entropy properties.
+- FIXED_2  = -2   → exactly 2 chars
+- FIXED_3  = -3   → exactly 3 chars
+- FIXED_4  = -4   → exactly 4 chars
+- FIXED_5  = -5   → exactly 5 chars
+- FIXED_6  = -6   → exactly 6 chars
+- FIXED_7  = -7   → exactly 7 chars
+- FIXED_8  = -8   → exactly 8 chars
+- FIXED_9  = -9   → exactly 9 chars
+- FIXED_10 = -10  → exactly 10 chars
+- FIXED_11 = -11  → exactly 11 chars
+- FIXED_12 = -12  → exactly 12 chars
+
+Notes:
+
+- All FIXED_k are derived from ID57_LEN_128 of the same input
+  (5.2), so they are cross-consistent: FIXED_j is a prefix of
+  FIXED_k for j < k.
+- The maximum defined width is 12. This MUST remain <= 16 (the
+  guaranteed minimum width of ID57_LEN_128) so the cut always
+  has enough characters; 12 leaves margin.
+- Fixed-width outputs are prefixes of a bignum encoding and are
+  NOT canonical B57 (5.2); they are validated by exact width,
+  not by decode/canonical checks (11.5).
 
 ------------------------------------------------------------
 7.3 Length Bounds (NORMATIVE)
 ------------------------------------------------------------
 
-For any length_enum, with bit_length = bits(length_enum):
+Length semantics depend on the SIGN of length_enum:
 
- byte_length = ceil(bit_length / 8)
- min_chars   = byte_length
- max_chars   = b57_encoded_length(byte_length)
-             = ceil(byte_length * 8 / log2(57))
+ length_enum > 0  (BIT LENGTH, 7.1):
+   Character length is a BOUND, not a fixed value. With
+   bit_length = bits(length_enum):
 
-The ranges in 7.1 and 7.2 are derived directly from this
-formula and MUST be treated as [min_chars, max_chars]
-bounds, never as a fixed width. This formula does NOT apply
-to id57_generate_fixed4 (7.2.1, 5.2), which is exactly 4
-chars by construction, not by this bound.
+     byte_length = ceil(bit_length / 8)
+     min_chars   = byte_length
+     max_chars   = b57_encoded_length(byte_length)
+                 = ceil(byte_length * 8 / log2(57))
+
+   The 7.1 ranges are derived from this formula and MUST be
+   treated as [min_chars, max_chars] bounds, never as a fixed
+   width. Implementations MUST NOT assume or enforce an exact
+   character count for these lengths.
+
+ length_enum < 0  (FIXED WIDTH, 7.2):
+     min_chars = max_chars = -length_enum = k
+   The output is EXACTLY k characters by construction (5.2).
+   Exact-width checking is REQUIRED here (the opposite of the
+   bit-length rule), because fixed-width outputs are not
+   bounded - they are fixed.
 
 Requirements:
 
-- Length MUST correspond to defined model values
+- length_enum MUST correspond to a defined value (positive
+  7.1 bit length, negative 7.2 fixed width, or DEFAULT)
 - Implementations MUST NOT accept arbitrary lengths
-- Security-sensitive use MUST use ≥ ID57_LEN_128
-- Implementations MUST NOT assume or enforce a fixed
-  character count for any length_enum (id57_generate_fixed4
-  is the sole, explicitly-documented exception)
+- Security-sensitive use MUST use ≥ ID57_LEN_128 and MUST NOT
+  use any fixed length (they are non-security)
 
 ============================================================
 8. TRUNCATION MODEL
@@ -323,11 +336,21 @@ Bit handling:
   byte_length = ceil(bit_length / 8)
 - Excess bits in the final byte MUST be truncated (not rounded)
 
-Prohibited:
+Prohibited (bit-length mode, positive length_enum):
 
 - truncating encoded strings
 - suffix truncation
 - post-encoding manipulation
+
+Fixed-width exception (negative length_enum only):
+
+- Fixed lengths (7.2, FIXED_k) DO perform post-encoding string
+  truncation: they cut the ID57_LEN_128 output to the first k
+  characters (5.2). This is the SOLE permitted use of encoded-
+  string truncation, allowed only for negative length_enum.
+- It remains PREFIX truncation of the string (first k chars),
+  never suffix truncation.
+- It MUST NOT be applied to any positive (bit-length) enum.
 
 ============================================================
 9. ONE-WAY PROPERTY
@@ -343,41 +366,40 @@ ID57 is a one-way transformation:
 Security depends on hash function properties.
 
 ============================================================
-10. SHORT-LENGTH USAGE (ID57_LEN_24/48/96/192/384, id57_generate_fixed4)
+10. SHORT-LENGTH USAGE (FIXED_k and small bit lengths)
 ============================================================
 
-This section applies specifically to identifiers generated
-with the informational lengths defined in 7.2 (ID57_LEN_24,
-ID57_LEN_48, ID57_LEN_96, ID57_LEN_192, ID57_LEN_384) and to
-id57_generate_fixed4 (5.2, 7.2.1). These trade collision
-resistance for compactness and carry additional usage
-requirements beyond the general ID57 rules. ID57_LEN_32 (from
-7.1) is also commonly used at this end of the range and is
-included in the guidance below where relevant.
+This section applies to compact identifiers: the fixed
+lengths defined in 7.2 (FIXED_2 .. FIXED_12) and the small
+security lengths from 7.1 (ID57_LEN_8/16/32 in particular).
+These trade collision resistance for compactness and carry
+additional usage requirements beyond the general ID57 rules.
 
-There is no separate "short" profile, module, or API. Short
-identifiers are produced by calling id57_generate (5.1) with
-one of these length_enum values directly - e.g.
-id57_generate(x, ID57_LEN_48) for a 6-9 char short identifier,
-or id57_generate_fixed4(x) for a hard-fixed 4-char identifier.
-Implementations MUST NOT expose a distinct short-specific
-function name, type, or default beyond id57_generate_fixed4
-itself (this consolidates what a prior ID57-SHORT companion
-profile specified separately; see 17 REVISION NOTES).
+There is no separate "short" profile, module, or API. Compact
+identifiers are produced by calling id57_generate (5.1) with a
+fixed length_enum - e.g. id57_generate(x, FIXED_8) for an
+exactly-8-char identifier - or with a small bit length such as
+id57_generate(x, ID57_LEN_32). Implementations MUST NOT expose
+a distinct short-specific function name, type, or default (this
+consolidates what a prior ID57-SHORT companion profile
+specified separately; see 17 REVISION NOTES).
 
 ------------------------------------------------------------
 10.1 Collision Model
 ------------------------------------------------------------
 
-Approximate collision onset (birthday bound):
+Approximate collision onset (birthday bound). Fixed lengths
+use an effective space near 57^k, reduced slightly by
+leading-digit skew (5.2):
 
-- id57_generate_fixed4 (~23.33-bit effective space) → ~2^11-2^12 entries
-- ID57_LEN_24 (24-bit) → ~2^12 entries
-- ID57_LEN_32 (32-bit, from 7.1) → ~2^16 entries
-- ID57_LEN_48 (48-bit) → ~2^24 entries
-- ID57_LEN_96 (96-bit) → ~2^48 entries
-- ID57_LEN_192 (192-bit) → ~2^96 entries
-- ID57_LEN_384 (384-bit) → ~2^192 entries
+- FIXED_2  (~11 bits)    → ~2^5-2^6 entries
+- FIXED_4  (~19-23 bits) → ~2^10-2^11 entries
+- FIXED_6  (~35 bits)    → ~2^17 entries
+- FIXED_8  (~47 bits)    → ~2^23 entries
+- FIXED_12 (~70 bits)    → ~2^35 entries
+- ID57_LEN_8  (8-bit)    → ~2^4 entries
+- ID57_LEN_16 (16-bit)   → ~2^8 entries
+- ID57_LEN_32 (32-bit)   → ~2^16 entries
 
 ------------------------------------------------------------
 10.2 Required Safety Mechanisms
@@ -400,7 +422,7 @@ Implementations MUST NOT:
 
 Dual-Identifier Model:
 
- short_id = id57_generate(x, ID57_LEN_48)
+ short_id = id57_generate(x, FIXED_8)
  full_id  = id57_generate(x, ID57_LEN_128)
 
 Namespaced Identifiers:
@@ -417,8 +439,13 @@ Collision-Aware Allocation:
 
 Progressive Length Upgrade:
 
- id57_generate_fixed4 → ID57_LEN_24 → ID57_LEN_32 →
- ID57_LEN_48 → ID57_LEN_96 → ID57_LEN_192 → ID57_LEN_384
+ FIXED_4 → FIXED_6 → FIXED_8 → FIXED_12 →
+ ID57_LEN_128 (when a stable, security-grade id is needed)
+
+ Note: FIXED widths are nested prefixes of the same
+ ID57_LEN_128 value (5.2), so upgrading a FIXED_k id to a
+ wider FIXED_m (m > k) EXTENDS the same string; upgrading to a
+ bit length (ID57_LEN_128) produces a different, canonical id.
 
 ------------------------------------------------------------
 10.4 Use Cases
@@ -487,13 +514,13 @@ function id57_is_canonical(id57_string) -> boolean
 
 function id57_range(length_enum) -> (min_chars, max_chars)
 
- bit_length  = bits(length_enum)
- byte_length = ceil(bit_length / 8)
+ if length_enum < 0:                 // FIXED width (7.2)
+     k = -length_enum
+     return (k, k)                    // fixed: min == max
 
- return (
-   byte_length,
-   b57_encoded_length(byte_length)
- )
+ bit_length  = bits(length_enum)      // positive / DEFAULT
+ byte_length = ceil(bit_length / 8)
+ return (byte_length, b57_encoded_length(byte_length))
 
 ------------------------------------------------------------
 
@@ -501,56 +528,75 @@ function id57_range(length_enum) -> (min_chars, max_chars)
 
 function id57_is_length(id57_string, length_enum) -> boolean
 
- (min_chars, max_chars) = id57_range(length_enum)
+ Fixed-width case (length_enum < 0):
 
- if length(id57_string) < min_chars or
-    length(id57_string) > max_chars:
-       return false
+   k = -length_enum
+   // fixed-width outputs are prefixes of a bignum encoding and
+   // are NOT canonical B57 - validate width + alphabet only
+   if length(id57_string) != k:            return false
+   if not id57_is_valid(id57_string):      return false
+   return true
 
- if not id57_is_canonical(id57_string):
-       return false
+ Bit-length case (length_enum > 0 or DEFAULT):
 
- decoded     = b57_decode(id57_string)
- bit_length  = bits(length_enum)
- byte_length = ceil(bit_length / 8)
+   (min_chars, max_chars) = id57_range(length_enum)
 
- if length(decoded) != byte_length:
-       return false
+   if length(id57_string) < min_chars or
+      length(id57_string) > max_chars:      return false
+   if not id57_is_canonical(id57_string):   return false
 
- excess_bits = byte_length * 8 - bit_length
- if excess_bits > 0:
-     last_byte = decoded[byte_length - 1]
-     if (last_byte & ((1 << excess_bits) - 1)) != 0:
-         return false
+   decoded     = b57_decode(id57_string)
+   bit_length  = bits(length_enum)
+   byte_length = ceil(bit_length / 8)
+   if length(decoded) != byte_length:       return false
 
- return true
+   excess_bits = byte_length * 8 - bit_length
+   if excess_bits > 0:
+       last_byte = decoded[byte_length - 1]
+       if (last_byte & ((1 << excess_bits) - 1)) != 0:
+           return false
+
+   return true
 
 Requirements:
 
-- MUST be used instead of exact character-count comparison
+- MUST be used instead of ad-hoc character-count comparison
   for any length conformance check
-- MUST NOT be used to infer length_enum from an unknown
-  string; distinct length_enum values MAY share the same
-  byte_length and therefore the same valid range and the
-  same decoded shape (see 7.3 note)
+- For fixed widths, exact-length checking IS correct (they are
+  fixed); for bit lengths, exact-length checking is WRONG (they
+  are bounded) - id57_is_length applies the right rule per sign
+- MUST NOT be used to infer length_enum from an unknown string;
+  distinct length_enum values MAY share a range/shape, and a
+  fixed-width string is a valid prefix of many bit-length
+  strings (see 5.2, 7.3)
 
 ============================================================
 12. INVARIANTS
 ============================================================
 
-The following MUST hold:
+The following MUST hold.
+
+Bit-length invariant (positive length_enum L):
 
  id57_generate(x, L) ==
  b57_encode(truncate_bytes(HASH(x), bits(L)))
+
+Fixed-width invariant (negative length_enum FIXED_k, value -k):
+
+ id57_generate(x, FIXED_k) ==
+ id57_generate(x, ID57_LEN_128)[0 : k]
 
 Determinism:
 
  same input + same configured hash + same length -> same output
 
-Canonical constraint:
+Canonical constraint (bit-length outputs only):
 
  b57_encode(b57_decode(y)) == y
  (only if y is canonical)
+
+ Fixed-width outputs are prefixes of a bignum encoding and are
+ NOT canonical B57; this constraint does not apply to them.
 
 ============================================================
 13. ERROR MODEL
@@ -576,7 +622,9 @@ Implementations MUST NOT:
 
 - bypass hashing stage
 - encode raw input directly
-- truncate after encoding
+- truncate after encoding, EXCEPT the fixed-width prefix cut
+  for negative length_enum (5.2, 8); this exception applies
+  ONLY to FIXED_k and never to positive bit lengths
 - use suffix truncation
 - accept arbitrary lengths
 - normalize or transform identifiers
@@ -598,7 +646,12 @@ Security depends on:
 
 Shorter identifiers reduce security proportionally.
 
-Encoded length MUST NOT be treated as a guarantee.
+Encoded length MUST NOT be treated as a security guarantee.
+For positive bit lengths it is not even stable (it varies
+within the 7.3 bound); for FIXED_k it is stable by
+construction but says nothing about entropy beyond
+~k * log2(57) bits minus leading-digit skew (5.2). Fixed
+lengths are NON-SECURITY identifiers in all cases.
 
 ============================================================
 16. IANA CONSIDERATIONS
@@ -645,26 +698,36 @@ v0.2.0:
 
 v0.3.0:
 
-- BREAKING: replaced the entire informational length set
-  (7.2). ID57_LEN_23, ID57_LEN_29, ID57_LEN_47, ID57_LEN_70,
-  ID57_LEN_93, ID57_LEN_186, ID57_LEN_373 are REMOVED and
-  replaced by ID57_LEN_24, ID57_LEN_48, ID57_LEN_96,
-  ID57_LEN_192, ID57_LEN_384 - a byte-aligned doubling
-  sequence with no byte_length overlap with any 7.1 security
-  length (the prior set had one: ID57_LEN_29/ID57_LEN_32
-  shared byte_length 4).
-- Added id57_generate_fixed4 (5.2) - the one ID57 output that
-  is a genuinely fixed 4 characters, always. Unlike every
-  other length, it uses modulo reduction (value mod 57^4) and
-  fixed-width zero-padding rather than the standard
-  truncate-then-encode pipeline; see 7.2.1 for why no
-  length_enum/7.3 combination can reach exactly 4 chars, and
-  5.2 for the algorithm and its entropy/bias trade-offs.
-- Updated 10 (SHORT-LENGTH USAGE), including 10.1 collision
-  model and the 10.3 progressive-length-upgrade pattern, for
-  the new length set and id57_generate_fixed4.
-- No change to id57_generate's algorithm for existing lengths,
-  to B57, or to the security length set (7.1).
+- BREAKING: replaced the informational length model entirely.
+  The former informational BIT lengths (ID57_LEN_23/29/47/70/
+  93/186/373) are REMOVED. Non-security identifiers are now
+  FIXED-WIDTH lengths (7.2), identified by NEGATIVE length_enum
+  values whose magnitude is the exact character count:
+  FIXED_2, FIXED_3, FIXED_4, FIXED_5, FIXED_6, FIXED_7,
+  FIXED_8, FIXED_10, FIXED_11, FIXED_12 (values -2..-12,
+  FIXED_9 intentionally omitted).
+- The sign of length_enum now selects the mode (5.1, 7.3):
+  positive = bit length (variable width within a
+  [min,max] bound, unchanged), negative = fixed character
+  width. DEFAULT (0) still resolves to ID57_LEN_128.
+- Fixed-width generation (5.2): produce ID57_LEN_128 and CUT
+  it to the first k characters. Because ID57_LEN_128 is always
+  >= 16 chars and k <= 12, the cut always yields exactly k.
+  This is the single permitted use of post-encoding string
+  truncation (8, 14) and is allowed ONLY for negative
+  length_enum. Fixed-width outputs are prefixes of a bignum
+  encoding and are therefore NOT canonical B57; id57_is_length
+  validates them by exact width + alphabet, not by decode
+  (11.5).
+- id57_range/id57_is_length now dispatch on sign (11.4/11.5):
+  fixed widths return (k, k) and require exact-length; bit
+  lengths keep the [min_chars, max_chars] bound behavior.
+- Supersedes the intermediate v0.3.0 draft that used a
+  24/48/96/192/384-bit informational set and a modulo-based
+  id57_generate_fixed4; both are dropped in favor of the
+  FIXED_k cut model above.
+- No change to id57_generate's algorithm for positive bit
+  lengths, to B57, or to the security length set (7.1).
 
 ============================================================
 18. REFERENCES
