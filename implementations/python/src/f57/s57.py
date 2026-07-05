@@ -183,17 +183,10 @@ def _id57_bits(length: ID57Length) -> int:
     bits = {
         ID57Length.LEN8: 8,
         ID57Length.LEN16: 16,
-        ID57Length.LEN23: 23,
-        ID57Length.LEN29: 29,
         ID57Length.LEN32: 32,
-        ID57Length.LEN47: 47,
         ID57Length.LEN64: 64,
-        ID57Length.LEN70: 70,
-        ID57Length.LEN93: 93,
         ID57Length.LEN128: 128,
-        ID57Length.LEN186: 186,
         ID57Length.LEN256: 256,
-        ID57Length.LEN373: 373,
         ID57Length.LEN512: 512,
     }
     if length not in bits:

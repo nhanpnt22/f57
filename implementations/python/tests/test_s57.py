@@ -60,7 +60,7 @@ def test_s57_id_deterministic_and_lengths():
     assert len(v512) == 88
 
     with pytest.raises(InvalidLengthEnumError):
-        s57.id(inp, ID57Length.LEN47)
+        s57.id(inp, ID57Length.LEN8)
 
 
 def test_s57_random_api_outputs():

@@ -4,11 +4,11 @@ import json
 import subprocess
 from hashlib import sha256
 from f57 import (
-    encode, decode, h57_hash, id57_generate_default, id57_short_generate_default,
-    id57_generate, id57_short_generate, id57_verify_default, id57_short_verify_default,
+    encode, decode, h57_hash, id57_generate_default,
+    id57_generate, id57_verify_default, id57_range, id57_is_length,
     i57_encode, i57_decode, i57_hash, i57_id, i57_random, i57_is_valid, i57_is_canonical,
     i57_validate_identifier, i57_validate_entropy,
-    HashFunction, H57Length, ID57Length, ID57ShortLength, R57Mode, r57_is_valid, r57_is_canonical,
+    HashFunction, H57Length, ID57Length, R57Mode, r57_is_valid, r57_is_canonical,
     is_valid, is_canonical, encoded_length, decoded_length, h57_verify
 )
 
@@ -59,12 +59,13 @@ def test_compare_10000_datasets_with_go_rust_dart():
         h57_blake3_auto = h57_hash(input_data, HashFunction.SHA256, H57Length.HASH_AUTO)
         
         id57_default = id57_generate_default(input_data)
-        id57_len47_sha256 = id57_generate(input_data, HashFunction.SHA256, ID57Length.LEN47)
-        id57_len70_blake3 = id57_generate(input_data, HashFunction.SHA256, ID57Length.LEN70)
-        
-        id57_short_default = id57_short_generate_default(input_data)
-        id57_short_len23 = id57_short_generate(input_data, HashFunction.SHA256, ID57ShortLength.LEN23)
-        
+        id57_len32_sha256 = id57_generate(input_data, HashFunction.SHA256, ID57Length.LEN32)
+        id57_len64_blake3 = id57_generate(input_data, HashFunction.SHA256, ID57Length.LEN64)
+
+        id57_fixed8_sha256 = id57_generate(input_data, HashFunction.SHA256, ID57Length.FIXED_8)
+        assert id57_fixed8_sha256 == id57_generate(input_data, HashFunction.SHA256, ID57Length.LEN128)[:8]
+        assert id57_is_length(id57_fixed8_sha256, ID57Length.FIXED_8)
+
         i57_enc = i57_encode(input_data)
         i57_dec = i57_decode(i57_enc)
         i57_dec_hex = _bytes_to_hex(i57_dec)

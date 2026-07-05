@@ -1,9 +1,12 @@
 """B57 core encode/decode implementation."""
 
+import math
+
 from .errors import InvalidCharError, NonCanonicalError
 
 ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789"
 BASE = 57
+_LOG2_BASE = math.log2(BASE)
 
 # Build lookup table
 _ALPHA_INDEX = {ord(c): i for i, c in enumerate(ALPHABET)}
@@ -98,11 +101,10 @@ def is_canonical(s: str) -> bool:
 
 
 def encoded_length(byte_len: int) -> int:
-    """Estimate encoded length for given byte count."""
+    """Max B57 chars needed to encode byte_len bytes: ceil(byte_len*8 / log2(57))."""
     if byte_len == 0:
         return 0
-    bits_per_char = len(bin(BASE)) - 2
-    return (byte_len * 8 + bits_per_char - 1) // bits_per_char
+    return math.ceil(byte_len * 8 / _LOG2_BASE)
 
 
 def decoded_length(char_len: int) -> int:
