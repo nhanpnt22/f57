@@ -1,7 +1,7 @@
 ============================================================
 ID57 CORE API (MINDU)
 One-Way Identifier Profile (Hash → Truncate → B57)
-Version: v0.3.1 FINAL
+Version: v0.3.2 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -700,8 +700,10 @@ v0.2.0:
   longer a separate profile, module, or API for short
   identifiers - id57_generate/id57_verify/id57_range/
   id57_is_length already cover ID57_LEN_23/29/32/47/70
-  directly. id57-short-profile.txt is now a deprecation
-  pointer to this document.
+  directly. id57-short-profile.txt is REMOVED (it briefly
+  existed as a deprecation stub; fully deleted as of the same
+  cleanup that removed the language-level ID57-SHORT modules,
+  see v0.3.1 below).
 - BREAKING for implementations: the id57s_generate,
   id57s_range, id57s_is_length function names and any
   ID57-SHORT-specific default/type (e.g. ID57ShortLength,
@@ -767,6 +769,17 @@ v0.3.1:
   overlapping bit-length ranges is via id57_is_canonical +
   decoded byte length, not id57_is_length (which no longer
   covers bit lengths at all).
+
+v0.3.2:
+
+- id57-short-profile.txt is fully DELETED (removed from the
+  repository, not merely stubbed - see v0.2.0 above for the
+  earlier stub, now superseded). Every language implementation
+  (Go, Rust, TypeScript, Dart, JavaScript, Python) has removed
+  its ID57-SHORT module/type/function set to match. There is no
+  remaining reference to ID57-SHORT as a distinct thing
+  anywhere in this spec family; it exists only as history in
+  these REVISION NOTES.
 
 ============================================================
 18. REFERENCES
