@@ -1,6 +1,6 @@
 name: f57
 description: F57 binary-to-text encoding in Dart with H57, ID57, I57, and R57 profiles.
-version: 0.2.0
+version: 0.3.0
 publish_to: none
 homepage: https://github.com/aco/f57
 repository: https://github.com/aco/f57
