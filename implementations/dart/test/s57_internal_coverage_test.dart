@@ -30,7 +30,8 @@ void main() {
     final s57 = newS57();
     expect(s57.hash('x'.codeUnits, H57Length.hashAuto).isNotEmpty, true);
     expect(() => s57.hash('x'.codeUnits, H57Length.len47), throwsA(isA<InvalidLengthEnumError>()));
-    expect(() => s57.id('x'.codeUnits, ID57Length.len47), throwsA(isA<InvalidLengthEnumError>()));
+    expect(() => s57.id('x'.codeUnits, ID57Length.len8), throwsA(isA<InvalidLengthEnumError>()));
+    expect(() => s57.id('x'.codeUnits, ID57Length.fixed8), throwsA(isA<InvalidLengthEnumError>()));
   });
 
   test('randomHybrid empty source fails', () {

@@ -113,13 +113,21 @@ class S57 {
     return b57.encode(out);
   }
 
-  String id(List<int> data, [ID57Length length = ID57Length.def]) {
-    final effective = length == ID57Length.def ? ID57Length.len128 : length;
-    final bits = _bitsByLength(effective);
-    if (bits != 128 && bits != 256 && bits != 512) {
-      throw InvalidLengthEnumError(length.value);
+  String id(List<int> data, [int length = ID57Length.def]) {
+    // S57 restricts length_enum to the security profile subset
+    // (128/256/512 bit, all positive). Even though ID57 core supports
+    // additional bit lengths (8/16/32/64) and fixed widths (FIXED_k,
+    // negative length_enum - the former ID57-SHORT lengths), S57 MUST NOT
+    // expose them: fixed widths are non-security by definition (S57
+    // Security 57, section 8).
+    final effective = resolveID57Length(length);
+    if (effective != ID57Length.len128 &&
+        effective != ID57Length.len256 &&
+        effective != ID57Length.len512) {
+      throw InvalidLengthEnumError(length);
     }
 
+    final bits = effective;
     final requested = (bits + 7) ~/ 8;
     final out = blake3Keyed(
       Uint8List.fromList(keys.id57Key),
@@ -289,27 +297,6 @@ String _encodeR57128(List<int> raw) {
     encoded = b57.encode(derived);
   }
   return encoded;
-}
-
-int _bitsByLength(ID57Length length) {
-  const bits = {
-    ID57Length.len23: 23,
-    ID57Length.len29: 29,
-    ID57Length.len32: 32,
-    ID57Length.len47: 47,
-    ID57Length.len64: 64,
-    ID57Length.len70: 70,
-    ID57Length.len93: 93,
-    ID57Length.len128: 128,
-    ID57Length.len186: 186,
-    ID57Length.len256: 256,
-    ID57Length.len373: 373,
-    ID57Length.len512: 512,
-  };
-  if (!bits.containsKey(length)) {
-    throw InvalidLengthEnumError(length.value);
-  }
-  return bits[length]!;
 }
 
 void _maskExcessBits(List<int> bytes, int bitLength) {

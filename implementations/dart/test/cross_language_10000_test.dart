@@ -23,11 +23,8 @@ void main() {
         final h57Blake3Auto = h57Hash(input, H57Length.hashAuto);
 
         final id57Default = id57Generate(input, ID57Length.def);
-        final id57Len47Sha256 = id57Generate(input, ID57Length.len47);
-        final id57Len70Blake3 = id57Generate(input, ID57Length.len70);
-
-        final id57ShortDefault = id57ShortGenerate(input, ID57ShortLength.def);
-        final id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.len23);
+        final id57Fixed8 = id57Generate(input, ID57Length.fixed8);
+        final id57Len64Blake3 = id57Generate(input, ID57Length.len64);
 
         final i57EncodeOut = i57Encode(input);
         final i57DecodeOut = i57Decode(i57EncodeOut);
@@ -49,10 +46,8 @@ void main() {
           'h57Sha512Len128': h57Sha512Len128,
           'h57Blake3Auto': h57Blake3Auto,
           'id57Default': id57Default,
-          'id57Len47Sha256': id57Len47Sha256,
-          'id57Len70Blake3': id57Len70Blake3,
-          'id57ShortDefault': id57ShortDefault,
-          'id57ShortLen23': id57ShortLen23,
+          'id57Fixed8': id57Fixed8,
+          'id57Len64Blake3': id57Len64Blake3,
           'i57Encode': i57EncodeOut,
           'i57DecodeHex': i57DecodeHex,
           'i57HashBlake3Len128': i57HashBlake3Len128,
@@ -64,7 +59,6 @@ void main() {
           'r57IsValidOnI57Id': r57IsValid(i57IdDefault),
           'r57IsCanonicalOnI57Id': r57IsCanonical(i57IdDefault),
           'id57VerifyDefault': id57Verify(input, id57Default, ID57Length.def),
-          'id57ShortVerifyDefault': id57ShortVerify(input, id57ShortDefault, ID57ShortLength.def),
           'h57VerifyBlake3Len128':
               h57Verify(input, h57Blake3Len128, H57Length.len128),
           
