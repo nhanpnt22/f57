@@ -2,7 +2,7 @@
 
 **F57 for Go**
 
-This branch contains the Go implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57, ID57-SHORT, R57, and S57.
+This branch contains the Go implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (incl. fixed-width lengths), R57, and S57.
 
 ## Quick Start
 
@@ -28,7 +28,6 @@ go/
 ├── h57.go               # H57 hash representation
 ├── i57.go               # I57 identifiers
 ├── id57.go              # ID57 profiles
-├── id57_short.go        # ID57-SHORT (compact)
 ├── r57.go               # R57 random generation
 ├── s57.go               # S57 security composition
 ├── errors.go            # Error types and handling
@@ -85,17 +84,14 @@ fmt.Println(hash)
 ### ID57 - Identifiers
 
 ```go
-// Generate deterministic 22-character identifier
+// Generate deterministic identifier (16-22 chars; length is a bound, not fixed)
 id := f57.ID(input, f57.ID57DefaultLength)
-fmt.Println(id) // 22-character B57 string
-```
+fmt.Println(id) // B57 string
 
-### ID57-SHORT - Compact Identifiers
-
-```go
-// Generate 8-character compact identifier
-shortID := f57.IDShort(input, f57.ID57ShortDefaultLength)
-fmt.Println(shortID) // 8-character B57 string
+// Fixed-width identifiers use a NEGATIVE length_enum - the magnitude is the
+// exact character count (a prefix cut of the LEN_128 id), not a bound
+shortID := f57.ID(input, f57.ID57Fixed8) // always exactly 8 chars
+fmt.Println(shortID)
 ```
 
 ### R57 - Random Generation
@@ -193,7 +189,6 @@ GOOS=windows GOARCH=amd64 go build -o b57.exe
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
 - **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
-- **ID57-SHORT:** [spec/id57-short-profile.txt](../spec/id57-short-profile.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 

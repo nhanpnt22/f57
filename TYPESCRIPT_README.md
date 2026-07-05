@@ -2,7 +2,7 @@
 
 **F57 for TypeScript/Node.js**
 
-This branch contains the TypeScript implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57, ID57-SHORT, R57, and S57.
+This branch contains the TypeScript implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (incl. fixed-width lengths), R57, and S57.
 
 ## Quick Start
 
@@ -33,7 +33,6 @@ ts/
 │   ├── h57.ts           # H57 hash representation
 │   ├── i57.ts           # I57 identifiers
 │   ├── id57.ts          # ID57 profiles
-│   ├── id57_short.ts    # ID57-SHORT (compact)
 │   ├── r57.ts           # R57 random generation
 │   ├── s57.ts           # S57 security composition
 │   ├── errors.ts        # Error types
@@ -43,7 +42,6 @@ ts/
 │   ├── h57.test.ts
 │   ├── i57.test.ts
 │   ├── id57.test.ts
-│   ├── id57_short.test.ts
 │   ├── r57.test.ts
 │   ├── s57.test.ts
 │   └── e2e.test.ts
@@ -96,19 +94,14 @@ console.log(hash);
 ```typescript
 import { ID57, ID57Length } from './src/index.js';
 
-// Generate deterministic 22-character identifier
+// Generate deterministic identifier (16-22 chars; length is a bound, not fixed)
 const id = ID57.id(input, ID57Length.DEFAULT);
-console.log(id); // 22-character B57 string
-```
+console.log(id); // B57 string
 
-### ID57-SHORT - Compact Identifiers
-
-```typescript
-import { ID57Short, ID57ShortLength } from './src/index.js';
-
-// Generate 8-character compact identifier
-const shortId = ID57Short.id(input, ID57ShortLength.DEFAULT);
-console.log(shortId); // 8-character B57 string
+// Fixed-width identifiers use a NEGATIVE length_enum - the magnitude is the
+// exact character count (a prefix cut of the LEN_128 id), not a bound
+const shortId = ID57.id(input, ID57Length.FIXED_8); // always exactly 8 chars
+console.log(shortId);
 ```
 
 ### R57 - Random Generation
@@ -230,7 +223,6 @@ const result: B57Output = B57.encode(input);
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
 - **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
-- **ID57-SHORT:** [spec/id57-short-profile.txt](../spec/id57-short-profile.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 

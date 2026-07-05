@@ -2,7 +2,7 @@
 
 **F57 for Rust**
 
-This branch contains the Rust implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57, ID57-SHORT, R57, and S57.
+This branch contains the Rust implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (incl. fixed-width lengths), R57, and S57.
 
 ## Quick Start
 
@@ -33,7 +33,6 @@ rust/
 │   ├── h57.rs           # H57 hash representation
 │   ├── i57.rs           # I57 identifiers
 │   ├── id57.rs          # ID57 profiles
-│   ├── id57_short.rs    # ID57-SHORT (compact)
 │   ├── r57.rs           # R57 random generation
 │   ├── s57.rs           # S57 security composition
 │   └── errors.rs        # Error types
@@ -42,7 +41,6 @@ rust/
 │   ├── h57_tests.rs
 │   ├── i57_tests.rs
 │   ├── id57_tests.rs
-│   ├── id57_short_tests.rs
 │   ├── r57_tests.rs
 │   ├── s57_tests.rs
 │   └── e2e_tests.rs
@@ -93,17 +91,14 @@ println!("{}", hash);
 ### ID57 - Identifiers
 
 ```rust
-// Generate deterministic 22-character identifier
+// Generate deterministic identifier (16-22 chars; length is a bound, not fixed)
 let id = ID57::id(&input, ID57Length::DEFAULT);
-println!("{}", id); // 22-character B57 string
-```
+println!("{}", id); // B57 string
 
-### ID57-SHORT - Compact Identifiers
-
-```rust
-// Generate 8-character compact identifier
-let short_id = ID57Short::id(&input, ID57ShortLength::DEFAULT);
-println!("{}", short_id); // 8-character B57 string
+// Fixed-width identifiers use a NEGATIVE length_enum - the magnitude is the
+// exact character count (a prefix cut of the LEN_128 id), not a bound
+let short_id = ID57::id(&input, ID57Length::Fixed8); // always exactly 8 chars
+println!("{}", short_id);
 ```
 
 ### R57 - Random Generation
@@ -194,7 +189,6 @@ See [Cargo.toml](Cargo.toml) for complete dependency list.
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
 - **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
-- **ID57-SHORT:** [spec/id57-short-profile.txt](../spec/id57-short-profile.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 

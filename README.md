@@ -2,7 +2,7 @@
 
 **Tagline:** A unified family of secure, deterministic 57-series encodings.
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) delivered across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57 (including fixed-width lengths), R57, S57) delivered across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
@@ -101,27 +101,22 @@ The protocol is composed of a 7-layer architecture with strict conceptual bounda
 
 ### 2.3 ID57 (Identifier Profile)
 * **Specification:** [ID57 Core](spec/id57-core-api.txt)
-* Generates fixed-length, human-readable identifiers through controlled entropy reduction.
-* **Pipeline:** `input → HASH → prefix truncate → B57 string`
-* **Properties:** Default 128-bit (22 chars). Ensures prefix-level byte truncation prior to encoding.
+* Generates human-readable identifiers through controlled entropy reduction, in two modes selected by the SIGN of length_enum:
+  * **Positive length_enum (bit length):** `input → HASH → prefix truncate → B57 string`. Default 128-bit is 16-22 chars - a bound, not a fixed count, since B57 is a bignum encoding.
+  * **Negative length_enum (fixed width, `FIXED_2`..`FIXED_12`):** generates the full 128-bit identifier and cuts it to the first `k` characters - always exactly `k`, e.g. `FIXED_8` for QR codes, short URLs, or UI-brief temporary IDs. Requires safe namespace sizing (non-security). There is no separate "ID57-SHORT" profile or module - this is the same ID57 API.
 
-### 2.4 ID57-SHORT (Ultra-Compact Profile)
-* **Specification:** [ID57-SHORT](spec/id57-short-profile.txt)
-* Generates heavily truncated local identifiers (e.g., 47-bit / 8 chars).
-* **Properties:** Optimized strictly for QR codes, UI brevity, and temporary IDs. Requires safe namespace sizing.
-
-### 2.5 R57 (Random Generation Profile)
+### 2.4 R57 (Random Generation Profile)
 * **Specification:** [R57 Core](spec/r57-core-api.txt)
 * Generates high-entropy 128-bit random identifiers securely.
 * **Pipeline:** `entropy_source (128-bit) → B57 string`
 * **Properties:** Mandates CSPRNG, KDF, or Hybrid generation modes to ensure unpredictable, collision-resistant outputs.
 
-### 2.6 I57 (Integration Interface)
+### 2.5 I57 (Integration Interface)
 * **Specification:** [I57 Core](spec/i57-core-api.txt)
 * The top-level facade interface unifying all underlying profiles into a seamless developer API.
 * Ensures correct composition and safe parameter passing.
 
-### 2.7 S57 (Security Composition Layer)
+### 2.6 S57 (Security Composition Layer)
 * **Specification:** [S57 Security 57](spec/s57-security-57.txt)
 * Secure composition profile over B57/H57/ID57/R57 with domain-separated key derivation and envelope encryption.
 * **Pipeline:** `data -> keyed hash/id/random profile -> optional AES-256-GCM envelope -> B57 string`
@@ -165,7 +160,7 @@ S57 release gating also passed with zero mismatches in the 5-language benchmark 
 The stack encourages standard integration patterns:
 
 - **Dual-Layer Identity:** Produce a full `H57(data)` internally for database deduplication, while exposing a targeted `ID57(data, 128-bit)` externally via APIs.
-- **Storage vs. Exposure:** Use `ID57-SHORT` for printable offline receipts or tiny URLs, mapped safely to a heavily collision-resistant `H57` hash stored remotely.
+- **Storage vs. Exposure:** Use a fixed-width `ID57(data, FIXED_k)` for printable offline receipts or tiny URLs, mapped safely to a heavily collision-resistant `H57` hash stored remotely.
 - **Tamper Detection & Content Routing:** Execute exact hash matching without truncation using native length 44-character `H57` outputs.
 - **Confidential Payload Transport:** Use `S57` envelope encryption (`encrypt`/`decrypt`) for authenticated payload exchange where transport-safe B57 strings are required.
 
