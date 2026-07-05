@@ -34,8 +34,9 @@ test('i57Random', () => {
 
 test('i57Id', () => {
   const input = new Uint8Array([1, 2, 3]);
-  const res = i57Id(input, 47);
+  const res = i57Id(input, -8); // FIXED_8: negative length_enum = fixed 8-char width
   assert.equal(typeof res, 'string');
+  assert.equal(res.length, 8);
 });
 
 test('i57IsValid', () => {

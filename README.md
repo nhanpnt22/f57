@@ -98,8 +98,9 @@ import { ID57, ID57Length } from './src/index.js';
 const id = ID57.id(input, ID57Length.DEFAULT);
 console.log(id); // B57 string
 
-// Short/informational lengths are the same API, not a separate profile
-const shortId = ID57.id(input, ID57Length.LEN_47); // 6-9 chars
+// Fixed-width identifiers use a NEGATIVE length_enum - the magnitude is the
+// exact character count (a prefix cut of the LEN_128 id), not a bound
+const shortId = ID57.id(input, ID57Length.FIXED_8); // always exactly 8 chars
 console.log(shortId);
 ```
 

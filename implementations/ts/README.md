@@ -30,7 +30,8 @@ Exports are available from `index`:
 - `encode`, `decode`, `isValid`, `isCanonical`, `encodedLength`, `decodedLength`
 - `h57Hash`, `h57Verify`, `h57IsValid`, `h57IsCanonical`, `H57Length`
 - `id57Generate`, `id57GenerateDefault`, `id57Verify`, `id57Range`, `id57IsLength`, `ID57Length`
-  (short identifiers are `id57Generate(x, ID57Length.LEN_47)` etc. - there is no separate short API)
+  (short identifiers are `id57Generate(x, ID57Length.FIXED_8)` etc. - negative length_enum values
+  select a hard-fixed character width instead of a bit length; there is no separate short API)
 - `r57Generate`, `r57IsValid`, `r57IsCanonical`, `R57Mode`
 - `i57Encode`, `i57Decode`, `i57Hash`, `i57Random`, `i57Id`
 - `S57`

@@ -24,7 +24,7 @@ test('e2e b57-h57-id57 pipelines', () => {
     const id57 = id57Generate(input, ID57Length.LEN_128);
     assert.equal(id57Verify(input, id57, ID57Length.LEN_128), true);
 
-    const short = id57Generate(input, ID57Length.LEN_47);
-    assert.equal(id57Verify(input, short, ID57Length.LEN_47), true);
+    const short = id57Generate(input, ID57Length.FIXED_8);
+    assert.equal(id57Verify(input, short, ID57Length.FIXED_8), true);
   }
 });

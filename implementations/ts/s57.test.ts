@@ -50,7 +50,7 @@ test('S57 id deterministic and enforces profile lengths', () => {
   assert.equal(v256.length, 44);
   assert.equal(v512.length, 88);
 
-  assert.throws(() => s57.id(input, ID57Length.LEN_47), (err) => err.code === ErrorCode.INVALID_LENGTH_ENUM);
+  assert.throws(() => s57.id(input, ID57Length.LEN_32), (err) => err.code === ErrorCode.INVALID_LENGTH_ENUM);
 });
 
 test('S57 random API variants produce canonical 22-char strings', () => {

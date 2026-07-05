@@ -37,6 +37,7 @@ test('i57 integration random properly', () => {
 
 test('i57 integration ID properly', () => {
   const data = new Uint8Array([0, 255, 128, 64]);
-  const id = i57Id(data, 47);
+  const id = i57Id(data, -8); // FIXED_8: negative length_enum = fixed 8-char width
   assert.equal(i57IsValid(id), true);
+  assert.equal(id.length, 8);
 });

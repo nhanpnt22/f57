@@ -120,11 +120,11 @@ function buildJSCoreRecord(index) {
   const h57Sha512Len128 = h57Hash(input, H57Length.LEN_128);
   const h57Blake3Auto = h57Hash(input, H57Length.HASH_AUTO);
   const id57Default = id57GenerateDefault(input);
-  const id57Len47Sha256 = id57Generate(input, ID57Length.LEN_47);
-  const id57Len70Blake3 = id57Generate(input, ID57Length.LEN_70);
-  // "Short" is no longer a separate API - these are just id57Generate with a short length_enum.
-  const id57ShortDefault = id57Generate(input, ID57Length.LEN_47);
-  const id57ShortLen23 = id57Generate(input, ID57Length.LEN_23);
+  const id57Len47Sha256 = id57Generate(input, ID57Length.FIXED_8);
+  const id57Len70Blake3 = id57Generate(input, ID57Length.FIXED_12);
+  // "Short" is no longer a separate API - these are just id57Generate with a fixed-width length_enum.
+  const id57ShortDefault = id57Generate(input, ID57Length.FIXED_8);
+  const id57ShortLen23 = id57Generate(input, ID57Length.FIXED_4);
   const i57EncodeValue = i57Encode(input);
   const i57DecodeHex = hex(i57Decode(i57EncodeValue));
   const i57HashBlake3Len128 = i57Hash(input, H57Length.LEN_128);
@@ -159,7 +159,7 @@ function buildJSCoreRecord(index) {
     r57IsValidOnI57Id: r57IsValid(i57IdDefault),
     r57IsCanonicalOnI57Id: r57IsCanonical(i57IdDefault),
     id57VerifyDefault: id57VerifyDefault(input, id57Default),
-    id57ShortVerifyDefault: id57Verify(input, id57ShortDefault, ID57Length.LEN_47),
+    id57ShortVerifyDefault: id57Verify(input, id57ShortDefault, ID57Length.FIXED_8),
     h57VerifyBlake3Len128: h57Verify(input, h57Blake3Len128, H57Length.LEN_128),
     i57ValidateIdentifierId: i57ValidateIdentifier(i57IdDefault)
   };
@@ -301,10 +301,10 @@ for i in range(DATASET_SIZE):
         'h57Sha512Len128': h57_hash(input_data, HashFunction.BLAKE3, H57Length.LEN128),
         'h57Blake3Auto': h57_hash(input_data, HashFunction.BLAKE3, H57Length.HASH_AUTO),
         'id57Default': id57_generate_default(input_data),
-        'id57Len47Sha256': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.LEN47),
-        'id57Len70Blake3': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.LEN70),
-        'id57ShortDefault': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.LEN47),
-        'id57ShortLen23': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.LEN23),
+        'id57Len47Sha256': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.FIXED8),
+        'id57Len70Blake3': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.FIXED12),
+        'id57ShortDefault': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.FIXED8),
+        'id57ShortLen23': id57_generate(input_data, HashFunction.BLAKE3, ID57Length.FIXED4),
         'i57Encode': i57_encode(input_data),
         'i57DecodeHex': i57_decode(i57_encode(input_data)).hex(),
         'i57HashBlake3Len128': i57_hash(input_data, HashFunction.BLAKE3, H57Length.LEN128),
@@ -316,7 +316,7 @@ for i in range(DATASET_SIZE):
         'r57IsValidOnI57Id': r57_is_valid(i57_id(input_data, HashFunction.BLAKE3, ID57Length.DEFAULT)),
         'r57IsCanonicalOnI57Id': r57_is_canonical(i57_id(input_data, HashFunction.BLAKE3, ID57Length.DEFAULT)),
         'id57VerifyDefault': id57_verify_default(input_data, id57_generate_default(input_data)),
-        'id57ShortVerifyDefault': id57_verify(input_data, HashFunction.BLAKE3, id57_generate(input_data, HashFunction.BLAKE3, ID57Length.LEN47), ID57Length.LEN47),
+        'id57ShortVerifyDefault': id57_verify(input_data, HashFunction.BLAKE3, id57_generate(input_data, HashFunction.BLAKE3, ID57Length.FIXED8), ID57Length.FIXED8),
         'h57VerifyBlake3Len128': h57_verify(input_data, h57_hash(input_data, HashFunction.BLAKE3, H57Length.LEN128), HashFunction.BLAKE3, H57Length.LEN128),
         'i57ValidateIdentifierId': i57_validate_identifier(i57_id(input_data, HashFunction.BLAKE3, ID57Length.DEFAULT)),
     }
