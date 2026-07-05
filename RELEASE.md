@@ -2,7 +2,7 @@
 
 **F57:** A unified family of secure, deterministic 57-series encodings.
 
-**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57, ID57-SHORT, R57, S57) across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
+**Description:** F57 is the umbrella architecture for the 57-series standards and implementations (B57, H57, I57, ID57 (incl. fixed-width lengths), R57, S57) across Go, Rust, JavaScript/Node.js, TypeScript/Node.js, Dart, and Python.
 
 **Purpose:** Provide one canonical, cross-language foundation for readable encoding, deterministic identifiers, secure random generation, and security composition, with release-grade parity guarantees.
 
@@ -10,7 +10,39 @@
 
 This document defines repository-level release decisions and safe release flow.
 
-## Current Release Posture (2026-05-23)
+## Current Release Posture (2026-07-05)
+
+**Scope of this release:** ID57-SHORT removed and merged into ID57 Core API;
+ID57's non-security lengths replaced by a sign-based model (`FIXED_2`..`FIXED_12`,
+negative `length_enum` = exact character width, cut from `ID57_LEN_128`);
+`id57_is_length`/`i57_validate_identifier` corrected to match. See
+`CHANGELOG.md` [0.3.0] for the full breaking-change list.
+
+- Repository-wide unqualified release: **v0.3.0** (all seven branches -
+  `ts`, `main`, `go`, `rust`, `dart`, `javascript`, `python`)
+- Go scoped release (`v0.3.0-go`): tests pass (`go test ./...`)
+- JavaScript scoped release (`v0.3.0-javascript`): tests pass (`npm test`, 62/62)
+- TypeScript package (`implementations/ts`, `v0.3.0`): tests pass (59/59), typecheck
+  clean, `npm run build` clean - **`npm run verify:all` / `npm pack` were NOT
+  re-rehearsed for this release** (unlike the v0.1.1 execution below)
+- Rust scoped release (`v0.3.0-rust`): `cargo test --lib` passes (28/28) - full
+  `cargo test` (including cross-language/e2e binaries) was not re-run
+- Dart scoped release (`v0.3.0-dart`): `dart test` passes (65/65)
+- Python scoped release (`v0.3.0-python`): `pytest -q` passes (78/78)
+
+**Parity evidence for this release is a targeted spot-check, not the full
+evidentiary bar below.** A shared test input was run through `id57_generate`
+for `LEN_128`, `LEN_32`, and `FIXED_2/4/8/9/12` across all six languages and
+compared byte-for-byte - all identical, confirming the `FIXED_j` ⊂ `FIXED_k`
+prefix-nesting invariant holds across implementations. This is NOT a re-run
+of the 10,000-dataset cross-language benchmark suite that `UAT_10K_PARITY_REPORT.md`
+and `s57-benchmark-10000x5-summary.json` document for prior releases - re-run
+that suite before publishing if the same rigor as the v0.1.1 release below is
+required.
+
+## Release Posture History
+
+### v0.1.1 (2026-05-23)
 
 - Repository-wide unqualified release: **READY (protocol v0.1.0, latest repository tag v0.1.1)**
 - Go scoped release (`v0.1.0-go`): READY

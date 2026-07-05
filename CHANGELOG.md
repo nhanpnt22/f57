@@ -5,7 +5,7 @@ All notable changes to the F57 specification family and its associated native im
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-07-05
 
 ### Added
 - TypeScript package release hardening in `implementations/ts`:
@@ -65,6 +65,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a genuinely short bit-length truncation - they do **not** avoid `BigInt` cost.
 - Top-level release governance docs updated to include TypeScript package release posture
   and validation evidence.
+- Package versions bumped to `0.3.0` in every language manifest (`package.json` for
+  TypeScript/JavaScript, `Cargo.toml`/`Cargo.lock` for Rust, `pubspec.yaml` for Dart,
+  `setup.py` for Python; Go has no in-manifest version and is tagged `v0.3.0-go` instead).
+- Cross-language byte-for-byte parity spot-checked across all six languages for `LEN_128`,
+  `LEN_32`, and `FIXED_2/4/8/9/12` on a shared test input - identical output everywhere,
+  confirming the `FIXED_j` prefix-of-`FIXED_k` nesting invariant holds across
+  implementations, not just within one. This was a targeted check, not a full run of the
+  existing 10,000-dataset cross-language benchmark suite (`UAT_10K_PARITY_REPORT.md` /
+  `s57-benchmark-10000x5-summary.json`) - re-run that suite before publishing if the same
+  evidentiary bar as prior releases is required.
 
 ## [0.1.1] - 2026-05-23
 

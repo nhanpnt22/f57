@@ -222,17 +222,17 @@ const result: B57Output = B57.encode(input);
 
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
-- **ID57 Identifiers (incl. short/informational lengths):** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
+- **ID57 Identifiers (incl. fixed-width lengths):** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 
 ## Branch Information
 
 - **Branch:** `ts` (TypeScript-only implementation)
-- **Version:** v0.2.0
-- **Release Branch:** `release/ts-v0.2.0`
+- **Version:** v0.3.0
+- **Release Branch:** `release/ts-v0.3.0`
 - **Status:** Production Ready
-- **Last Updated:** June 2026
+- **Last Updated:** July 2026
 
 ## Multi-Language Support
 
@@ -265,5 +265,5 @@ Internal Restricted - See [LICENSE](../../LICENSE) and [LICENSE.md](../../LICENS
 
 ---
 
-**Version:** v0.2.0  
-**Last Updated:** June 2026
+**Version:** v0.3.0  
+**Last Updated:** July 2026
