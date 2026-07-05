@@ -291,18 +291,23 @@ enforced; character length MUST NOT be checked for equality.
 Profile note:
 
 - S57 intentionally restricts length_enum to this security profile subset
-  even if lower-level APIs support additional informational lengths
-  (including the former ID57-SHORT lengths, now merged into ID57 Core
-  API section 10 - S57 does not expose them)
+  (128/256/512 bit - all POSITIVE length_enum values). Even if
+  lower-level APIs support additional lengths - including the fixed
+  widths (FIXED_k, NEGATIVE length_enum) that replaced the former
+  ID57-SHORT lengths, now in ID57 Core API section 10 - S57 does not
+  expose them; fixed widths are non-security by definition and MUST
+  NOT be used here.
 
 Requirements:
 
 - MUST enforce exact bit length
 - MUST reject invalid length_enum
 - MUST NOT truncate encoded output
-- MUST use id57_is_length (or equivalent range check) rather
-  than exact character-count comparison when validating output
-  length
+- MUST validate output length via id57_range's [min_chars,
+  max_chars] bound (or i57_validate_identifier), never via exact
+  character-count comparison. id57_is_length does NOT apply here -
+  it is defined only for fixed widths (ID57 Core API 11.5), and S57
+  never uses fixed widths
 
 ============================================================
 9. VALIDATION RULES
@@ -408,6 +413,13 @@ instead of a version change:
   ID57-SHORT profile into itself; this does not change S57's
   own length_enum subset (S57 still restricts to 128/256/512
   bit, per the existing Profile note in section 8).
+- Cross-reference (ID57 Core API v0.3.0/v0.3.1): informational
+  lengths became fixed widths (FIXED_k, negative length_enum),
+  and id57_is_length was narrowed to apply ONLY to fixed
+  widths. Section 8's validation requirement is corrected
+  accordingly: S57 (128/256/512 bit, all positive) MUST use
+  id57_range's bound, not id57_is_length, which does not accept
+  positive length_enum values at all.
 
 ============================================================
 17. REFERENCES

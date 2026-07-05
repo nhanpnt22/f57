@@ -1,7 +1,7 @@
 ============================================================
 I57 CORE API
 Canonical Integration Interface (B57, H57, R57, ID57)
-Version: v1.0.1
+Version: v1.0.2
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -132,11 +132,11 @@ Definition:
 
 Notes:
 
-- length_enum MAY be any ID57 Core API length, including the
-  short/informational lengths (ID57_LEN_23/29/32/47/70). There
+- length_enum MAY be positive (bit length, ID57 Core API 7.1)
+  or negative (fixed width, FIXED_k, ID57 Core API 7.2). There
   is no separate short-identifier function; i57_id covers both
-  security and informational lengths uniformly (see ID57 Core
-  API v0.2.0, section 10).
+  uniformly via the same sign dispatch as id57_generate (see
+  ID57 Core API v0.3.0/v0.3.1, sections 5, 7, 10).
 
 ============================================================
 5. VALIDATION FUNCTIONS
@@ -171,17 +171,49 @@ Definition:
 
 function i57_validate_identifier(input_string, length_enum) -> boolean
 
+length_enum's SIGN selects the check, mirroring ID57 Core API
+7.3/11.4/11.5. id57_is_length (ID57 Core API 11.5) is defined
+ONLY for fixed widths, so it is used only in that branch; the
+bit-length branch is implemented directly here.
+
 Definition:
 
- return id57_is_length(input_string, length_enum)
+ if length_enum < 0:                     // FIXED width
+     return id57_is_length(input_string, length_enum)
+
+ // bit length - id57_is_length does not apply; validate via
+ // canonical decode + byte-length/mask check
+ (min_chars, max_chars) = id57_range(length_enum)
+ if length(input_string) < min_chars or
+    length(input_string) > max_chars:
+        return false
+ if not id57_is_canonical(input_string):
+        return false
+
+ decoded     = b57_decode(input_string)
+ bit_length  = bits(length_enum)
+ byte_length = ceil(bit_length / 8)
+ if length(decoded) != byte_length:
+        return false
+
+ excess_bits = byte_length * 8 - bit_length
+ if excess_bits > 0:
+     last_byte = decoded[byte_length - 1]
+     if (last_byte & ((1 << excess_bits) - 1)) != 0:
+         return false
+
+ return true
 
 Requirements:
 
-- MUST be valid B57
-- MUST be canonical
-- MUST fall within the [min_chars, max_chars] bounds for
-  length_enum (see ID57 Core API 7.3); character length is a
-  bound, not a fixed value, and MUST NOT be checked for exact
+- Fixed widths (negative length_enum): valid B57 AND exact
+  length == -length_enum (delegates entirely to id57_is_length;
+  MUST NOT decode/check canonical form - fixed-width output is
+  a bignum prefix, not canonical B57)
+- Bit lengths (positive length_enum): valid B57, canonical,
+  within the [min_chars, max_chars] bound (ID57 Core API 7.3),
+  and decodes to the correct byte length with correctly masked
+  excess bits. Character length MUST NOT be checked for exact
   equality
 
 ------------------------------------------------------------
@@ -206,10 +238,11 @@ function i57_validate(input_string, length_enum?) -> boolean
 
 Requirements:
 
-- MUST enforce valid + canonical behavior
-- MUST enforce the length_enum's [min_chars, max_chars] bound
-  (via i57_validate_identifier / id57_is_length) when provided
-- MUST NOT enforce an exact character count
+- MUST enforce valid + canonical behavior for bit lengths, or
+  valid + exact width for fixed lengths (via
+  i57_validate_identifier, 5.3) when length_enum is provided
+- MUST NOT enforce an exact character count for bit lengths;
+  MUST enforce one for fixed lengths (sign-dependent, per 5.3)
 
 ============================================================
 6. OPTIONAL SECURE EXTENSION
@@ -348,6 +381,20 @@ v1.0.1:
 - Noted (4.5) that i57_id already covers the former
   ID57-SHORT lengths directly - ID57-SHORT is merged into
   ID57 Core API and no longer exists as a separate profile.
+
+v1.0.2:
+
+- Aligned with ID57 Core API v0.3.0/v0.3.1: informational bit
+  lengths are replaced by fixed widths selected by NEGATIVE
+  length_enum values (FIXED_k). id57_is_length is now defined
+  ONLY for fixed widths.
+- BREAKING: i57_validate_identifier (5.3) and i57_validate
+  (5.5) now branch on length_enum's sign. Fixed widths delegate
+  to id57_is_length unchanged. Bit lengths NO LONGER delegate
+  to id57_is_length (it does not accept them) - the bound +
+  canonical + decoded-byte-length check is now implemented
+  directly in i57_validate_identifier itself.
+- i57_id (4.5) notes updated for the sign-based length model.
 
 ============================================================
 14. REFERENCES

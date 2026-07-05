@@ -1,7 +1,7 @@
 ============================================================
 ID57 CORE API (MINDU)
 One-Way Identifier Profile (Hash → Truncate → B57)
-Version: v0.3.0 FINAL
+Version: v0.3.1 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -223,8 +223,9 @@ distinguished by SIGN:
   magnitude is the exact output width, always. Exact-width
   checks are REQUIRED here.
 
-See 7.3 for the normative rules per sign and 11.4/11.5 for
-the required range/validation functions.
+See 7.3 for the normative rules per sign, 11.4 (id57_range)
+for bounds on either sign, and 11.5 (id57_is_length) for the
+fixed-width-only validation function.
 
 ------------------------------------------------------------
 7.1 Security Lengths (REQUIRED)
@@ -242,12 +243,38 @@ Note: adjacent ranges MAY touch (e.g. ID57_LEN_8 and
 ID57_LEN_16 both admit a 2-char output), and a larger bit
 length near its minimum MAY be shorter than a smaller bit
 length near its maximum. Character width MUST NOT be used to
-infer which length_enum produced a string; id57_is_length
-(11.5) distinguishes them by decoded byte length instead.
+infer which length_enum produced a string; decode and compare
+byte length instead (id57_is_canonical, 11.3). id57_is_length
+(11.5) does not apply here - it is defined only for fixed
+widths (7.2).
 
 ------------------------------------------------------------
 7.2 Fixed Lengths (NON-SECURITY)
 ------------------------------------------------------------
+
+Why fixed lengths exist:
+
+Bit lengths (7.1) are the right choice when only entropy
+matters, but several common integrations need a CONSTANT
+character count, not merely a bounded one:
+
+- QR codes: payload capacity is typically provisioned for an
+  exact character budget. A variable-width id complicates that
+  budget and wastes reserved capacity in the common case.
+- Short URLs: a fixed-width path segment (e.g. short.example/
+  AB3F9K7Q) is simpler to route, log, rate-limit, and display
+  than one whose length varies per request.
+- Fixed-width common identifiers: invite codes, ticket/order
+  numbers, database columns, and printed labels are simpler
+  when every id occupies the same number of characters - no
+  padding logic, no truncation logic, no layout reflow.
+
+A bit length cannot guarantee this: B57 is a bignum encoding,
+so its character width is only ever a bound (7.3), never a
+constant. FIXED_k solves this directly, at the cost of the
+output being a prefix rather than an independent canonical
+value (5.2) - an explicit, narrow trade made only for these
+non-security identifiers.
 
 Fixed lengths are identified by NEGATIVE length_enum values.
 The sign distinguishes them unambiguously from the positive
@@ -528,47 +555,36 @@ function id57_range(length_enum) -> (min_chars, max_chars)
 
 function id57_is_length(id57_string, length_enum) -> boolean
 
- Fixed-width case (length_enum < 0):
+id57_is_length is defined ONLY for fixed widths (length_enum <
+0, 7.2). It is not a general bit-length validator - it exists
+specifically because fixed-width outputs are prefixes of a
+bignum encoding and are NOT canonical B57, so they cannot be
+validated by decoding (11.3). It checks exactly two things:
+the string is valid B57 (alphabet), and it is exactly k
+characters.
 
-   k = -length_enum
-   // fixed-width outputs are prefixes of a bignum encoding and
-   // are NOT canonical B57 - validate width + alphabet only
-   if length(id57_string) != k:            return false
-   if not id57_is_valid(id57_string):      return false
-   return true
+ if length_enum >= 0:
+     raise INVALID_LENGTH_ENUM
+     // id57_is_length does not apply to bit lengths; for those,
+     // use id57_range for the bound and id57_is_canonical /
+     // id57_verify for validation (7.1, 11.3, 11.1)
 
- Bit-length case (length_enum > 0 or DEFAULT):
+ k = -length_enum
 
-   (min_chars, max_chars) = id57_range(length_enum)
-
-   if length(id57_string) < min_chars or
-      length(id57_string) > max_chars:      return false
-   if not id57_is_canonical(id57_string):   return false
-
-   decoded     = b57_decode(id57_string)
-   bit_length  = bits(length_enum)
-   byte_length = ceil(bit_length / 8)
-   if length(decoded) != byte_length:       return false
-
-   excess_bits = byte_length * 8 - bit_length
-   if excess_bits > 0:
-       last_byte = decoded[byte_length - 1]
-       if (last_byte & ((1 << excess_bits) - 1)) != 0:
-           return false
-
-   return true
+ if length(id57_string) != k:       return false
+ if not id57_is_valid(id57_string): return false
+ return true
 
 Requirements:
 
-- MUST be used instead of ad-hoc character-count comparison
-  for any length conformance check
-- For fixed widths, exact-length checking IS correct (they are
-  fixed); for bit lengths, exact-length checking is WRONG (they
-  are bounded) - id57_is_length applies the right rule per sign
-- MUST NOT be used to infer length_enum from an unknown string;
-  distinct length_enum values MAY share a range/shape, and a
-  fixed-width string is a valid prefix of many bit-length
-  strings (see 5.2, 7.3)
+- MUST reject (INVALID_LENGTH_ENUM) any non-negative
+  length_enum - it is not defined for bit lengths
+- MUST check BOTH conditions: id57_is_valid AND exact length
+  == k; neither alone is sufficient
+- MUST NOT be used to infer length_enum from an unknown
+  string: a fixed-width string is a valid prefix of many
+  bit-length strings, and FIXED_j output is a prefix of
+  FIXED_k output for j < k (5.2)
 
 ============================================================
 12. INVARIANTS
@@ -703,9 +719,7 @@ v0.3.0:
   93/186/373) are REMOVED. Non-security identifiers are now
   FIXED-WIDTH lengths (7.2), identified by NEGATIVE length_enum
   values whose magnitude is the exact character count:
-  FIXED_2, FIXED_3, FIXED_4, FIXED_5, FIXED_6, FIXED_7,
-  FIXED_8, FIXED_10, FIXED_11, FIXED_12 (values -2..-12,
-  FIXED_9 intentionally omitted).
+  FIXED_2 through FIXED_12 (values -2..-12, all defined).
 - The sign of length_enum now selects the mode (5.1, 7.3):
   positive = bit length (variable width within a
   [min,max] bound, unchanged), negative = fixed character
@@ -728,6 +742,31 @@ v0.3.0:
   FIXED_k cut model above.
 - No change to id57_generate's algorithm for positive bit
   lengths, to B57, or to the security length set (7.1).
+
+v0.3.1:
+
+- Completed the FIXED_k set: FIXED_9 is now defined (no gap).
+  The full set is FIXED_2 through FIXED_12.
+- BREAKING: narrowed id57_is_length (11.5) to fixed widths
+  ONLY. It no longer accepts positive/bit-length length_enum
+  values - calling it with one now raises INVALID_LENGTH_ENUM.
+  For bit lengths, use id57_range (11.4) for the bound and
+  id57_is_canonical (11.3) / id57_verify (11.1) for validation
+  instead; id57_is_length's prior bit-length branch (decode +
+  byte-length + excess-bits check) is removed rather than kept
+  as a second code path, since it duplicated what canonical
+  decoding already establishes and blurred what "is_length"
+  means. id57_is_length now checks exactly two things for a
+  FIXED_k string: id57_is_valid AND exact length == k.
+- Added explicit rationale for fixed lengths (7.2): QR code
+  payload budgets, short-URL path segments, and fixed-width
+  common identifiers (invite/ticket/order codes, database
+  columns, printed labels) all need a CONSTANT width, which no
+  bit length can guarantee under B57's bignum encoding (7.3).
+- Corrected the 7.1 note: byte-length disambiguation for
+  overlapping bit-length ranges is via id57_is_canonical +
+  decoded byte length, not id57_is_length (which no longer
+  covers bit lengths at all).
 
 ============================================================
 18. REFERENCES
