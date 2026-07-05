@@ -15,6 +15,7 @@ export declare const ID57Length: Readonly<{
     FIXED_6: -6;
     FIXED_7: -7;
     FIXED_8: -8;
+    FIXED_9: -9;
     FIXED_10: -10;
     FIXED_11: -11;
     FIXED_12: -12;
@@ -32,6 +33,6 @@ export declare function id57Range(length?: number): {
     min: number;
     max: number;
 };
-export declare function id57IsLength(id57String: string, length?: number): boolean;
+export declare function id57IsLength(id57String: string, length: number): boolean;
 export {};
 //# sourceMappingURL=id57.d.ts.map

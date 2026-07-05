@@ -1,4 +1,4 @@
-import { decode, encode, encodedLength, isCanonical, isValid } from './b57.js';
+import { encode, encodedLength, isCanonical, isValid } from './b57.js';
 import { computeHashBLAKE3XOF } from './h57.js';
 import { newInvalidLengthEnumError } from './errors.js';
 
@@ -12,7 +12,7 @@ export const ID57Length = Object.freeze({
   // Negative values: fixed character widths (non-security).
   // Magnitude = exact output width; generated as a prefix cut of LEN_128.
   FIXED_2: -2, FIXED_3: -3, FIXED_4: -4, FIXED_5: -5, FIXED_6: -6,
-  FIXED_7: -7, FIXED_8: -8, FIXED_10: -10, FIXED_11: -11, FIXED_12: -12
+  FIXED_7: -7, FIXED_8: -8, FIXED_9: -9, FIXED_10: -10, FIXED_11: -11, FIXED_12: -12
 });
 
 export const id57BitsByLength: Map<number, number> = new Map([
@@ -21,7 +21,7 @@ export const id57BitsByLength: Map<number, number> = new Map([
   [ID57Length.LEN_256, 256], [ID57Length.LEN_512, 512]
 ]);
 
-const id57FixedWidths: Set<number> = new Set([2, 3, 4, 5, 6, 7, 8, 10, 11, 12]);
+const id57FixedWidths: Set<number> = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
 export function resolveID57Length(length: number) {
   if (length === ID57Length.DEFAULT) return ID57Length.LEN_128;
@@ -100,30 +100,14 @@ export function id57Range(length: number = ID57Length.DEFAULT) {
   return { min: byteLength, max: encodedLength(byteLength) };
 }
 
-export function id57IsLength(id57String: string, length: number = ID57Length.DEFAULT) {
+// id57IsLength is defined ONLY for fixed widths (negative length_enum, spec 11.5).
+// Fixed-width outputs are bignum prefixes, NOT canonical B57, so they are validated
+// by exact width + alphabet only, never by decode. For bit lengths, use id57Range
+// for the bound and id57IsCanonical/id57Verify for validation instead.
+export function id57IsLength(id57String: string, length: number) {
   const effectiveLength = resolveID57Length(length);
+  if (effectiveLength >= 0) throw newInvalidLengthEnumError(length);
 
-  if (effectiveLength < 0) {
-    // Fixed-width outputs are bignum prefixes, NOT canonical B57 (spec 11.5):
-    // validate exact width + alphabet only, never decode.
-    return id57String.length === -effectiveLength && isValid(id57String);
-  }
-
-  const bits = id57BitsByLength.get(effectiveLength);
-  const byteLength = Math.ceil(bits / 8);
-  const { min, max } = id57Range(length);
-
-  if (id57String.length < min || id57String.length > max) return false;
-  if (!isCanonical(id57String)) return false;
-
-  const decoded = decode(id57String);
-  if (decoded.length !== byteLength) return false;
-
-  const excessBits = byteLength * 8 - bits;
-  if (excessBits > 0) {
-    const mask = (1 << excessBits) - 1;
-    if ((decoded[byteLength - 1] & mask) !== 0) return false;
-  }
-
-  return true;
+  const k = -effectiveLength;
+  return id57String.length === k && isValid(id57String);
 }

@@ -62,7 +62,12 @@ test('id57 all bit-length enums with BLAKE3', () => {
     const effectiveLen = len === ID57Length.DEFAULT ? ID57Length.LEN_128 : len;
     const { min, max } = id57Range(effectiveLen);
     assert.ok(out.length >= min && out.length <= max);
-    assert.equal(id57IsLength(out, effectiveLen), true);
+
+    // id57IsLength does not apply to bit lengths (spec 11.5) - it must throw.
+    assert.throws(
+      () => id57IsLength(out, effectiveLen),
+      (err) => err instanceof B57Error && err.code === ErrorCode.INVALID_LENGTH_ENUM
+    );
   }
 });
 
@@ -70,7 +75,7 @@ test('id57 all fixed-width enums with BLAKE3', () => {
   const input = te.encode('id57-fixed-length-enums');
   const widths = [
     ID57Length.FIXED_2, ID57Length.FIXED_3, ID57Length.FIXED_4, ID57Length.FIXED_5,
-    ID57Length.FIXED_6, ID57Length.FIXED_7, ID57Length.FIXED_8,
+    ID57Length.FIXED_6, ID57Length.FIXED_7, ID57Length.FIXED_8, ID57Length.FIXED_9,
     ID57Length.FIXED_10, ID57Length.FIXED_11, ID57Length.FIXED_12
   ];
 
@@ -116,19 +121,25 @@ test('id57IsLength on fixed widths validates exact width + alphabet, not canonic
   assert.equal(id57IsLength('!!!!', ID57Length.FIXED_4), false);
 });
 
-test('id57IsLength rejects bit-length strings outside the valid range or non-canonical form', () => {
+test('id57IsLength rejects bit-length length_enum values entirely', () => {
   const input = te.encode('id57-is-length');
   const out = id57Generate(input, ID57Length.LEN_32);
 
-  assert.equal(id57IsLength(out, ID57Length.LEN_32), true);
-  assert.equal(id57IsLength(out.slice(0, 1), ID57Length.LEN_32), false);
-  assert.equal(id57IsLength(out + out, ID57Length.LEN_32), false);
-  assert.equal(id57IsLength('!!!', ID57Length.LEN_32), false);
+  for (const len of [ID57Length.LEN_32, ID57Length.LEN_128, ID57Length.DEFAULT]) {
+    assert.throws(
+      () => id57IsLength(out, len),
+      (err) => err instanceof B57Error && err.code === ErrorCode.INVALID_LENGTH_ENUM
+    );
+  }
 });
 
-test('id57 rejects the omitted FIXED_9 and unknown fixed widths', () => {
+test('id57 rejects unknown fixed widths', () => {
   assert.throws(
-    () => id57Generate(te.encode('id57-fixed9'), -9),
+    () => id57Generate(te.encode('id57-fixed13'), -13),
+    (err) => err instanceof B57Error && err.code === ErrorCode.INVALID_LENGTH_ENUM
+  );
+  assert.throws(
+    () => id57Generate(te.encode('id57-fixed1'), -1),
     (err) => err instanceof B57Error && err.code === ErrorCode.INVALID_LENGTH_ENUM
   );
 });
