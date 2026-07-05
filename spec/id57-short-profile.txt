@@ -1,7 +1,7 @@
 ============================================================
 ID57-SHORT PROFILE (MINDU)
 Ultra-Compact Identifier Profile (ID57 Subset)
-Version: v0.1.0 FINAL
+Version: v0.1.1 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -61,29 +61,35 @@ Requirements:
 
 ID57-SHORT reuses the standard ID57 length model.
 
+Character length is a BOUND, NOT a guarantee — see 3.6 for
+the normative bounds formula and 4.3/4.4 for the required
+range/validation functions. Implementations MUST NOT
+generate, reject, or validate an identifier by requiring an
+exact character count.
+
 ------------------------------------------------------------
 3.1 Security Lengths (REQUIRED)
 ------------------------------------------------------------
 
-- ID57_LEN_8   → 2 chars
-- ID57_LEN_16  → 3 chars
-- ID57_LEN_32  → 6 chars
-- ID57_LEN_64  → 11 chars
-- ID57_LEN_128 → 22 chars (DEFAULT)
-- ID57_LEN_256 → 44 chars
-- ID57_LEN_512 → 88 chars
+- ID57_LEN_8   → 1-2 chars
+- ID57_LEN_16  → 2-3 chars
+- ID57_LEN_32  → 4-6 chars
+- ID57_LEN_64  → 8-11 chars
+- ID57_LEN_128 → 16-22 chars (DEFAULT)
+- ID57_LEN_256 → 32-44 chars
+- ID57_LEN_512 → 64-88 chars
 
 ------------------------------------------------------------
 3.2 Informational Lengths (NON-SECURITY)
 ------------------------------------------------------------
 
-- ID57_LEN_23  → 4 chars
-- ID57_LEN_29  → 5 chars
-- ID57_LEN_47  → 8 chars
-- ID57_LEN_70  → 12 chars
-- ID57_LEN_93  → 16 chars
-- ID57_LEN_186 → 32 chars
-- ID57_LEN_373 → 64 chars
+- ID57_LEN_23  → 3-5 chars
+- ID57_LEN_29  → 4-6 chars
+- ID57_LEN_47  → 6-9 chars
+- ID57_LEN_70  → 9-13 chars
+- ID57_LEN_93  → 12-17 chars
+- ID57_LEN_186 → 24-33 chars
+- ID57_LEN_373 → 47-65 chars
 
 ------------------------------------------------------------
 3.3 SHORT PROFILE CONSTRAINT
@@ -91,11 +97,11 @@ ID57-SHORT reuses the standard ID57 length model.
 
 ID57-SHORT MUST restrict usage to:
 
-- ID57_LEN_23  (4 chars)
-- ID57_LEN_29  (5 chars)
-- ID57_LEN_32  (6 chars)
-- ID57_LEN_47  (8 chars)
-- ID57_LEN_70  (12 chars)
+- ID57_LEN_23  (3-5 chars)
+- ID57_LEN_29  (4-6 chars)
+- ID57_LEN_32  (4-6 chars)
+- ID57_LEN_47  (6-9 chars)
+- ID57_LEN_70  (9-13 chars)
 
 Implementations MUST NOT use other lengths in SHORT mode.
 
@@ -116,7 +122,28 @@ bits(ID57_LEN_70)  = 70
 ID57S_DEFAULT:
 
 - MUST resolve to ID57_LEN_47
-- MUST produce 8-character identifiers
+- MUST produce identifiers of at most 9 characters
+  (6-9 chars; see 3.6 for the length bounds model)
+
+------------------------------------------------------------
+3.6 Length Bounds (NORMATIVE)
+------------------------------------------------------------
+
+For any length_enum, with bit_length = bits(length_enum):
+
+ byte_length = ceil(bit_length / 8)
+ min_chars   = byte_length
+ max_chars   = b57_encoded_length(byte_length)
+             = ceil(byte_length * 8 / log2(57))
+
+The ranges in 3.1 and 3.2 are derived directly from this
+formula and MUST be treated as [min_chars, max_chars]
+bounds, never as a fixed width.
+
+Note: ID57_LEN_29 and ID57_LEN_32 both use byte_length 4 and
+therefore share an identical range and decoded shape. Length
+bounds MUST NOT be used to infer which length_enum produced
+a given string.
 
 ============================================================
 4. CORE FUNCTION
@@ -177,6 +204,32 @@ If bit_length is not byte-aligned:
 
 - Excess bits in the final byte MUST be truncated
   (not rounded, not padded)
+
+------------------------------------------------------------
+4.3 id57s_range
+------------------------------------------------------------
+
+function id57s_range(length_enum) -> (min_chars, max_chars)
+
+ Delegates to ID57 Core API id57_range using the same
+ length_enum value (ID57-SHORT reuses the ID57 bit mapping,
+ see 3.4).
+
+------------------------------------------------------------
+4.4 id57s_is_length
+------------------------------------------------------------
+
+function id57s_is_length(id57_string, length_enum) -> boolean
+
+ Delegates to ID57 Core API id57_is_length using the same
+ length_enum value.
+
+Requirements:
+
+- MUST be used instead of exact character-count comparison
+  for any length conformance check
+- MUST NOT be used to infer length_enum from an unknown
+  string (see 3.6 note)
 
 ============================================================
 5. INVARIANTS
@@ -301,7 +354,25 @@ Security depends on:
 This document has no IANA actions.
 
 ============================================================
-13. REFERENCES
+13. REVISION NOTES
+============================================================
+
+v0.1.1:
+
+- Corrected the length model (3.1/3.2): all profile lengths
+  are non-byte-aligned and were undercounted by 1 char versus
+  their true maximum, and were incorrectly presented as fixed
+  rather than bounded. Replaced with normative
+  [min_chars, max_chars] ranges (3.6).
+- Added id57s_range and id57s_is_length (4.3, 4.4) as the
+  required mechanism for length conformance checks. Exact
+  character-count comparison MUST NOT be used.
+- No change to id57s_generate or truncation behavior; this is
+  a documentation and validation-API correction only, mirrors
+  ID57 Core API v0.1.1.
+
+============================================================
+14. REFERENCES
 ============================================================
 
 RFC 2119

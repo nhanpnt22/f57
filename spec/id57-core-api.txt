@@ -1,7 +1,7 @@
 ============================================================
 ID57 CORE API (MINDU)
 One-Way Identifier Profile (Hash → Truncate → B57)
-Version: v0.1.0 FINAL
+Version: v0.1.1 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -35,7 +35,7 @@ This memo is intended for production use.
 ============================================================
 
 ID57 Core API defines the minimal function set required to
-produce canonical, fixed-length identifiers.
+produce canonical, bounded-length identifiers.
 
 ID57 is a one-way transformation:
 
@@ -147,7 +147,8 @@ Requirements:
 ID57_DEFAULT:
 
 - MUST resolve to ID57_LEN_128
-- MUST produce 22-character identifiers
+- MUST produce identifiers of at most 22 characters
+  (16-22 chars; see 7.3 for the length bounds model)
 - MUST NOT preserve full hash entropy
 
 Default pipeline:
@@ -160,35 +161,67 @@ Default pipeline:
 
 Implementations MUST support:
 
+Character length is a BOUND, NOT a guarantee. B57 is a
+bignum-style positional encoding: the exact number of
+characters produced for a given length_enum depends on the
+numeric value of the truncated hash, and MAY be shorter than
+the maximum shown below. Implementations MUST NOT generate,
+reject, or validate an identifier by requiring an exact
+character count. See 7.3 for the normative bounds formula
+and 10.4/10.5 for the required range/validation functions.
+
 ------------------------------------------------------------
 7.1 Security Lengths (REQUIRED)
 ------------------------------------------------------------
 
-- ID57_LEN_8   → 2 chars
-- ID57_LEN_16  → 3 chars
-- ID57_LEN_32  → 6 chars
-- ID57_LEN_64  → 11 chars
-- ID57_LEN_128 → 22 chars (DEFAULT)
-- ID57_LEN_256 → 44 chars
-- ID57_LEN_512 → 88 chars
+- ID57_LEN_8   → 1-2 chars
+- ID57_LEN_16  → 2-3 chars
+- ID57_LEN_32  → 4-6 chars
+- ID57_LEN_64  → 8-11 chars
+- ID57_LEN_128 → 16-22 chars (DEFAULT)
+- ID57_LEN_256 → 32-44 chars
+- ID57_LEN_512 → 64-88 chars
 
 ------------------------------------------------------------
 7.2 Informational Lengths (NON-SECURITY)
 ------------------------------------------------------------
 
-- ID57_LEN_23  → 4 chars
-- ID57_LEN_29  → 5 chars
-- ID57_LEN_47  → 8 chars
-- ID57_LEN_70  → 12 chars
-- ID57_LEN_93  → 16 chars
-- ID57_LEN_186 → 32 chars
-- ID57_LEN_373 → 64 chars
+- ID57_LEN_23  → 3-5 chars
+- ID57_LEN_29  → 4-6 chars
+- ID57_LEN_47  → 6-9 chars
+- ID57_LEN_70  → 9-13 chars
+- ID57_LEN_93  → 12-17 chars
+- ID57_LEN_186 → 24-33 chars
+- ID57_LEN_373 → 47-65 chars
+
+------------------------------------------------------------
+7.3 Length Bounds (NORMATIVE)
+------------------------------------------------------------
+
+For any length_enum, with bit_length = bits(length_enum):
+
+ byte_length = ceil(bit_length / 8)
+ min_chars   = byte_length
+ max_chars   = b57_encoded_length(byte_length)
+             = ceil(byte_length * 8 / log2(57))
+
+The ranges in 7.1 and 7.2 are derived directly from this
+formula and MUST be treated as [min_chars, max_chars]
+bounds, never as a fixed width.
+
+Note: length_enum values MAY share an identical byte_length
+(and therefore an identical range) while representing
+different bit_length values — e.g. ID57_LEN_29 and
+ID57_LEN_32 both use byte_length 4. Length bounds MUST NOT
+be used to infer which length_enum produced a given string.
 
 Requirements:
 
 - Length MUST correspond to defined model values
 - Implementations MUST NOT accept arbitrary lengths
 - Security-sensitive use MUST use ≥ ID57_LEN_128
+- Implementations MUST NOT assume or enforce a fixed
+  character count for any length_enum
 
 ============================================================
 8. TRUNCATION MODEL
@@ -266,6 +299,59 @@ function id57_is_canonical(id57_string) -> boolean
 
  return (id57_string == reencoded)
 
+------------------------------------------------------------
+
+10.4 id57_range
+
+function id57_range(length_enum) -> (min_chars, max_chars)
+
+ bit_length  = bits(length_enum)
+ byte_length = ceil(bit_length / 8)
+
+ return (
+   byte_length,
+   b57_encoded_length(byte_length)
+ )
+
+------------------------------------------------------------
+
+10.5 id57_is_length
+
+function id57_is_length(id57_string, length_enum) -> boolean
+
+ (min_chars, max_chars) = id57_range(length_enum)
+
+ if length(id57_string) < min_chars or
+    length(id57_string) > max_chars:
+       return false
+
+ if not id57_is_canonical(id57_string):
+       return false
+
+ decoded     = b57_decode(id57_string)
+ bit_length  = bits(length_enum)
+ byte_length = ceil(bit_length / 8)
+
+ if length(decoded) != byte_length:
+       return false
+
+ excess_bits = byte_length * 8 - bit_length
+ if excess_bits > 0:
+     last_byte = decoded[byte_length - 1]
+     if (last_byte & ((1 << excess_bits) - 1)) != 0:
+         return false
+
+ return true
+
+Requirements:
+
+- MUST be used instead of exact character-count comparison
+  for any length conformance check
+- MUST NOT be used to infer length_enum from an unknown
+  string; distinct length_enum values MAY share the same
+  byte_length and therefore the same valid range and the
+  same decoded shape (see 7.3 note)
+
 ============================================================
 11. INVARIANTS
 ============================================================
@@ -339,7 +425,25 @@ Encoded length MUST NOT be treated as a guarantee.
 This document has no IANA actions.
 
 ============================================================
-16. REFERENCES
+16. REVISION NOTES
+============================================================
+
+v0.1.1:
+
+- Corrected the length model (7.1/7.2): character counts for
+  non-byte-aligned lengths (23, 29, 47, 70, 93, 186, 373 bits)
+  were undercounted by 1 char versus their true maximum, and
+  all lengths were incorrectly presented as fixed rather than
+  bounded. Replaced with normative [min_chars, max_chars]
+  ranges (7.3).
+- Added id57_range and id57_is_length (10.4, 10.5) as the
+  required mechanism for length conformance checks. Exact
+  character-count comparison MUST NOT be used.
+- No change to id57_generate, truncation, or B57 behavior;
+  this is a documentation and validation-API correction only.
+
+============================================================
+17. REFERENCES
 ============================================================
 
 RFC 2119 - Requirement Levels
