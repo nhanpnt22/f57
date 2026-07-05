@@ -25,5 +25,10 @@ export declare function id57Verify(input: ByteInput, id57String: string, length?
 export declare function id57VerifyDefault(input: ByteInput, id57String: string): boolean;
 export declare function id57IsValid(id57String: string): boolean;
 export declare function id57IsCanonical(id57String: string): boolean;
+export declare function id57Range(length?: number): {
+    min: number;
+    max: number;
+};
+export declare function id57IsLength(id57String: string, length?: number): boolean;
 export {};
 //# sourceMappingURL=id57.d.ts.map

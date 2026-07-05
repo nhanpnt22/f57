@@ -12,9 +12,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - distributable build output (`dist/` with JS + `.d.ts`)
   - package export metadata (`main`, `types`, `exports`, `files`)
   - release rehearsal command (`npm run verify:all`) and successful `npm pack` packaging flow
+- `id57-core-api.txt` bumped to v0.2.0: length model corrected from fixed character counts
+  to normative `[min_chars, max_chars]` bounds (the previous counts for non-byte-aligned
+  lengths were undercounted by 1 char, and all lengths are inherently variable-width under
+  B57's bignum encoding). Added `id57_range`/`id57_is_length` as the required
+  length-conformance check, replacing exact character-count comparison.
+- `i57-core-api.txt` (v1.0.1) and `s57-security-57.txt` (errata, version unchanged): same
+  length-bound correction propagated to `i57_validate_identifier`/`i57_validate` and to
+  S57's ID57/H57 length table.
+- TypeScript: `id57Range`, `id57IsLength` in `implementations/ts/id57.ts`.
 
 ### Changed
+- **ID57-SHORT merged into ID57 Core API** (`id57-core-api.txt` v0.2.0, new section 10:
+  SHORT-LENGTH USAGE). There is no longer a separate short-identifier profile, spec, or
+  module - `id57_generate`/`id57_verify`/`id57_range`/`id57_is_length` already cover the
+  short/informational lengths (`ID57_LEN_23/29/32/47/70`) directly.
+  `spec/id57-short-profile.txt` is now a deprecation pointer to `id57-core-api.txt`.
 - Top-level release governance docs updated to include TypeScript package release posture and validation evidence.
+
+### Removed
+- **BREAKING (per language, rolling out per branch):** `id57s_generate`, `ID57ShortLength`,
+  `ID57S_DEFAULT`, and equivalent short-specific function names/types in every language
+  implementation. Callers needing a short identifier call `id57_generate(x, ID57_LEN_47)`
+  (or another short length_enum) directly on the unified ID57 API.
+  TypeScript: `id57_short.ts` deleted; short lengths are plain `ID57Length` values.
 
 ## [0.1.1] - 2026-05-23
 

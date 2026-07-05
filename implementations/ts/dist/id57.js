@@ -1,4 +1,4 @@
-import { encode, isCanonical, isValid } from './b57.js';
+import { decode, encode, encodedLength, isCanonical, isValid } from './b57.js';
 import { computeHashBLAKE3XOF } from './h57.js';
 import { newInvalidLengthEnumError } from './errors.js';
 export const ID57Length = Object.freeze({
@@ -58,5 +58,31 @@ export function id57IsValid(id57String) {
 }
 export function id57IsCanonical(id57String) {
     return isCanonical(id57String);
+}
+export function id57Range(length = ID57Length.DEFAULT) {
+    const effectiveLength = resolveID57Length(length);
+    const bits = id57BitsByLength.get(effectiveLength);
+    const byteLength = Math.ceil(bits / 8);
+    return { min: byteLength, max: encodedLength(byteLength) };
+}
+export function id57IsLength(id57String, length = ID57Length.DEFAULT) {
+    const effectiveLength = resolveID57Length(length);
+    const bits = id57BitsByLength.get(effectiveLength);
+    const byteLength = Math.ceil(bits / 8);
+    const { min, max } = id57Range(length);
+    if (id57String.length < min || id57String.length > max)
+        return false;
+    if (!isCanonical(id57String))
+        return false;
+    const decoded = decode(id57String);
+    if (decoded.length !== byteLength)
+        return false;
+    const excessBits = byteLength * 8 - bits;
+    if (excessBits > 0) {
+        const mask = (1 << excessBits) - 1;
+        if ((decoded[byteLength - 1] & mask) !== 0)
+            return false;
+    }
+    return true;
 }
 //# sourceMappingURL=id57.js.map

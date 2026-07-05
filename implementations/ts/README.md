@@ -1,6 +1,6 @@
 # B57 TypeScript Implementation
 
-TypeScript/Node.js implementation of B57, H57, ID57, ID57-SHORT, R57, I57, and S57.
+TypeScript/Node.js implementation of B57, H57, ID57 (including short/informational lengths), R57, I57, and S57.
 
 ## Install
 
@@ -29,8 +29,8 @@ Exports are available from `index`:
 
 - `encode`, `decode`, `isValid`, `isCanonical`, `encodedLength`, `decodedLength`
 - `h57Hash`, `h57Verify`, `h57IsValid`, `h57IsCanonical`, `H57Length`
-- `id57Generate`, `id57GenerateDefault`, `id57Verify`, `ID57Length`
-- `id57ShortGenerate`, `id57ShortGenerateDefault`, `id57ShortVerify`, `ID57ShortLength`
+- `id57Generate`, `id57GenerateDefault`, `id57Verify`, `id57Range`, `id57IsLength`, `ID57Length`
+  (short identifiers are `id57Generate(x, ID57Length.LEN_47)` etc. - there is no separate short API)
 - `r57Generate`, `r57IsValid`, `r57IsCanonical`, `R57Mode`
 - `i57Encode`, `i57Decode`, `i57Hash`, `i57Random`, `i57Id`
 - `S57`

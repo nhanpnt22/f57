@@ -16,12 +16,9 @@ import {
   H57Length,
   id57Generate,
   id57GenerateDefault,
+  id57Verify,
   id57VerifyDefault,
   ID57Length,
-  id57ShortGenerate,
-  id57ShortGenerateDefault,
-  id57ShortVerifyDefault,
-  ID57ShortLength,
   i57Encode,
   i57Decode,
   i57Hash,
@@ -133,8 +130,9 @@ function buildJSRecord(index) {
   const id57Default = id57GenerateDefault(input);
   const id57Len47Sha256 = id57Generate(input, ID57Length.LEN_47);
   const id57Len70Blake3 = id57Generate(input, ID57Length.LEN_70);
-  const id57ShortDefault = id57ShortGenerateDefault(input);
-  const id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.LEN_23);
+  // "Short" is no longer a separate API - these are just id57Generate with a short length_enum.
+  const id57ShortDefault = id57Generate(input, ID57Length.LEN_47);
+  const id57ShortLen23 = id57Generate(input, ID57Length.LEN_23);
 
   const i57EncodeValue = i57Encode(input);
   const i57DecodeHex = hex(i57Decode(i57EncodeValue));
@@ -170,7 +168,7 @@ function buildJSRecord(index) {
     r57IsValidOnI57Id: r57IsValid(i57IdDefault),
     r57IsCanonicalOnI57Id: r57IsCanonical(i57IdDefault),
     id57VerifyDefault: id57VerifyDefault(input, id57Default),
-    id57ShortVerifyDefault: id57ShortVerifyDefault(input, id57ShortDefault),
+    id57ShortVerifyDefault: id57Verify(input, id57ShortDefault, ID57Length.LEN_47),
     h57VerifyBlake3Len128: h57Verify(input, h57Blake3Len128, H57Length.LEN_128),
     i57ValidateIdentifierId: i57ValidateIdentifier(i57IdDefault)
   };
@@ -232,7 +230,7 @@ function run() {
     deterministicScope: [
       'encode/decode/isValid/isCanonical/length helpers',
       'h57 hash/verify',
-      'id57 and id57-short generate/verify',
+      'id57 generate/verify (including short/informational lengths)',
       'i57 encode/decode/hash/id/validation',
       'r57 validators on deterministic identifier input'
     ],

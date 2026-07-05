@@ -1,7 +1,7 @@
 ============================================================
 I57 CORE API
 Canonical Integration Interface (B57, H57, R57, ID57)
-Version: v1.0.0
+Version: v1.0.1
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -130,6 +130,14 @@ function i57_id(input_bytes, length_enum) -> string
 Definition:
  return id57_generate(input_bytes, length_enum)
 
+Notes:
+
+- length_enum MAY be any ID57 Core API length, including the
+  short/informational lengths (ID57_LEN_23/29/32/47/70). There
+  is no separate short-identifier function; i57_id covers both
+  security and informational lengths uniformly (see ID57 Core
+  API v0.2.0, section 10).
+
 ============================================================
 5. VALIDATION FUNCTIONS
 ============================================================
@@ -161,13 +169,20 @@ Definition:
 
 5.3 i57_validate_identifier
 
-function i57_validate_identifier(input_string) -> boolean
+function i57_validate_identifier(input_string, length_enum) -> boolean
+
+Definition:
+
+ return id57_is_length(input_string, length_enum)
 
 Requirements:
 
 - MUST be valid B57
 - MUST be canonical
-- MUST match expected identifier length policy
+- MUST fall within the [min_chars, max_chars] bounds for
+  length_enum (see ID57 Core API 7.3); character length is a
+  bound, not a fixed value, and MUST NOT be checked for exact
+  equality
 
 ------------------------------------------------------------
 
@@ -187,12 +202,14 @@ Requirements:
 
 5.5 i57_validate
 
-function i57_validate(input_string, expected_length_chars?) -> boolean
+function i57_validate(input_string, length_enum?) -> boolean
 
 Requirements:
 
 - MUST enforce valid + canonical behavior
-- MUST enforce expected length when provided
+- MUST enforce the length_enum's [min_chars, max_chars] bound
+  (via i57_validate_identifier / id57_is_length) when provided
+- MUST NOT enforce an exact character count
 
 ============================================================
 6. OPTIONAL SECURE EXTENSION
@@ -317,7 +334,23 @@ use S57.
 This document has no IANA actions.
 
 ============================================================
-13. REFERENCES
+13. REVISION NOTES
+============================================================
+
+v1.0.1:
+
+- Aligned with ID57 Core API v0.2.0: i57_validate_identifier
+  and i57_validate now take a length_enum and enforce it via
+  id57_is_length's [min_chars, max_chars] bound instead of an
+  exact character count (the old "expected identifier length
+  policy" / expected_length_chars wording implied a fixed
+  length, which B57's bignum encoding never guaranteed).
+- Noted (4.5) that i57_id already covers the former
+  ID57-SHORT lengths directly - ID57-SHORT is merged into
+  ID57 Core API and no longer exists as a separate profile.
+
+============================================================
+14. REFERENCES
 ============================================================
 
 RFC 2119 - Requirement Levels
