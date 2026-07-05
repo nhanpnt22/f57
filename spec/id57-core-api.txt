@@ -1,7 +1,7 @@
 ============================================================
 ID57 CORE API (MINDU)
 One-Way Identifier Profile (Hash → Truncate → B57)
-Version: v0.1.1 FINAL
+Version: v0.2.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -168,7 +168,7 @@ numeric value of the truncated hash, and MAY be shorter than
 the maximum shown below. Implementations MUST NOT generate,
 reject, or validate an identifier by requiring an exact
 character count. See 7.3 for the normative bounds formula
-and 10.4/10.5 for the required range/validation functions.
+and 11.4/11.5 for the required range/validation functions.
 
 ------------------------------------------------------------
 7.1 Security Lengths (REQUIRED)
@@ -264,10 +264,108 @@ ID57 is a one-way transformation:
 Security depends on hash function properties.
 
 ============================================================
-10. OPTIONAL FUNCTIONS
+10. SHORT-LENGTH USAGE (ID57_LEN_23/29/32/47/70)
 ============================================================
 
-10.1 id57_verify
+This section applies specifically to identifiers generated
+with the informational lengths defined in 7.2
+(ID57_LEN_23, ID57_LEN_29, ID57_LEN_32, ID57_LEN_47,
+ID57_LEN_70). These lengths trade collision resistance for
+compactness and carry additional usage requirements beyond
+the general ID57 rules.
+
+There is no separate "short" profile, module, or API. Short
+identifiers are produced by calling id57_generate (5.1) with
+one of these length_enum values directly - e.g.
+id57_generate(x, ID57_LEN_47) for an 8-9 char default short
+identifier. Implementations MUST NOT expose a distinct
+short-specific function name, type, or default (this
+consolidates what a prior ID57-SHORT companion profile
+specified separately; see 17 REVISION NOTES).
+
+------------------------------------------------------------
+10.1 Collision Model
+------------------------------------------------------------
+
+Approximate collision onset (birthday bound):
+
+- 23-bit → ~2^11-2^12 entries
+- 29-bit → ~2^14-2^15 entries
+- 32-bit → ~2^16 entries
+- 47-bit → ~2^23 entries
+- 70-bit → ~2^35 entries
+
+------------------------------------------------------------
+10.2 Required Safety Mechanisms
+------------------------------------------------------------
+
+Implementations MUST:
+
+- detect collisions before insertion
+- reject or regenerate on collision
+- scope identifiers within a namespace
+
+Implementations MUST NOT:
+
+- assume uniqueness
+- use identifiers without verification
+
+------------------------------------------------------------
+10.3 Recommended Patterns
+------------------------------------------------------------
+
+Dual-Identifier Model:
+
+ short_id = id57_generate(x, ID57_LEN_47)
+ full_id  = id57_generate(x, ID57_LEN_128)
+
+Namespaced Identifiers:
+
+ short_id = id57_generate(namespace || x, L)
+
+Collision-Aware Allocation:
+
+ loop:
+   id = id57_generate(x || counter, L)
+   if not exists(id):
+     store(id)
+     break
+
+Progressive Length Upgrade:
+
+ ID57_LEN_23 → ID57_LEN_29 → ID57_LEN_32 →
+ ID57_LEN_47 → ID57_LEN_70
+
+------------------------------------------------------------
+10.4 Use Cases
+------------------------------------------------------------
+
+Suitable for:
+
+- short URLs
+- QR code payload minimization
+- user IDs (non-sensitive)
+- invite codes
+- temporary tokens
+- UI-friendly identifiers
+
+------------------------------------------------------------
+10.5 Prohibited Usage
+------------------------------------------------------------
+
+MUST NOT be used for:
+
+- authentication tokens
+- authorization systems
+- cryptographic identity
+- globally unique identifiers
+- security-critical systems
+
+============================================================
+11. OPTIONAL FUNCTIONS
+============================================================
+
+11.1 id57_verify
 
 function id57_verify(input_bytes, id57_string, length_enum) -> boolean
 
@@ -281,7 +379,7 @@ function id57_verify(input_bytes, hash_fn, id57_string, length_enum) -> boolean
 
 ------------------------------------------------------------
 
-10.2 id57_is_valid
+11.2 id57_is_valid
 
 function id57_is_valid(id57_string) -> boolean
 
@@ -290,7 +388,7 @@ function id57_is_valid(id57_string) -> boolean
 
 ------------------------------------------------------------
 
-10.3 id57_is_canonical
+11.3 id57_is_canonical
 
 function id57_is_canonical(id57_string) -> boolean
 
@@ -301,7 +399,7 @@ function id57_is_canonical(id57_string) -> boolean
 
 ------------------------------------------------------------
 
-10.4 id57_range
+11.4 id57_range
 
 function id57_range(length_enum) -> (min_chars, max_chars)
 
@@ -315,7 +413,7 @@ function id57_range(length_enum) -> (min_chars, max_chars)
 
 ------------------------------------------------------------
 
-10.5 id57_is_length
+11.5 id57_is_length
 
 function id57_is_length(id57_string, length_enum) -> boolean
 
@@ -353,7 +451,7 @@ Requirements:
   same decoded shape (see 7.3 note)
 
 ============================================================
-11. INVARIANTS
+12. INVARIANTS
 ============================================================
 
 The following MUST hold:
@@ -371,7 +469,7 @@ Canonical constraint:
  (only if y is canonical)
 
 ============================================================
-12. ERROR MODEL
+13. ERROR MODEL
 ============================================================
 
 Implementations MUST distinguish:
@@ -387,7 +485,7 @@ Requirements:
 - MUST NOT use ambiguous errors
 
 ============================================================
-13. PROHIBITED BEHAVIORS
+14. PROHIBITED BEHAVIORS
 ============================================================
 
 Implementations MUST NOT:
@@ -402,7 +500,7 @@ Implementations MUST NOT:
 - introduce randomness
 
 ============================================================
-14. SECURITY CONSIDERATIONS
+15. SECURITY CONSIDERATIONS
 ============================================================
 
 ID57 provides no cryptographic guarantees beyond the
@@ -419,13 +517,13 @@ Shorter identifiers reduce security proportionally.
 Encoded length MUST NOT be treated as a guarantee.
 
 ============================================================
-15. IANA CONSIDERATIONS
+16. IANA CONSIDERATIONS
 ============================================================
 
 This document has no IANA actions.
 
 ============================================================
-16. REVISION NOTES
+17. REVISION NOTES
 ============================================================
 
 v0.1.1:
@@ -436,14 +534,33 @@ v0.1.1:
   all lengths were incorrectly presented as fixed rather than
   bounded. Replaced with normative [min_chars, max_chars]
   ranges (7.3).
-- Added id57_range and id57_is_length (10.4, 10.5) as the
+- Added id57_range and id57_is_length (11.4, 11.5) as the
   required mechanism for length conformance checks. Exact
   character-count comparison MUST NOT be used.
 - No change to id57_generate, truncation, or B57 behavior;
   this is a documentation and validation-API correction only.
 
+v0.2.0:
+
+- Merged the ID57-SHORT PROFILE companion document into this
+  spec (new section 10: SHORT-LENGTH USAGE). There is no
+  longer a separate profile, module, or API for short
+  identifiers - id57_generate/id57_verify/id57_range/
+  id57_is_length already cover ID57_LEN_23/29/32/47/70
+  directly. id57-short-profile.txt is now a deprecation
+  pointer to this document.
+- BREAKING for implementations: the id57s_generate,
+  id57s_range, id57s_is_length function names and any
+  ID57-SHORT-specific default/type (e.g. ID57ShortLength,
+  ID57S_DEFAULT) MUST be removed. Callers needing a short
+  identifier call id57_generate(x, ID57_LEN_47) (or another
+  short length_enum) directly.
+- Collision model, required safety mechanisms, recommended
+  patterns, use cases, and prohibited usage for short lengths
+  moved to 10.1-10.5 verbatim in substance.
+
 ============================================================
-17. REFERENCES
+18. REFERENCES
 ============================================================
 
 RFC 2119 - Requirement Levels

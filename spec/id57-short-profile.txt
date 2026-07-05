@@ -1,382 +1,45 @@
 ============================================================
 ID57-SHORT PROFILE (MINDU)
 Ultra-Compact Identifier Profile (ID57 Subset)
-Version: v0.1.1 FINAL
-Status: Informational (RFC-Grade, Production-Ready)
+Version: v0.2.0 DEPRECATED - MERGED INTO ID57 CORE API
+Status: Informational - Superseded
 Date: May 2026
 ============================================================
 
 ============================================================
-ABSTRACT
+NOTICE
 ============================================================
 
-ID57-SHORT defines a constrained profile of ID57 for
-ultra-compact, human-centric identifiers.
+As of ID57 Core API v0.2.0, this document is merged into
+id57-core-api.txt and no longer stands on its own.
 
-It specifies the safe use of short-length identifiers
-(4–12 characters) derived from cryptographic hashes using
-controlled prefix truncation and B57 encoding.
+There is no separate ID57-SHORT profile, module, or API.
+Short identifiers (previously described here as ID57-SHORT)
+are produced with the standard ID57 Core API functions using
+the existing informational length_enum values:
 
-This profile prioritizes usability and compactness over
-strong collision resistance and MUST be used with explicit
-collision management strategies.
+ ID57_LEN_23, ID57_LEN_29, ID57_LEN_32, ID57_LEN_47, ID57_LEN_70
 
-============================================================
-1. INTRODUCTION
-============================================================
+ id57_generate(input_bytes, ID57_LEN_47)   // e.g. a short id
+ id57_verify(input_bytes, id57_string, ID57_LEN_47)
+ id57_range(ID57_LEN_47)
+ id57_is_length(id57_string, ID57_LEN_47)
 
-ID57-SHORT is a specialization of ID57:
+The collision model, required safety mechanisms, recommended
+patterns, use cases, and prohibited usage that were specified
+in this document now live in id57-core-api.txt, section 10
+(SHORT-LENGTH USAGE).
 
- input → HASH → truncate → B57 → short identifier
-
-It is designed for:
-
-- short URLs
-- QR codes
-- user-facing identifiers
-- manual entry systems
-
-ID57-SHORT MUST NOT be used as a general-purpose identifier
-without additional safeguards.
+Implementations MUST NOT expose separate ID57-SHORT-specific
+function names, types, or defaults (e.g. id57s_generate,
+ID57ShortLength, ID57S_DEFAULT). See id57-core-api.txt,
+section 17 (REVISION NOTES, v0.2.0) for the full rationale.
 
 ============================================================
-2. DEPENDENCIES
+REFERENCES
 ============================================================
 
-ID57-SHORT depends on:
-
-- ID57 Core API
-- B57 Core API
-
-Requirements:
-
-- Encoding MUST be canonical B57
-- Hash functions MUST be cryptographic
-- BLAKE3 SHOULD be the primary default hash function
-- ID57-SHORT MUST NOT modify B57 behavior
-
-============================================================
-3. LENGTH PROFILE
-============================================================
-
-ID57-SHORT reuses the standard ID57 length model.
-
-Character length is a BOUND, NOT a guarantee — see 3.6 for
-the normative bounds formula and 4.3/4.4 for the required
-range/validation functions. Implementations MUST NOT
-generate, reject, or validate an identifier by requiring an
-exact character count.
-
-------------------------------------------------------------
-3.1 Security Lengths (REQUIRED)
-------------------------------------------------------------
-
-- ID57_LEN_8   → 1-2 chars
-- ID57_LEN_16  → 2-3 chars
-- ID57_LEN_32  → 4-6 chars
-- ID57_LEN_64  → 8-11 chars
-- ID57_LEN_128 → 16-22 chars (DEFAULT)
-- ID57_LEN_256 → 32-44 chars
-- ID57_LEN_512 → 64-88 chars
-
-------------------------------------------------------------
-3.2 Informational Lengths (NON-SECURITY)
-------------------------------------------------------------
-
-- ID57_LEN_23  → 3-5 chars
-- ID57_LEN_29  → 4-6 chars
-- ID57_LEN_47  → 6-9 chars
-- ID57_LEN_70  → 9-13 chars
-- ID57_LEN_93  → 12-17 chars
-- ID57_LEN_186 → 24-33 chars
-- ID57_LEN_373 → 47-65 chars
-
-------------------------------------------------------------
-3.3 SHORT PROFILE CONSTRAINT
-------------------------------------------------------------
-
-ID57-SHORT MUST restrict usage to:
-
-- ID57_LEN_23  (3-5 chars)
-- ID57_LEN_29  (4-6 chars)
-- ID57_LEN_32  (4-6 chars)
-- ID57_LEN_47  (6-9 chars)
-- ID57_LEN_70  (9-13 chars)
-
-Implementations MUST NOT use other lengths in SHORT mode.
-
-------------------------------------------------------------
-3.4 Bit Mapping (REQUIRED)
-------------------------------------------------------------
-
-bits(ID57_LEN_23)  = 23
-bits(ID57_LEN_29)  = 29
-bits(ID57_LEN_32)  = 32
-bits(ID57_LEN_47)  = 47
-bits(ID57_LEN_70)  = 70
-
-------------------------------------------------------------
-3.5 Default Behavior
-------------------------------------------------------------
-
-ID57S_DEFAULT:
-
-- MUST resolve to ID57_LEN_47
-- MUST produce identifiers of at most 9 characters
-  (6-9 chars; see 3.6 for the length bounds model)
-
-------------------------------------------------------------
-3.6 Length Bounds (NORMATIVE)
-------------------------------------------------------------
-
-For any length_enum, with bit_length = bits(length_enum):
-
- byte_length = ceil(bit_length / 8)
- min_chars   = byte_length
- max_chars   = b57_encoded_length(byte_length)
-             = ceil(byte_length * 8 / log2(57))
-
-The ranges in 3.1 and 3.2 are derived directly from this
-formula and MUST be treated as [min_chars, max_chars]
-bounds, never as a fixed width.
-
-Note: ID57_LEN_29 and ID57_LEN_32 both use byte_length 4 and
-therefore share an identical range and decoded shape. Length
-bounds MUST NOT be used to infer which length_enum produced
-a given string.
-
-============================================================
-4. CORE FUNCTION
-============================================================
-
-4.1 id57s_generate
-
-function id57s_generate(input_bytes, length_enum) -> string
-
-Optional extension:
-
-function id57s_generate(input_bytes, hash_fn, length_enum) -> string
-
-Binding compatibility note:
-
-- Some language bindings require the hash_fn argument and treat
-  BLAKE3 as the effective default when unspecified by caller.
-
-Definition:
-
- hash_bytes = HASH(input_bytes)
-
- length_enum MUST be one of:
-  ID57_LEN_23, ID57_LEN_29, ID57_LEN_32,
-  ID57_LEN_47, ID57_LEN_70
-
- bit_length = bits(length_enum)
-
- byte_length = ceil(bit_length / 8)
-
- truncated_bytes =
-   truncate_bytes_prefix(hash_bytes, byte_length)
-
- output = b57_encode(truncated_bytes)
-
-Requirements:
-
-- HASH MUST be cryptographic
-- HASH MUST be deterministic
-- BLAKE3 SHOULD be the primary default
-- If hash_fn is exposed, it MUST be cryptographic and deterministic
-- truncation MUST be prefix-based
-- truncation MUST occur BEFORE encoding
-- truncate_bytes_prefix MUST preserve big-endian ordering
-- encoding MUST be canonical B57
-- output MUST be deterministic
-- input MUST NOT be modified
-
-------------------------------------------------------------
-4.2 Bit Handling
-------------------------------------------------------------
-
-If bit_length is not byte-aligned:
-
-- byte_length MUST be:
-
-  ceil(bit_length / 8)
-
-- Excess bits in the final byte MUST be truncated
-  (not rounded, not padded)
-
-------------------------------------------------------------
-4.3 id57s_range
-------------------------------------------------------------
-
-function id57s_range(length_enum) -> (min_chars, max_chars)
-
- Delegates to ID57 Core API id57_range using the same
- length_enum value (ID57-SHORT reuses the ID57 bit mapping,
- see 3.4).
-
-------------------------------------------------------------
-4.4 id57s_is_length
-------------------------------------------------------------
-
-function id57s_is_length(id57_string, length_enum) -> boolean
-
- Delegates to ID57 Core API id57_is_length using the same
- length_enum value.
-
-Requirements:
-
-- MUST be used instead of exact character-count comparison
-  for any length conformance check
-- MUST NOT be used to infer length_enum from an unknown
-  string (see 3.6 note)
-
-============================================================
-5. INVARIANTS
-============================================================
-
-The following MUST hold:
-
- id57s_generate(x, L) ==
- b57_encode(truncate_bytes_prefix(HASH(x),
- ceil(bits(L)/8)))
-
-Determinism:
-
- same input + same configured hash + same length -> same output
-
-============================================================
-6. COLLISION MODEL
-============================================================
-
-ID57-SHORT operates under non-negligible collision risk.
-
-Approximate collision onset:
-
-- 23-bit → ~2^11–2^12 entries
-- 29-bit → ~2^14–2^15 entries
-- 32-bit → ~2^16 entries
-- 47-bit → ~2^23 entries
-- 70-bit → ~2^35 entries
-
-============================================================
-7. REQUIRED SAFETY MECHANISMS
-============================================================
-
-Implementations MUST:
-
-- detect collisions before insertion
-- reject or regenerate on collision
-- scope identifiers within a namespace
-
-Implementations MUST NOT:
-
-- assume uniqueness
-- use identifiers without verification
-
-============================================================
-8. RECOMMENDED PATTERNS
-============================================================
-
-8.1 Dual-Identifier Model
-
- short_id = ID57S(x)
- full_id  = H57(x)
-
-------------------------------------------------------------
-
-8.2 Namespaced Identifiers
-
- short_id = ID57S(namespace || x)
-
-------------------------------------------------------------
-
-8.3 Collision-Aware Allocation
-
- loop:
-   id = ID57S(x || counter)
-   if not exists(id):
-     store(id)
-     break
-
-------------------------------------------------------------
-
-8.4 Progressive Length Upgrade
-
- 4 → 5 → 6 → 8 → 12 chars
-
-============================================================
-9. USE CASES
-============================================================
-
-ID57-SHORT is suitable for:
-
-- short URLs
-- QR code payload minimization
-- user IDs (non-sensitive)
-- invite codes
-- temporary tokens
-- UI-friendly identifiers
-
-============================================================
-10. PROHIBITED USAGE
-============================================================
-
-ID57-SHORT MUST NOT be used for:
-
-- authentication tokens
-- authorization systems
-- cryptographic identity
-- globally unique identifiers
-- security-critical systems
-
-============================================================
-11. SECURITY CONSIDERATIONS
-============================================================
-
-Security is limited by truncation length.
-
-Short identifiers:
-
-- reduce collision resistance
-- reduce preimage resistance
-
-Security depends on:
-
-- hash function strength (BLAKE3 recommended)
-- identifier length
-- collision handling correctness
-
-============================================================
-12. IANA CONSIDERATIONS
-============================================================
-
-This document has no IANA actions.
-
-============================================================
-13. REVISION NOTES
-============================================================
-
-v0.1.1:
-
-- Corrected the length model (3.1/3.2): all profile lengths
-  are non-byte-aligned and were undercounted by 1 char versus
-  their true maximum, and were incorrectly presented as fixed
-  rather than bounded. Replaced with normative
-  [min_chars, max_chars] ranges (3.6).
-- Added id57s_range and id57s_is_length (4.3, 4.4) as the
-  required mechanism for length conformance checks. Exact
-  character-count comparison MUST NOT be used.
-- No change to id57s_generate or truncation behavior; this is
-  a documentation and validation-API correction only, mirrors
-  ID57 Core API v0.1.1.
-
-============================================================
-14. REFERENCES
-============================================================
-
-RFC 2119
-RFC 8174
+See spec/id57-core-api.txt (normative).
 
 ============================================================
 AUTHOR
