@@ -1,7 +1,7 @@
 ============================================================
 ID57 CORE API (MINDU)
 One-Way Identifier Profile (Hash → Truncate → B57)
-Version: v0.2.0 FINAL
+Version: v0.3.0 FINAL
 Status: Informational (RFC-Grade, Production-Ready)
 Date: May 2026
 ============================================================
@@ -140,6 +140,65 @@ Requirements:
 
 - length_enum MUST be one of defined ID57 values or DEFAULT
 
+------------------------------------------------------------
+
+5.2 id57_generate_fixed4
+
+function id57_generate_fixed4(input_bytes) -> string
+
+Optional extension:
+
+function id57_generate_fixed4(input_bytes, hash_fn) -> string
+
+This is the sole fixed-width ID57 output (7.2.1): always
+exactly 4 characters, never a range. It intentionally departs
+from the standard pipeline (5.1) in two ways: it reduces the
+truncated value modulo 57^4 before encoding, and it zero-pads
+the result to a fixed width. Both are prohibited for every
+other ID57 length_enum (8 TRUNCATION MODEL, 14 PROHIBITED
+BEHAVIORS) and MUST NOT be applied there; they are permitted
+here only because this function is explicitly, separately
+specified and never defines a decoding interface (9).
+
+Definition:
+
+ hash_bytes = HASH(input_bytes)
+
+ truncated_bytes = truncate_bytes(hash_bytes, 32)
+                    // same 32-bit/4-byte truncation as ID57_LEN_32
+
+ value = bytes_to_uint_be(truncated_bytes)   // 0 .. 2^32-1
+
+ reduced = value mod 57^4                     // 0 .. 57^4-1 (10,556,001 buckets)
+
+ digits = to_base57_digits(reduced)           // minimal digits, no leading zero digit
+ output = ALPHABET[0] * (4 - length(digits)) + digits
+                    // left-pad with the zero-value alphabet character to width 4
+
+ return output   // length(output) == 4, always
+
+Requirements:
+
+- HASH MUST be cryptographic and deterministic
+- truncated_bytes MUST be derived via prefix truncation, as in 8
+- the modulo reduction MUST use the full 32-bit truncated value
+  (not a bit-level pre-truncation to fewer bits)
+- output MUST always be exactly 4 characters
+- output MUST use only B57 alphabet characters
+
+Security / entropy notes:
+
+- Effective output space is 57^4 (~23.33 bits), smaller than
+  the 32-bit truncation it is derived from; ~8.7 bits are
+  discarded by the modulo reduction
+- 2^32 is not an exact multiple of 57^4, so the reduction has
+  a small modulo bias (some outputs are marginally more likely
+  than others); this is acceptable for a non-security,
+  informational identifier but MUST NOT be used where unbiased
+  output is required
+- Collision guidance for this function follows the ~23-bit row
+  in 10.1 (~2^11-2^12 entries), same as ID57_LEN_24
+
 ============================================================
 6. DEFAULT BEHAVIOR
 ============================================================
@@ -186,13 +245,36 @@ and 11.4/11.5 for the required range/validation functions.
 7.2 Informational Lengths (NON-SECURITY)
 ------------------------------------------------------------
 
-- ID57_LEN_23  → 3-5 chars
-- ID57_LEN_29  → 4-6 chars
-- ID57_LEN_47  → 6-9 chars
-- ID57_LEN_70  → 9-13 chars
-- ID57_LEN_93  → 12-17 chars
-- ID57_LEN_186 → 24-33 chars
-- ID57_LEN_373 → 47-65 chars
+- ID57_LEN_24  → 3-5 chars
+- ID57_LEN_48  → 6-9 chars
+- ID57_LEN_96  → 12-17 chars
+- ID57_LEN_192 → 24-33 chars
+- ID57_LEN_384 → 48-66 chars
+
+All five are byte-aligned (3/6/12/24/48 bytes) and form a
+doubling sequence. None of them share a byte_length with any
+7.1 security length (1/2/4/8/16/32/64 bytes), so - unlike the
+prior informational set - no informational length_enum's
+range or decoded shape can be confused with a security one.
+
+------------------------------------------------------------
+7.2.1 Fixed-Width Special Case: id57_generate_fixed4
+------------------------------------------------------------
+
+One additional, explicitly special-cased identifier exists
+outside the length_enum model above: id57_generate_fixed4
+(5.2). It is the only ID57 output that is a truly fixed
+4 characters, always - not a [min_chars, max_chars] bound.
+
+This is NOT achievable by picking a smaller length_enum and
+applying 7.3's normal formula: max_chars computed from any
+whole byte_length never lands on exactly 4 (2 bytes -> max 3,
+3 bytes -> max 5; 4 is unreachable). Achieving an exact 4
+requires a different mechanism - see 5.2 for the algorithm
+(modulo reduction into 57^4 plus fixed-width zero-padding).
+id57_generate_fixed4 MUST NOT be confused with, or treated as
+interchangeable with, ID57_LEN_24 (3-5 chars) - they have
+different algorithms and different entropy properties.
 
 ------------------------------------------------------------
 7.3 Length Bounds (NORMATIVE)
@@ -207,13 +289,9 @@ For any length_enum, with bit_length = bits(length_enum):
 
 The ranges in 7.1 and 7.2 are derived directly from this
 formula and MUST be treated as [min_chars, max_chars]
-bounds, never as a fixed width.
-
-Note: length_enum values MAY share an identical byte_length
-(and therefore an identical range) while representing
-different bit_length values — e.g. ID57_LEN_29 and
-ID57_LEN_32 both use byte_length 4. Length bounds MUST NOT
-be used to infer which length_enum produced a given string.
+bounds, never as a fixed width. This formula does NOT apply
+to id57_generate_fixed4 (7.2.1, 5.2), which is exactly 4
+chars by construction, not by this bound.
 
 Requirements:
 
@@ -221,7 +299,8 @@ Requirements:
 - Implementations MUST NOT accept arbitrary lengths
 - Security-sensitive use MUST use ≥ ID57_LEN_128
 - Implementations MUST NOT assume or enforce a fixed
-  character count for any length_enum
+  character count for any length_enum (id57_generate_fixed4
+  is the sole, explicitly-documented exception)
 
 ============================================================
 8. TRUNCATION MODEL
@@ -264,24 +343,27 @@ ID57 is a one-way transformation:
 Security depends on hash function properties.
 
 ============================================================
-10. SHORT-LENGTH USAGE (ID57_LEN_23/29/32/47/70)
+10. SHORT-LENGTH USAGE (ID57_LEN_24/48/96/192/384, id57_generate_fixed4)
 ============================================================
 
 This section applies specifically to identifiers generated
-with the informational lengths defined in 7.2
-(ID57_LEN_23, ID57_LEN_29, ID57_LEN_32, ID57_LEN_47,
-ID57_LEN_70). These lengths trade collision resistance for
-compactness and carry additional usage requirements beyond
-the general ID57 rules.
+with the informational lengths defined in 7.2 (ID57_LEN_24,
+ID57_LEN_48, ID57_LEN_96, ID57_LEN_192, ID57_LEN_384) and to
+id57_generate_fixed4 (5.2, 7.2.1). These trade collision
+resistance for compactness and carry additional usage
+requirements beyond the general ID57 rules. ID57_LEN_32 (from
+7.1) is also commonly used at this end of the range and is
+included in the guidance below where relevant.
 
 There is no separate "short" profile, module, or API. Short
 identifiers are produced by calling id57_generate (5.1) with
 one of these length_enum values directly - e.g.
-id57_generate(x, ID57_LEN_47) for an 8-9 char default short
-identifier. Implementations MUST NOT expose a distinct
-short-specific function name, type, or default (this
-consolidates what a prior ID57-SHORT companion profile
-specified separately; see 17 REVISION NOTES).
+id57_generate(x, ID57_LEN_48) for a 6-9 char short identifier,
+or id57_generate_fixed4(x) for a hard-fixed 4-char identifier.
+Implementations MUST NOT expose a distinct short-specific
+function name, type, or default beyond id57_generate_fixed4
+itself (this consolidates what a prior ID57-SHORT companion
+profile specified separately; see 17 REVISION NOTES).
 
 ------------------------------------------------------------
 10.1 Collision Model
@@ -289,11 +371,13 @@ specified separately; see 17 REVISION NOTES).
 
 Approximate collision onset (birthday bound):
 
-- 23-bit → ~2^11-2^12 entries
-- 29-bit → ~2^14-2^15 entries
-- 32-bit → ~2^16 entries
-- 47-bit → ~2^23 entries
-- 70-bit → ~2^35 entries
+- id57_generate_fixed4 (~23.33-bit effective space) → ~2^11-2^12 entries
+- ID57_LEN_24 (24-bit) → ~2^12 entries
+- ID57_LEN_32 (32-bit, from 7.1) → ~2^16 entries
+- ID57_LEN_48 (48-bit) → ~2^24 entries
+- ID57_LEN_96 (96-bit) → ~2^48 entries
+- ID57_LEN_192 (192-bit) → ~2^96 entries
+- ID57_LEN_384 (384-bit) → ~2^192 entries
 
 ------------------------------------------------------------
 10.2 Required Safety Mechanisms
@@ -316,7 +400,7 @@ Implementations MUST NOT:
 
 Dual-Identifier Model:
 
- short_id = id57_generate(x, ID57_LEN_47)
+ short_id = id57_generate(x, ID57_LEN_48)
  full_id  = id57_generate(x, ID57_LEN_128)
 
 Namespaced Identifiers:
@@ -333,8 +417,8 @@ Collision-Aware Allocation:
 
 Progressive Length Upgrade:
 
- ID57_LEN_23 → ID57_LEN_29 → ID57_LEN_32 →
- ID57_LEN_47 → ID57_LEN_70
+ id57_generate_fixed4 → ID57_LEN_24 → ID57_LEN_32 →
+ ID57_LEN_48 → ID57_LEN_96 → ID57_LEN_192 → ID57_LEN_384
 
 ------------------------------------------------------------
 10.4 Use Cases
@@ -558,6 +642,29 @@ v0.2.0:
 - Collision model, required safety mechanisms, recommended
   patterns, use cases, and prohibited usage for short lengths
   moved to 10.1-10.5 verbatim in substance.
+
+v0.3.0:
+
+- BREAKING: replaced the entire informational length set
+  (7.2). ID57_LEN_23, ID57_LEN_29, ID57_LEN_47, ID57_LEN_70,
+  ID57_LEN_93, ID57_LEN_186, ID57_LEN_373 are REMOVED and
+  replaced by ID57_LEN_24, ID57_LEN_48, ID57_LEN_96,
+  ID57_LEN_192, ID57_LEN_384 - a byte-aligned doubling
+  sequence with no byte_length overlap with any 7.1 security
+  length (the prior set had one: ID57_LEN_29/ID57_LEN_32
+  shared byte_length 4).
+- Added id57_generate_fixed4 (5.2) - the one ID57 output that
+  is a genuinely fixed 4 characters, always. Unlike every
+  other length, it uses modulo reduction (value mod 57^4) and
+  fixed-width zero-padding rather than the standard
+  truncate-then-encode pipeline; see 7.2.1 for why no
+  length_enum/7.3 combination can reach exactly 4 chars, and
+  5.2 for the algorithm and its entropy/bias trade-offs.
+- Updated 10 (SHORT-LENGTH USAGE), including 10.1 collision
+  model and the 10.3 progressive-length-upgrade pattern, for
+  the new length set and id57_generate_fixed4.
+- No change to id57_generate's algorithm for existing lengths,
+  to B57, or to the security length set (7.1).
 
 ============================================================
 18. REFERENCES
