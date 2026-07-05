@@ -19,8 +19,8 @@ The primary hashing algorithm required for B57 (`H57`, `ID57`) is **BLAKE3**. Wh
 For S57 keyed surfaces, parity and security assumptions require domain-separated BLAKE3 derivation and keyed hashing as defined by the S57 specification and implementation reports.
 
 ### Entropy & Collision Domain
-* **ID57 (Default):** Utilizes **128 bits** of entropy (22 Base57 characters). This is cryptographically secure for globally unique identifiers and primary keys, comparable to standard UUIDv4/v7.
-* **ID57-SHORT:** Utilizes **47 bits** of entropy (8 Base57 characters). **Warning:** This is designed for human-readable localized contexts (e.g., short URLs, receipt numbers, local shard references). It is **not** cryptographically secure against brute-force collision attacks globally. Do not use `ID57-SHORT` for highly sensitive global session keys or un-namespaced database identities.
+* **ID57 (Default):** Utilizes **128 bits** of entropy (16-22 Base57 characters - a bound, not a fixed count; see the ID57 Core API spec). This is cryptographically secure for globally unique identifiers and primary keys, comparable to standard UUIDv4/v7.
+* **ID57 fixed-width identifiers (`FIXED_2`..`FIXED_12`):** There is no separate "ID57-SHORT" profile or module - fixed-width identifiers are produced by `id57_generate(x, FIXED_k)` on the same ID57 API, where `k` is the exact character count (e.g. `FIXED_8` is always exactly 8 characters). **Warning:** these are designed for human-readable, non-sensitive, localized contexts (e.g. short URLs, receipt numbers, local shard references), not global cryptographic uniqueness. They are **not** cryptographically secure against brute-force collision attacks globally. Do not use fixed-width identifiers for highly sensitive global session keys or un-namespaced database identities.
 
 ## S57 Security Considerations
 
