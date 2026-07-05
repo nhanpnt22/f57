@@ -1,6 +1,6 @@
 [package]
 name = "f57"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "F57 binary-to-text encoding with H57, ID57 (bit-length and fixed-width), I57, and R57 profiles"
 repository = "https://github.com/aco/f57"
