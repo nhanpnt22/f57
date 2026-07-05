@@ -8,7 +8,7 @@ B57 provides a minimal, bijective, deterministic encoding for binary data into h
 
 Scope note:
 - This README documents the B57 core encoding layer.
-- The repository also contains higher-level H57, ID57, ID57-SHORT, R57, and I57 code.
+- The repository also contains higher-level H57, ID57 (incl. fixed-width lengths), R57, and I57 code.
 - Those higher-level surfaces do not all currently align cleanly with every attached spec document, so release claims for them should be evaluated separately.
 
 ## Installation
