@@ -44,7 +44,7 @@ def test_s57_helper_paths_and_error_branches():
 
     assert s57.id(b"x", ID57Length.DEFAULT)
     with pytest.raises(InvalidLengthEnumError):
-        s57.id(b"x", ID57Length.LEN47)
+        s57.id(b"x", ID57Length.LEN8)
 
     with pytest.raises(InvalidInputError):
         s57.random_hybrid()

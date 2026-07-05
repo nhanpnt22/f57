@@ -2,7 +2,7 @@
 
 **F57 for TypeScript/Node.js**
 
-This branch contains the TypeScript implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (incl. fixed-width lengths), R57, and S57.
+This branch contains the TypeScript implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (including its short/informational lengths), R57, and S57.
 
 ## Quick Start
 
@@ -32,7 +32,7 @@ ts/
 │   ├── b57.ts           # B57 encoding
 │   ├── h57.ts           # H57 hash representation
 │   ├── i57.ts           # I57 identifiers
-│   ├── id57.ts          # ID57 profiles
+│   ├── id57.ts          # ID57 profiles (incl. short/informational lengths)
 │   ├── r57.ts           # R57 random generation
 │   ├── s57.ts           # S57 security composition
 │   ├── errors.ts        # Error types
@@ -222,17 +222,17 @@ const result: B57Output = B57.encode(input);
 
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
-- **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
+- **ID57 Identifiers (incl. fixed-width lengths):** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 
 ## Branch Information
 
 - **Branch:** `ts` (TypeScript-only implementation)
-- **Version:** v0.2.0
-- **Release Branch:** `release/ts-v0.2.0`
+- **Version:** v0.3.0
+- **Release Branch:** `release/ts-v0.3.0`
 - **Status:** Production Ready
-- **Last Updated:** June 2026
+- **Last Updated:** July 2026
 
 ## Multi-Language Support
 
@@ -265,5 +265,5 @@ Internal Restricted - See [LICENSE](../../LICENSE) and [LICENSE.md](../../LICENS
 
 ---
 
-**Version:** v0.2.0  
-**Last Updated:** June 2026
+**Version:** v0.3.0  
+**Last Updated:** July 2026

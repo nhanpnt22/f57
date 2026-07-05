@@ -14,10 +14,12 @@ void main() {
       expect(h57Out.isNotEmpty, true);
 
       final id = id57Generate(input, ID57Length.def);
-      expect(id.length, 22);
+      final idRange = id57Range(ID57Length.def);
+      expect(id.length >= idRange.min && id.length <= idRange.max, true);
 
-      final idShort = id57ShortGenerate(input, ID57ShortLength.def);
-      expect(idShort.isNotEmpty, true);
+      final idFixed8 = id57Generate(input, ID57Length.fixed8);
+      expect(idFixed8.length, 8);
+      expect(id57IsLength(idFixed8, ID57Length.fixed8), true);
 
       final i57Enc = i57Encode(input);
       final i57Dec = i57Decode(i57Enc);
@@ -27,7 +29,8 @@ void main() {
       expect(i57HashOut.isNotEmpty, true);
 
       final i57IdOut = i57Id(input, ID57Length.def);
-      expect(i57IdOut.length, 22);
+      expect(i57IdOut.length >= idRange.min && i57IdOut.length <= idRange.max, true);
+      expect(i57ValidateIdentifier(i57IdOut, ID57Length.def), true);
 
       final r57 = r57Generate(R57Mode.csprng);
       expect(r57.length, 22);

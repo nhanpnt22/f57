@@ -4,8 +4,7 @@ Complete Python implementation of:
 
 - B57
 - H57
-- ID57
-- ID57-SHORT
+- ID57 (bit-length and fixed-width modes; ID57-SHORT has been merged in)
 - I57
 - R57
 

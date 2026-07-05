@@ -49,21 +49,68 @@ func I57IsCanonical(input string) bool {
 	return IsCanonical(input)
 }
 
-// I57ValidateIdentifier validates a canonical, 22-character integration identifier.
-func I57ValidateIdentifier(input string) bool {
-	if len(input) != 22 {
+// I57ValidateIdentifier validates input as an ID57 identifier produced for
+// length_enum, dispatching on the sign of length_enum (i57-core-api.txt 5.3):
+//
+//   - length_enum < 0 (FIXED width): delegates entirely to ID57IsLength
+//     (valid B57 alphabet AND exact length == -length_enum). The string
+//     MUST NOT be decoded/canonicalized - fixed-width output is a prefix
+//     of a bignum encoding, not canonical B57.
+//   - length_enum >= 0 (BIT length, including ID57Default): ID57IsLength
+//     does not apply, so the bound + canonical + decoded-byte-length +
+//     excess-bit check is implemented directly here.
+func I57ValidateIdentifier(input string, length ID57Length) bool {
+	effective, err := resolveID57Length(length)
+	if err != nil {
 		return false
 	}
-	if !I57IsValid(input) {
+
+	if effective < 0 {
+		ok, err := ID57IsLength(input, effective)
+		if err != nil {
+			return false
+		}
+		return ok
+	}
+
+	minChars, maxChars, err := ID57Range(effective)
+	if err != nil {
 		return false
 	}
-	return I57IsCanonical(input)
+	if len(input) < minChars || len(input) > maxChars {
+		return false
+	}
+	if !ID57IsCanonical(input) {
+		return false
+	}
+
+	decoded, err := Decode(input)
+	if err != nil {
+		return false
+	}
+
+	bits := id57BitsByLength[effective]
+	byteLength := (bits + 7) / 8
+	if len(decoded) != byteLength {
+		return false
+	}
+
+	excessBits := byteLength*8 - bits
+	if excessBits > 0 {
+		lastByte := decoded[byteLength-1]
+		mask := byte((1 << excessBits) - 1)
+		if lastByte&mask != 0 {
+			return false
+		}
+	}
+
+	return true
 }
 
 // I57ValidateEntropy performs a lightweight heuristic check for obviously
 // low-entropy-looking identifiers. It must not be used for security decisions.
 func I57ValidateEntropy(input string) bool {
-	if !I57ValidateIdentifier(input) {
+	if !I57ValidateIdentifier(input, ID57Default) {
 		return false
 	}
 	if !passesCharacterDiversity(input) {

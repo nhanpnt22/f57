@@ -1,4 +1,4 @@
-import { encode, isCanonical, isValid } from './b57.js';
+import { encode, encodedLength, isCanonical, isValid } from './b57.js';
 import { computeHashBLAKE3XOF } from './h57.js';
 import { newInvalidLengthEnumError } from './errors.js';
 
@@ -6,20 +6,29 @@ type ByteInput = Uint8Array | Buffer | ArrayBuffer;
 
 export const ID57Length = Object.freeze({
   DEFAULT: 0,
-  LEN_8: 8, LEN_16: 16, LEN_23: 23, LEN_29: 29, LEN_32: 32, LEN_47: 47,
-  LEN_64: 64, LEN_70: 70, LEN_93: 93, LEN_128: 128, LEN_186: 186,
-  LEN_256: 256, LEN_373: 373, LEN_512: 512
+  // Positive values: bit lengths (security model, variable width within [min,max]).
+  LEN_8: 8, LEN_16: 16, LEN_32: 32, LEN_64: 64,
+  LEN_128: 128, LEN_256: 256, LEN_512: 512,
+  // Negative values: fixed character widths (non-security).
+  // Magnitude = exact output width; generated as a prefix cut of LEN_128.
+  FIXED_2: -2, FIXED_3: -3, FIXED_4: -4, FIXED_5: -5, FIXED_6: -6,
+  FIXED_7: -7, FIXED_8: -8, FIXED_9: -9, FIXED_10: -10, FIXED_11: -11, FIXED_12: -12
 });
 
 export const id57BitsByLength: Map<number, number> = new Map([
-  [ID57Length.LEN_8, 8], [ID57Length.LEN_16, 16], [ID57Length.LEN_23, 23], [ID57Length.LEN_29, 29],
-  [ID57Length.LEN_32, 32], [ID57Length.LEN_47, 47], [ID57Length.LEN_64, 64], [ID57Length.LEN_70, 70],
-  [ID57Length.LEN_93, 93], [ID57Length.LEN_128, 128], [ID57Length.LEN_186, 186],
-  [ID57Length.LEN_256, 256], [ID57Length.LEN_373, 373], [ID57Length.LEN_512, 512]
+  [ID57Length.LEN_8, 8], [ID57Length.LEN_16, 16], [ID57Length.LEN_32, 32],
+  [ID57Length.LEN_64, 64], [ID57Length.LEN_128, 128],
+  [ID57Length.LEN_256, 256], [ID57Length.LEN_512, 512]
 ]);
+
+const id57FixedWidths: Set<number> = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
 export function resolveID57Length(length: number) {
   if (length === ID57Length.DEFAULT) return ID57Length.LEN_128;
+  if (length < 0) {
+    if (!id57FixedWidths.has(-length)) throw newInvalidLengthEnumError(length);
+    return length;
+  }
   if (!id57BitsByLength.has(length)) throw newInvalidLengthEnumError(length);
   return length;
 }
@@ -32,8 +41,16 @@ export function maskExcessBits(bytes: Uint8Array, bitLength: number) {
   bytes[bytes.length - 1] &= mask;
 }
 
-export function id57Generate(input: ByteInput, length: number = ID57Length.DEFAULT) {
+export function id57Generate(input: ByteInput, length: number = ID57Length.DEFAULT): string {
   const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    // Fixed width: prefix cut of the LEN_128 identifier (spec 5.2).
+    // LEN_128 output is always >= 16 chars and k <= 12, so the cut is always exact.
+    const full = id57Generate(input, ID57Length.LEN_128);
+    return full.slice(0, -effectiveLength);
+  }
+
   const bits = id57BitsByLength.get(effectiveLength);
   const requestedBytes = Math.ceil(bits / 8);
 
@@ -67,4 +84,30 @@ export function id57IsValid(id57String: string) {
 
 export function id57IsCanonical(id57String: string) {
   return isCanonical(id57String);
+}
+
+export function id57Range(length: number = ID57Length.DEFAULT) {
+  const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    // Fixed width: min == max == k (spec 11.4).
+    const k = -effectiveLength;
+    return { min: k, max: k };
+  }
+
+  const bits = id57BitsByLength.get(effectiveLength);
+  const byteLength = Math.ceil(bits / 8);
+  return { min: byteLength, max: encodedLength(byteLength) };
+}
+
+// id57IsLength is defined ONLY for fixed widths (negative length_enum, spec 11.5).
+// Fixed-width outputs are bignum prefixes, NOT canonical B57, so they are validated
+// by exact width + alphabet only, never by decode. For bit lengths, use id57Range
+// for the bound and id57IsCanonical/id57Verify for validation instead.
+export function id57IsLength(id57String: string, length: number) {
+  const effectiveLength = resolveID57Length(length);
+  if (effectiveLength >= 0) throw newInvalidLengthEnumError(length);
+
+  const k = -effectiveLength;
+  return id57String.length === k && isValid(id57String);
 }

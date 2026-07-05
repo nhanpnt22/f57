@@ -1,11 +1,14 @@
 library b57_core;
 
-import 'dart:typed_data';
+import 'dart:math' as math;
 import 'errors.dart';
 
 const String alphabet =
     'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz123456789';
 const int base = 57;
+
+/// log2(57), used to derive B57's bignum-encoded character bounds.
+final double _log2Base = math.log(base) / math.log(2);
 
 final List<int> _alphaIndex = _buildAlphaIndex();
 
@@ -107,14 +110,18 @@ bool isCanonical(String s) {
   }
 }
 
+/// Maximum B57 character count for [byteLen] raw bytes:
+/// ceil(byteLen * 8 / log2(57)). B57 is a bignum-style positional
+/// encoding, so this is an upper BOUND on encoded length, not a fixed
+/// value (ID57 Core API 7.3 / 11.4).
 int encodedLength(int byteLen) {
   if (byteLen == 0) return 0;
-  return ((byteLen * 8) / (57).toRadixString(2).length).ceil();
+  return (byteLen * 8 / _log2Base).ceil();
 }
 
 int decodedLength(int charLen) {
   if (charLen == 0) return 0;
-  return (charLen * (57).toRadixString(2).length / 8).floor();
+  return (charLen * _log2Base / 8).floor();
 }
 
 void _verifyCanonical(String original, List<int> decoded) {

@@ -16,12 +16,9 @@ import {
   H57Length,
   id57Generate,
   id57GenerateDefault,
+  id57Verify,
   id57VerifyDefault,
   ID57Length,
-  id57ShortGenerate,
-  id57ShortGenerateDefault,
-  id57ShortVerifyDefault,
-  ID57ShortLength,
   i57Encode,
   i57Decode,
   i57Hash,
@@ -58,10 +55,10 @@ const FIELD_ORDER = [
   'h57Sha512Len128',
   'h57Blake3Auto',
   'id57Default',
-  'id57Len47Sha256',
-  'id57Len70Blake3',
-  'id57ShortDefault',
-  'id57ShortLen23',
+  'id57Fixed9',
+  'id57Len64Blake3',
+  'id57FixedDefault',
+  'id57Fixed4',
   'i57Encode',
   'i57DecodeHex',
   'i57HashBlake3Len128',
@@ -73,7 +70,7 @@ const FIELD_ORDER = [
   'r57IsValidOnI57Id',
   'r57IsCanonicalOnI57Id',
   'id57VerifyDefault',
-  'id57ShortVerifyDefault',
+  'id57FixedVerifyDefault',
   'h57VerifyBlake3Len128',
   'i57ValidateIdentifierId'
 ];
@@ -131,10 +128,13 @@ function buildJSRecord(index) {
   const h57Blake3Auto = h57Hash(input, H57Length.HASH_AUTO);
 
   const id57Default = id57GenerateDefault(input);
-  const id57Len47Sha256 = id57Generate(input, ID57Length.LEN_47);
-  const id57Len70Blake3 = id57Generate(input, ID57Length.LEN_70);
-  const id57ShortDefault = id57ShortGenerateDefault(input);
-  const id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.LEN_23);
+  // Fixed-width (non-security) and bit-length identifiers now unified
+  // under id57Generate via the sign of length_enum (ID57-SHORT merged
+  // into ID57 core, spec/id57-core-api.txt section 10).
+  const id57Fixed9 = id57Generate(input, ID57Length.FIXED_9);
+  const id57Len64Blake3 = id57Generate(input, ID57Length.LEN_64);
+  const id57FixedDefault = id57Generate(input, ID57Length.FIXED_8);
+  const id57Fixed4 = id57Generate(input, ID57Length.FIXED_4);
 
   const i57EncodeValue = i57Encode(input);
   const i57DecodeHex = hex(i57Decode(i57EncodeValue));
@@ -155,10 +155,10 @@ function buildJSRecord(index) {
     h57Sha512Len128,
     h57Blake3Auto,
     id57Default,
-    id57Len47Sha256,
-    id57Len70Blake3,
-    id57ShortDefault,
-    id57ShortLen23,
+    id57Fixed9,
+    id57Len64Blake3,
+    id57FixedDefault,
+    id57Fixed4,
     i57Encode: i57EncodeValue,
     i57DecodeHex,
     i57HashBlake3Len128,
@@ -170,7 +170,7 @@ function buildJSRecord(index) {
     r57IsValidOnI57Id: r57IsValid(i57IdDefault),
     r57IsCanonicalOnI57Id: r57IsCanonical(i57IdDefault),
     id57VerifyDefault: id57VerifyDefault(input, id57Default),
-    id57ShortVerifyDefault: id57ShortVerifyDefault(input, id57ShortDefault),
+    id57FixedVerifyDefault: id57Verify(input, id57FixedDefault, ID57Length.FIXED_8),
     h57VerifyBlake3Len128: h57Verify(input, h57Blake3Len128, H57Length.LEN_128),
     i57ValidateIdentifierId: i57ValidateIdentifier(i57IdDefault)
   };
@@ -232,7 +232,7 @@ function run() {
     deterministicScope: [
       'encode/decode/isValid/isCanonical/length helpers',
       'h57 hash/verify',
-      'id57 and id57-short generate/verify',
+      'id57 bit-length and fixed-width generate/verify',
       'i57 encode/decode/hash/id/validation',
       'r57 validators on deterministic identifier input'
     ],

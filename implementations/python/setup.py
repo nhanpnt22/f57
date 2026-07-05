@@ -7,8 +7,8 @@ README = Path(__file__).with_name("README.md").read_text(encoding="utf-8")
 
 setup(
     name = "f57",
-    version="0.1.0",
-    description="F57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, R57 profiles",
+    version="0.3.0",
+    description="F57 binary-to-text encoding with H57, ID57 (incl. fixed-width lengths), I57, R57 profiles",
     long_description=README,
     long_description_content_type="text/markdown",
     author="F57 Project",

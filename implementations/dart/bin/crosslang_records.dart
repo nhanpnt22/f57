@@ -25,20 +25,16 @@ Future<void> main() async {
       final h57Blake3Auto = h57Hash(input, H57Length.hashAuto);
       
       final id57Default = id57Generate(input, ID57Length.def);
-      final id57Len47Sha256 = id57Generate(input, ID57Length.len47);
-      final id57Len70Blake3 = id57Generate(input, ID57Length.len70);
-      
-      final id57ShortDefault = id57ShortGenerate(input, ID57ShortLength.def);
-      final id57ShortLen23 = id57ShortGenerate(input, ID57ShortLength.len23);
-      
+      final id57Fixed8 = id57Generate(input, ID57Length.fixed8);
+      final id57Len64Blake3 = id57Generate(input, ID57Length.len64);
+
       final i57EncodeOut = i57Encode(input);
       final i57DecodeOut = i57Decode(i57EncodeOut);
       final i57DecodeHex = _bytesToHex(i57DecodeOut);
       final i57HashBlake3Len128 = i57Hash(input, H57Length.len128);
       final i57IdDefault = i57Id(input, ID57Length.def);
-        final i57ValidateIdentifier =
-          i57IdDefault.length == 22 && i57IsValid(i57IdDefault) && i57IsCanonical(i57IdDefault);
-        final i57ValidateEntropy = i57ValidateIdentifier;
+        final i57ValidateIdentifierOut = i57ValidateIdentifier(i57IdDefault, ID57Length.def);
+        final i57ValidateEntropy = i57ValidateIdentifierOut;
       
       records.add({
         'index': i,
@@ -54,24 +50,21 @@ Future<void> main() async {
         'h57_sha512_len128': h57Sha512Len128,
         'h57_blake3_auto': h57Blake3Auto,
         'id57_default': id57Default,
-        'id57_len47_sha256': id57Len47Sha256,
-        'id57_len70_blake3': id57Len70Blake3,
-        'id57_short_default': id57ShortDefault,
-        'id57_short_len23': id57ShortLen23,
+        'id57_fixed8': id57Fixed8,
+        'id57_len64_blake3': id57Len64Blake3,
         'i57_encode': i57EncodeOut,
         'i57_decode_hex': i57DecodeHex,
         'i57_hash_blake3_len128': i57HashBlake3Len128,
         'i57_id_default': i57IdDefault,
         'i57_is_valid': i57IsValid(i57EncodeOut),
         'i57_is_canonical': i57IsCanonical(i57EncodeOut),
-        'i57_validate_identifier': i57ValidateIdentifier,
+        'i57_validate_identifier': i57ValidateIdentifierOut,
         'i57_validate_entropy': i57ValidateEntropy,
         'r57_is_valid_on_i57_id': r57IsValid(i57IdDefault),
         'r57_is_canonical_on_i57_id': r57IsCanonical(i57IdDefault),
         'id57_verify_default': id57Verify(input, id57Default, ID57Length.def),
-        'id57_short_verify_default': id57ShortVerify(input, id57ShortDefault, ID57ShortLength.def),
         'h57_verify_blake3_len128': h57Verify(input, h57Blake3Len128, H57Length.len128),
-        'i57_validate_identifier_id': i57ValidateIdentifier,
+        'i57_validate_identifier_id': i57ValidateIdentifierOut,
       });
     }
     
@@ -123,7 +116,7 @@ Future<void> main() async {
   final summary = {
     'dataset_size': 10000,
     'runs_per_language': 3,
-    'deterministic_scope': ['core', 'h57', 'id57', 'id57_short', 'i57'],
+    'deterministic_scope': ['core', 'h57', 'id57', 'i57'],
     'excluded_as_nondeterministic': ['r57'],
     'runs': summaryRuns.map((r) => {
       'run': r['run'],

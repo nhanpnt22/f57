@@ -195,10 +195,10 @@ GOOS=windows GOARCH=amd64 go build -o b57.exe
 ## Branch Information
 
 - **Branch:** `go` (Go-only implementation)
-- **Version:** v0.2.0
-- **Release Branch:** `release/go-v0.2.0`
+- **Version:** v0.3.0
+- **Release Branch:** `release/go-v0.3.0`
 - **Status:** Production Ready
-- **Last Updated:** June 2026
+- **Last Updated:** July 2026
 
 ## Multi-Language Support
 
@@ -231,5 +231,5 @@ Internal Restricted - See [LICENSE](../../LICENSE) and [LICENSE.md](../../LICENS
 
 ---
 
-**Version:** v0.2.0  
-**Last Updated:** June 2026
+**Version:** v0.3.0  
+**Last Updated:** July 2026

@@ -4,8 +4,7 @@ This folder contains the Rust implementation of:
 
 - B57
 - H57
-- ID57
-- ID57-SHORT
+- ID57 (bit-length and fixed-width FIXED_k modes; ID57-SHORT is merged in, see ID57 Core API spec section 10)
 - I57
 - R57
 

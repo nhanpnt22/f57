@@ -4,8 +4,7 @@ Complete Dart implementation of:
 
 - B57
 - H57
-- ID57
-- ID57-SHORT
+- ID57 (bit-length and fixed-width modes; ID57-SHORT is merged into ID57)
 - I57
 - R57
 

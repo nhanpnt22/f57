@@ -64,12 +64,37 @@ func TestS57IDDeterministicAndLengths(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ID failed: %v", err)
 	}
-	if len(v128) != 22 || len(v256) != 44 || len(v512) != 88 {
-		t.Fatalf("unexpected id lengths: %d/%d/%d", len(v128), len(v256), len(v512))
+	min128, max128, err := ID57Range(ID57Len128)
+	if err != nil {
+		t.Fatalf("ID57Range(ID57Len128) failed: %v", err)
+	}
+	min256, max256, err := ID57Range(ID57Len256)
+	if err != nil {
+		t.Fatalf("ID57Range(ID57Len256) failed: %v", err)
+	}
+	min512, max512, err := ID57Range(ID57Len512)
+	if err != nil {
+		t.Fatalf("ID57Range(ID57Len512) failed: %v", err)
 	}
 
-	if _, err := s.ID(in, ID57Len47); err == nil {
+	if len(v128) < min128 || len(v128) > max128 {
+		t.Fatalf("v128 length %d outside bound [%d,%d]", len(v128), min128, max128)
+	}
+	if len(v256) < min256 || len(v256) > max256 {
+		t.Fatalf("v256 length %d outside bound [%d,%d]", len(v256), min256, max256)
+	}
+	if len(v512) < min512 || len(v512) > max512 {
+		t.Fatalf("v512 length %d outside bound [%d,%d]", len(v512), min512, max512)
+	}
+
+	// S57 restricts length_enum to the 128/256/512-bit security profile;
+	// any other positive bit length (and, by extension, any fixed width -
+	// non-security by design) MUST be rejected.
+	if _, err := s.ID(in, ID57Length(47)); err == nil {
 		t.Fatalf("expected invalid length error for S57 profile")
+	}
+	if _, err := s.ID(in, ID57Fixed8); err == nil {
+		t.Fatalf("expected S57 to reject fixed (non-security) lengths")
 	}
 }
 

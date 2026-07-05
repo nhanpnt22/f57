@@ -186,10 +186,10 @@ See [pyproject.toml](pyproject.toml) for complete dependency list.
 ## Branch Information
 
 - **Branch:** `python` (Python-only implementation)
-- **Version:** v0.2.0
-- **Release Branch:** `release/python-v0.2.0`
+- **Version:** v0.3.0
+- **Release Branch:** `release/python-v0.3.0`
 - **Status:** Production Ready
-- **Last Updated:** June 2026
+- **Last Updated:** July 2026
 
 ## Multi-Language Support
 
@@ -222,5 +222,5 @@ Internal Restricted - See [LICENSE](../../LICENSE) and [LICENSE.md](../../LICENS
 
 ---
 
-**Version:** v0.2.0  
-**Last Updated:** June 2026
+**Version:** v0.3.0  
+**Last Updated:** July 2026

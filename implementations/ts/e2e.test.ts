@@ -3,11 +3,10 @@ import assert from 'node:assert/strict';
 import { encode, decode } from './b57.js';
 import { H57Length, h57Hash, h57Verify } from './h57.js';
 import { ID57Length, id57Generate, id57Verify } from './id57.js';
-import { ID57ShortLength, id57ShortGenerate, id57ShortVerify } from './id57_short.js';
 
 const te = new TextEncoder();
 
-test('e2e b57-h57-id57-id57short pipelines', () => {
+test('e2e b57-h57-id57 pipelines', () => {
   const inputs = [
     te.encode(''),
     te.encode('abc'),
@@ -25,7 +24,7 @@ test('e2e b57-h57-id57-id57short pipelines', () => {
     const id57 = id57Generate(input, ID57Length.LEN_128);
     assert.equal(id57Verify(input, id57, ID57Length.LEN_128), true);
 
-    const short = id57ShortGenerate(input, ID57ShortLength.LEN_47);
-    assert.equal(id57ShortVerify(input, short, ID57ShortLength.LEN_47), true);
+    const short = id57Generate(input, ID57Length.FIXED_8);
+    assert.equal(id57Verify(input, short, ID57Length.FIXED_8), true);
   }
 });

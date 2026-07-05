@@ -1,4 +1,4 @@
-use f57::{B57Error, H57Length, ID57Length, S57Config, S57};
+use f57::{id57_range, B57Error, H57Length, ID57Length, S57Config, S57};
 
 fn create_s57() -> S57 {
     S57::new(S57Config {
@@ -17,17 +17,23 @@ fn s57_hash_and_id_deterministic() {
     let h1 = s.hash(input, H57Length::Len256).unwrap();
     let h2 = s.hash(input, H57Length::Len256).unwrap();
     assert_eq!(h1, h2);
-    assert_eq!(h1.len(), 44);
+    // Character length is a [min_chars, max_chars] bound under B57's
+    // bignum encoding, never a fixed value (S57 Core API 8) - do not
+    // assert exact character counts.
+    assert!(h1.len() >= 32 && h1.len() <= 44);
 
     let id1 = s.id(input, ID57Length::Default).unwrap();
     let id2 = s.id(input, ID57Length::Default).unwrap();
     assert_eq!(id1, id2);
-    assert_eq!(id1.len(), 22);
+    let (min128, max128) = id57_range(ID57Length::Len128).unwrap();
+    assert!(id1.len() >= min128 && id1.len() <= max128);
 
     let id256 = s.id(input, ID57Length::Len256).unwrap();
     let id512 = s.id(input, ID57Length::Len512).unwrap();
-    assert_eq!(id256.len(), 44);
-    assert_eq!(id512.len(), 88);
+    let (min256, max256) = id57_range(ID57Length::Len256).unwrap();
+    let (min512, max512) = id57_range(ID57Length::Len512).unwrap();
+    assert!(id256.len() >= min256 && id256.len() <= max256);
+    assert!(id512.len() >= min512 && id512.len() <= max512);
 }
 
 #[test]
@@ -92,7 +98,9 @@ fn s57_invalid_inputs_and_lengths_fail() {
 
     let s = create_s57();
     assert!(s.hash(b"x", H57Length::Len47).is_err());
-    assert!(s.id(b"x", ID57Length::Len47).is_err());
+    // S57 restricts to its 128/256/512-bit security profile subset; fixed
+    // widths (non-security, negative length_enum) MUST NOT be exposed.
+    assert!(s.id(b"x", ID57Length::Fixed8).is_err());
     assert!(s.random_hybrid(&[]).is_err());
 }
 

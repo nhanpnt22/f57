@@ -267,5 +267,5 @@ For detailed maintainer release assessment gates, see [PROJECT_ASSESS_RELEASE.md
 
 ---
 
-**Current Version:** v0.2.0  
-**Last Updated:** June 2026
+**Current Version:** v0.3.0  
+**Last Updated:** July 2026

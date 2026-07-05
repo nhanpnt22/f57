@@ -4,8 +4,8 @@ This folder provides JavaScript parity with the Go implementation for:
 - B57 encoding layer
 - H57 hash representation layer
 - I57 integration layer
-- ID57 core profile
-- ID57-SHORT profile
+- ID57 core profile (bit-length and fixed-width identifiers; ID57-SHORT
+  is merged into ID57 core, see spec/id57-core-api.txt section 10)
 - R57 random identifier profile
 - S57 secure composition profile (JavaScript implementation)
 
@@ -18,7 +18,6 @@ Runtime notes:
 - [H57 CORE API](../../spec/h57-core-api.txt)
 - [I57 CORE API](../../spec/i57-core-api.txt)
 - [ID57 CORE API (MINDU)](../../spec/id57-core-api.txt)
-- [ID57-SHORT PROFILE](../../spec/id57-short-profile.txt)
 - [R57 CORE API (MINDU)](../../spec/r57-core-api.txt)
 - [S57 - Security 57](../../spec/s57-security-57.txt)
 - [B57S-v0.1.0](../../spec/b57s-v0.1.0.txt)
@@ -45,7 +44,10 @@ npm run test:coverage
 - `i57Random(mode)`, `i57Id(input, length)`, `i57IsValid(string)`, `i57IsCanonical(string)`
 - `i57ValidateIdentifier(string)`, `i57ValidateEntropy(string)`
 - `id57Generate(input, length)`, `id57GenerateDefault(input)`
-- `id57ShortGenerate(input, length)`, `id57ShortGenerateDefault(input)`
+- `id57Verify(input, id57String, length)`, `id57VerifyDefault(input, id57String)`
+- `id57IsValid(string)`, `id57IsCanonical(string)`
+- `id57Range(length)`, `id57IsLength(string, length)` (fixed widths only), `resolveID57Length(length)`
+- `ID57Length` (bit lengths `LEN_8..LEN_512`/`DEFAULT`; fixed widths `FIXED_2..FIXED_12`)
 - `r57Generate(mode)`, `r57IsValid(string)`, `r57IsCanonical(string)`, `R57Mode`
 - `S57` class secure APIs (`hash/id/random*/encrypt/decrypt`)
 

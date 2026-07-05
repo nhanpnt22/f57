@@ -10,7 +10,16 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from .b57 import encode, decode, is_valid, is_canonical
 from .errors import InvalidInputError
 from .h57 import h57_hash, HashFunction, H57Length
-from .id57 import id57_generate, ID57Length
+from .id57 import (
+    id57_generate,
+    id57_range,
+    id57_is_length,
+    id57_is_canonical,
+    ID57Length,
+    _resolve_length as _id57_resolve_length,
+    _is_fixed as _id57_is_fixed,
+    _bits_by_length as _id57_bits_by_length,
+)
 from .r57 import r57_generate, R57Mode, r57_is_valid, r57_is_canonical
 
 
@@ -49,9 +58,39 @@ def i57_is_canonical(s: str) -> bool:
     return s and is_canonical(s)
 
 
-def i57_validate_identifier(s: str) -> bool:
-    """Validate as identifier (22 chars, valid, canonical)."""
-    return len(s) == 22 and is_valid(s) and is_canonical(s)
+def i57_validate_identifier(s: str, length: ID57Length = ID57Length.DEFAULT) -> bool:
+    """Validate as identifier, dispatching on the sign of length_enum.
+
+    Fixed widths (negative length_enum) delegate entirely to
+    id57_is_length. Bit lengths (positive length_enum, or DEFAULT) are
+    not covered by id57_is_length, so the [min_chars, max_chars] bound +
+    canonical + decoded-byte-length/mask check is implemented here.
+    """
+    effective = _id57_resolve_length(length)
+
+    if _id57_is_fixed(effective):
+        return id57_is_length(s, effective)
+
+    min_chars, max_chars = id57_range(effective)
+    if len(s) < min_chars or len(s) > max_chars:
+        return False
+    if not id57_is_canonical(s):
+        return False
+
+    decoded = decode(s)
+    bits = _id57_bits_by_length(effective)
+    byte_length = (bits + 7) // 8
+    if len(decoded) != byte_length:
+        return False
+
+    excess_bits = byte_length * 8 - bits
+    if excess_bits > 0:
+        last_byte = decoded[byte_length - 1]
+        mask = (1 << excess_bits) - 1
+        if last_byte & mask != 0:
+            return False
+
+    return True
 
 
 def i57_validate_entropy(s: str) -> bool:

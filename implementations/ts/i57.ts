@@ -1,6 +1,6 @@
 import { encode, decode, isValid, isCanonical } from './b57.js';
 import { h57Hash, H57Length } from './h57.js';
-import { id57Generate, ID57Length } from './id57.js';
+import { id57Generate, id57Range, id57IsLength, id57BitsByLength, resolveID57Length, ID57Length } from './id57.js';
 import { r57Generate } from './r57.js';
 
 type ByteInput = Uint8Array | Buffer | ArrayBuffer;
@@ -21,9 +21,35 @@ export function i57IsCanonical(s: string) {
   return isCanonical(s);
 }
 
-export function i57ValidateIdentifier(s: string) {
-  if (typeof s !== 'string' || s.length !== 22) return false;
-  return i57IsValid(s) && i57IsCanonical(s);
+// length_enum's sign selects the check (mirrors id57_generate/id57_range/id57_is_length):
+// fixed widths (negative) delegate to id57IsLength; bit lengths (positive/DEFAULT) validate
+// via canonical decode + byte-length/mask check directly, since id57IsLength is fixed-only.
+export function i57ValidateIdentifier(s: string, length: number = ID57Length.DEFAULT) {
+  if (typeof s !== 'string' || s.length === 0) return false;
+
+  const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    return id57IsLength(s, effectiveLength);
+  }
+
+  const bits = id57BitsByLength.get(effectiveLength);
+  const byteLength = Math.ceil(bits / 8);
+  const { min, max } = id57Range(effectiveLength);
+
+  if (s.length < min || s.length > max) return false;
+  if (!isCanonical(s)) return false;
+
+  const decoded = decode(s);
+  if (decoded.length !== byteLength) return false;
+
+  const excessBits = byteLength * 8 - bits;
+  if (excessBits > 0) {
+    const mask = (1 << excessBits) - 1;
+    if ((decoded[byteLength - 1] & mask) !== 0) return false;
+  }
+
+  return true;
 }
 
 export function i57ValidateEntropy(s: string) {

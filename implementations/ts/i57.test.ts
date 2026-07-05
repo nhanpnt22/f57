@@ -34,8 +34,9 @@ test('i57Random', () => {
 
 test('i57Id', () => {
   const input = new Uint8Array([1, 2, 3]);
-  const res = i57Id(input, 47);
+  const res = i57Id(input, -8); // FIXED_8: negative length_enum = fixed 8-char width
   assert.equal(typeof res, 'string');
+  assert.equal(res.length, 8);
 });
 
 test('i57IsValid', () => {
@@ -55,6 +56,20 @@ test('i57ValidateIdentifier', () => {
   assert.equal(i57ValidateIdentifier(id), true);
   assert.equal(i57ValidateIdentifier('short'), false);
   assert.equal(i57ValidateIdentifier('12345678901234567890 0'), false);
+});
+
+test('i57ValidateIdentifier dispatches on length_enum sign', () => {
+  const input = new Uint8Array([1, 2, 3]);
+
+  // Fixed width (negative): delegates to id57IsLength - exact width + alphabet only.
+  const fixed = i57Id(input, -8);
+  assert.equal(i57ValidateIdentifier(fixed, -8), true);
+  assert.equal(i57ValidateIdentifier(fixed.slice(0, 7), -8), false);
+
+  // Bit length (positive): bound + canonical + decoded byte length.
+  const bitLen = i57Id(input, 32);
+  assert.equal(i57ValidateIdentifier(bitLen, 32), true);
+  assert.equal(i57ValidateIdentifier(bitLen.slice(0, 1), 32), false);
 });
 
 test('i57ValidateEntropy', () => {

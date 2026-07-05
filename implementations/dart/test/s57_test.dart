@@ -45,7 +45,10 @@ void main() {
       expect(v256.length, 44);
       expect(v512.length, 88);
 
-      expect(() => s57.id(input, ID57Length.len47), throwsA(isA<InvalidLengthEnumError>()));
+      // S57 restricts length_enum to {128, 256, 512}; other ID57-valid bit
+      // lengths and all fixed widths (non-security) MUST be rejected.
+      expect(() => s57.id(input, ID57Length.len8), throwsA(isA<InvalidLengthEnumError>()));
+      expect(() => s57.id(input, ID57Length.fixed8), throwsA(isA<InvalidLengthEnumError>()));
     });
 
     test('random APIs produce canonical 22-char strings', () {

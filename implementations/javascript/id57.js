@@ -1,23 +1,55 @@
-import { encode, isCanonical, isValid } from './b57.js';
+import { encode, encodedLength, isCanonical, isValid } from './b57.js';
 import { computeHashBLAKE3XOF } from './h57.js';
 import { newInvalidLengthEnumError } from './errors.js';
 
 export const ID57Length = Object.freeze({
   DEFAULT: 0,
-  LEN_8: 8, LEN_16: 16, LEN_23: 23, LEN_29: 29, LEN_32: 32, LEN_47: 47,
-  LEN_64: 64, LEN_70: 70, LEN_93: 93, LEN_128: 128, LEN_186: 186,
-  LEN_256: 256, LEN_373: 373, LEN_512: 512
+  // Positive values: bit lengths (security model, variable width within
+  // [min_chars, max_chars]; spec 7.1). UNCHANGED.
+  LEN_8: 8,
+  LEN_16: 16,
+  LEN_32: 32,
+  LEN_64: 64,
+  LEN_128: 128,
+  LEN_256: 256,
+  LEN_512: 512,
+  // Negative values: fixed character widths (non-security; spec 7.2).
+  // Magnitude = exact output width; generated as a prefix cut of LEN_128.
+  FIXED_2: -2,
+  FIXED_3: -3,
+  FIXED_4: -4,
+  FIXED_5: -5,
+  FIXED_6: -6,
+  FIXED_7: -7,
+  FIXED_8: -8,
+  FIXED_9: -9,
+  FIXED_10: -10,
+  FIXED_11: -11,
+  FIXED_12: -12
 });
 
 export const id57BitsByLength = new Map([
-  [ID57Length.LEN_8, 8], [ID57Length.LEN_16, 16], [ID57Length.LEN_23, 23], [ID57Length.LEN_29, 29],
-  [ID57Length.LEN_32, 32], [ID57Length.LEN_47, 47], [ID57Length.LEN_64, 64], [ID57Length.LEN_70, 70],
-  [ID57Length.LEN_93, 93], [ID57Length.LEN_128, 128], [ID57Length.LEN_186, 186],
-  [ID57Length.LEN_256, 256], [ID57Length.LEN_373, 373], [ID57Length.LEN_512, 512]
+  [ID57Length.LEN_8, 8],
+  [ID57Length.LEN_16, 16],
+  [ID57Length.LEN_32, 32],
+  [ID57Length.LEN_64, 64],
+  [ID57Length.LEN_128, 128],
+  [ID57Length.LEN_256, 256],
+  [ID57Length.LEN_512, 512]
 ]);
 
+const id57FixedWidths = new Set([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+// Resolves a length_enum (positive bit length, negative fixed width, or
+// DEFAULT) to its effective value. Positive/DEFAULT resolution is
+// unchanged from before; negative values are validated against the
+// defined FIXED_k magnitudes (spec 7.2/7.3).
 export function resolveID57Length(length) {
   if (length === ID57Length.DEFAULT) return ID57Length.LEN_128;
+  if (length < 0) {
+    if (!id57FixedWidths.has(-length)) throw newInvalidLengthEnumError(length);
+    return length;
+  }
   if (!id57BitsByLength.has(length)) throw newInvalidLengthEnumError(length);
   return length;
 }
@@ -32,6 +64,15 @@ export function maskExcessBits(bytes, bitLength) {
 
 export function id57Generate(input, length = ID57Length.DEFAULT) {
   const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    // Fixed width (spec 5.2): prefix cut of the LEN_128 identifier.
+    // LEN_128 output is always >= 16 chars and every defined FIXED_k has
+    // k <= 12, so the cut always yields exactly k characters.
+    const full = id57Generate(input, ID57Length.LEN_128);
+    return full.slice(0, -effectiveLength);
+  }
+
   const bits = id57BitsByLength.get(effectiveLength);
   const requestedBytes = Math.ceil(bits / 8);
 
@@ -65,4 +106,33 @@ export function id57IsValid(id57String) {
 
 export function id57IsCanonical(id57String) {
   return isCanonical(id57String);
+}
+
+// id57_range (spec 11.4): returns the [min, max] character bound for a
+// length_enum. Fixed widths (negative) return an exact (k, k) bound;
+// bit lengths (positive/DEFAULT) return the usual [byteLength,
+// encodedLength] bound.
+export function id57Range(length = ID57Length.DEFAULT) {
+  const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    const k = -effectiveLength;
+    return { min: k, max: k };
+  }
+
+  const bits = id57BitsByLength.get(effectiveLength);
+  const byteLength = Math.ceil(bits / 8);
+  return { min: byteLength, max: encodedLength(byteLength) };
+}
+
+// id57_is_length (spec 11.5): defined ONLY for fixed widths. Fixed-width
+// outputs are prefixes of a bignum encoding, NOT canonical B57, so they
+// are validated by exact width + alphabet only, never by decode. For bit
+// lengths, use id57Range + id57IsCanonical/id57Verify instead.
+export function id57IsLength(id57String, length) {
+  const effectiveLength = resolveID57Length(length);
+  if (effectiveLength >= 0) throw newInvalidLengthEnumError(length);
+
+  const k = -effectiveLength;
+  return id57String.length === k && isValid(id57String);
 }
