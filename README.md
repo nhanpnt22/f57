@@ -2,7 +2,7 @@
 
 **F57 for Dart**
 
-This branch contains the Dart implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57, ID57-SHORT, R57, and S57.
+This branch contains the Dart implementation of the F57 (57-Series) encoding family, including B57, H57, I57, ID57 (incl. fixed-width lengths), R57, and S57.
 
 ## Quick Start
 
@@ -28,7 +28,6 @@ dart/
 │       ├── h57.dart       # H57 hash representation
 │       ├── i57.dart       # I57 identifiers
 │       ├── id57.dart      # ID57 profiles
-│       ├── id57_short.dart # ID57-SHORT (compact)
 │       ├── r57.dart       # R57 random generation
 │       ├── s57.dart       # S57 security composition
 │       └── errors.dart    # Error types
@@ -37,7 +36,6 @@ dart/
 │   ├── h57_test.dart
 │   ├── i57_test.dart
 │   ├── id57_test.dart
-│   ├── id57_short_test.dart
 │   ├── r57_test.dart
 │   ├── s57_e2e_test.dart
 │   ├── e2e_test.dart
@@ -87,15 +85,12 @@ final hash = H57.hash(input); // 44-character B57 string (256-bit)
 ### ID57 - Identifiers
 
 ```dart
-// Generate deterministic 22-character identifier
+// Generate deterministic identifier (16-22 chars; length is a bound, not fixed)
 final id = ID57.id([1, 2, 3]); // ID57Length.DEFAULT
-```
 
-### ID57-SHORT - Compact Identifiers
-
-```dart
-// Generate 8-character compact identifier
-final shortId = ID57Short.id([1, 2, 3]); // ID57ShortLength.DEFAULT (8 chars)
+// Fixed-width identifiers use a NEGATIVE length_enum - the magnitude is the
+// exact character count (a prefix cut of the LEN_128 id), not a bound
+final shortId = ID57.id([1, 2, 3], ID57Length.FIXED_8); // always exactly 8 chars
 ```
 
 ### R57 - Random Generation
@@ -160,7 +155,6 @@ See [pubspec.yaml](pubspec.yaml) for complete dependency list.
 - **B57 Encoding:** [spec/b57-core-api.txt](../spec/b57-core-api.txt)
 - **H57 Hash:** [spec/h57-core-api.txt](../spec/h57-core-api.txt)
 - **ID57 Identifiers:** [spec/id57-core-api.txt](../spec/id57-core-api.txt)
-- **ID57-SHORT:** [spec/id57-short-profile.txt](../spec/id57-short-profile.txt)
 - **R57 Random:** [spec/r57-core-api.txt](../spec/r57-core-api.txt)
 - **S57 Security:** [spec/s57-security-57.txt](../spec/s57-security-57.txt)
 
