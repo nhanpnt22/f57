@@ -2,7 +2,7 @@
 name = "f57"
 version = "0.1.0"
 edition = "2021"
-description = "F57 binary-to-text encoding with H57, ID57, ID57-SHORT, I57, and R57 profiles"
+description = "F57 binary-to-text encoding with H57, ID57 (bit-length and fixed-width), I57, and R57 profiles"
 repository = "https://github.com/aco/f57"
 homepage = "https://github.com/aco/f57"
 documentation = "https://github.com/aco/f57/tree/main/implementations/rust"

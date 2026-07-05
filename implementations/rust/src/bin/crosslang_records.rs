@@ -1,9 +1,8 @@
-use f57::{encoded_length, decoded_length, 
+use f57::{encoded_length, decoded_length,
     decode,   h57_hash, h57_verify, i57_decode, i57_encode, i57_hash,
-    i57_id, i57_is_canonical, i57_is_valid, i57_validate_entropy, i57_validate_identifier,
-    id57_generate, id57_generate_default, id57_short_generate, id57_short_generate_default,
-    id57_short_verify_default, id57_verify_default, is_canonical, is_valid, r57_is_canonical,
-    r57_is_valid,  H57Length, ID57Length, ID57ShortLength,
+    i57_id, i57_is_canonical, i57_is_valid, i57_validate_entropy, i57_validate_identifier_default,
+    id57_generate, id57_generate_default, id57_verify_default, is_canonical, is_valid,
+    r57_is_canonical, r57_is_valid,  H57Length, ID57Length,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -30,10 +29,8 @@ struct Record {
     h57_sha512_len128: String,
     h57_blake3_auto: String,
     id57_default: String,
-    id57_len47_sha256: String,
-    id57_len70_blake3: String,
-    id57_short_default: String,
-    id57_short_len23: String,
+    id57_fixed8: String,
+    id57_fixed12: String,
     i57_encode: String,
     i57_decode_hex: String,
     i57_hash_blake3_len128: String,
@@ -45,7 +42,6 @@ struct Record {
     r57_is_valid_on_i57_id: bool,
     r57_is_canonical_on_i57_id: bool,
     id57_verify_default: bool,
-    id57_short_verify_default: bool,
     h57_verify_blake3_len128: bool,
     i57_validate_identifier_id: bool,
 }
@@ -140,7 +136,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         deterministic_scope: vec![
             "encode/decode/isValid/isCanonical/length helpers",
             "h57 hash/verify",
-            "id57 and id57-short generate/verify",
+            "id57 generate/verify (bit-length and fixed-width)",
             "i57 encode/decode/hash/id/validation",
             "r57 validators on deterministic identifier input",
         ],
@@ -271,12 +267,8 @@ fn build_rust_record(index: usize) -> Result<Record, Box<dyn std::error::Error>>
     let h57_blake3_auto = h57_hash(&input, H57Length::HashAuto)?;
 
     let id57_default = id57_generate_default(&input)?;
-    let id57_len47_sha256 = id57_generate(&input, ID57Length::Len47)?;
-    let id57_len70_blake3 = id57_generate(&input, ID57Length::Len70)?;
-
-    let id57_short_default = id57_short_generate_default(&input)?;
-    let id57_short_len23 =
-        id57_short_generate(&input, ID57ShortLength::Len23)?;
+    let id57_fixed8 = id57_generate(&input, ID57Length::Fixed8)?;
+    let id57_fixed12 = id57_generate(&input, ID57Length::Fixed12)?;
 
     let i57_encode_out = i57_encode(&input);
     let i57_decode_hex = hex::encode(i57_decode(&i57_encode_out)?);
@@ -297,27 +289,24 @@ fn build_rust_record(index: usize) -> Result<Record, Box<dyn std::error::Error>>
         h57_sha512_len128,
         h57_blake3_auto,
         id57_default: id57_default.clone(),
-        id57_len47_sha256,
-        id57_len70_blake3,
-        id57_short_default: id57_short_default.clone(),
-        id57_short_len23,
+        id57_fixed8,
+        id57_fixed12,
         i57_encode: i57_encode_out.clone(),
         i57_decode_hex,
         i57_hash_blake3_len128: i57_hash_blake3_len128.clone(),
         i57_id_default: i57_id_default.clone(),
         i57_is_valid: i57_is_valid(&i57_encode_out),
         i57_is_canonical: i57_is_canonical(&i57_encode_out),
-        i57_validate_identifier: i57_validate_identifier(&i57_id_default),
+        i57_validate_identifier: i57_validate_identifier_default(&i57_id_default),
         i57_validate_entropy: i57_validate_entropy(&i57_id_default),
         r57_is_valid_on_i57_id: r57_is_valid(&i57_id_default),
         r57_is_canonical_on_i57_id: r57_is_canonical(&i57_id_default),
         id57_verify_default: id57_verify_default(&input, &id57_default),
-        id57_short_verify_default: id57_short_verify_default(&input, &id57_short_default),
         h57_verify_blake3_len128: h57_verify(
             &input,
             &h57_blake3_len128,
             H57Length::Len128,
         ),
-        i57_validate_identifier_id: i57_validate_identifier(&i57_id_default),
+        i57_validate_identifier_id: i57_validate_identifier_default(&i57_id_default),
     })
 }
