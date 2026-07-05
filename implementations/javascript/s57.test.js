@@ -50,7 +50,11 @@ test('S57 id deterministic and enforces profile lengths', () => {
   assert.equal(v256.length, 44);
   assert.equal(v512.length, 88);
 
-  assert.throws(() => s57.id(input, ID57Length.LEN_47), (err) => err.code === ErrorCode.INVALID_LENGTH_ENUM);
+  // S57 only exposes the 128/256/512-bit security profile: non-security
+  // fixed widths (FIXED_k, negative length_enum) MUST be rejected, since
+  // they are non-security by definition (spec s57-security-57.txt 8).
+  assert.throws(() => s57.id(input, ID57Length.FIXED_8), (err) => err.code === ErrorCode.INVALID_LENGTH_ENUM);
+  assert.throws(() => s57.id(input, 77777), (err) => err.code === ErrorCode.INVALID_LENGTH_ENUM);
 });
 
 test('S57 random API variants produce canonical 22-char strings', () => {

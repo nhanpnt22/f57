@@ -12,6 +12,7 @@ import {
   i57ValidateEntropy
 } from './i57.js';
 import { R57Mode } from './r57.js';
+import { ID57Length } from './id57.js';
 
 test('i57 encode and decode properly', () => {
   const data = new Uint8Array([0, 255, 128, 64]);
@@ -37,6 +38,10 @@ test('i57 integration random properly', () => {
 
 test('i57 integration ID properly', () => {
   const data = new Uint8Array([0, 255, 128, 64]);
-  const id = i57Id(data, 47);
+  const id = i57Id(data, ID57Length.LEN_32);
   assert.equal(i57IsValid(id), true);
+
+  const fixed = i57Id(data, ID57Length.FIXED_8);
+  assert.equal(i57IsValid(fixed), true);
+  assert.equal(fixed.length, 8);
 });

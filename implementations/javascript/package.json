@@ -1,7 +1,7 @@
 {
   "name": "@aco/f57-js",
   "version": "0.1.0",
-  "description": "JavaScript/TypeScript (Node.js) implementation of F57/H57/ID57/ID57-SHORT/R57/I57/S57",
+  "description": "JavaScript/TypeScript (Node.js) implementation of F57/H57/ID57/R57/I57/S57",
   "license": "UNLICENSED",
   "keywords": [
     "f57",

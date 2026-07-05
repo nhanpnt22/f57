@@ -1,13 +1,15 @@
 import { encode, decode, isValid, isCanonical } from './b57.js';
 import { h57Hash, H57Length } from './h57.js';
-import { id57Generate, ID57Length } from './id57.js';
+import {
+  id57Generate, ID57Length, id57BitsByLength, id57IsLength, id57Range, resolveID57Length
+} from './id57.js';
 import { r57Generate } from './r57.js';
 
 export function i57Encode(input) { return encode(input); }
 export function i57Decode(s) { return decode(s); }
 export function i57Hash(input, length = H57Length.HASH_AUTO) { return h57Hash(input, length); }
 export function i57Random(mode) { return r57Generate(mode); }
-export function i57Id(input, length = ID57Length.ID57_DEFAULT) { return id57Generate(input, length); }
+export function i57Id(input, length = ID57Length.DEFAULT) { return id57Generate(input, length); }
 
 export function i57IsValid(s) {
   if (typeof s !== 'string' || s.length === 0) return false;
@@ -19,9 +21,38 @@ export function i57IsCanonical(s) {
   return isCanonical(s);
 }
 
-export function i57ValidateIdentifier(s) {
-  if (typeof s !== 'string' || s.length !== 22) return false;
-  return i57IsValid(s) && i57IsCanonical(s);
+// i57_validate_identifier (i57-core-api.txt 5.3): length_enum's sign
+// selects the check, mirroring ID57 Core API 7.3/11.4/11.5. Fixed widths
+// (negative length_enum) delegate entirely to id57IsLength - it is a
+// bignum prefix, not canonical B57, so it MUST NOT be decoded/canonical-
+// checked. Bit lengths (positive/DEFAULT) validate via the [min,max]
+// bound, canonical form, and decoded byte length/mask directly, since
+// id57IsLength no longer covers bit lengths.
+export function i57ValidateIdentifier(s, length = ID57Length.DEFAULT) {
+  if (typeof s !== 'string' || s.length === 0) return false;
+
+  const effectiveLength = resolveID57Length(length);
+
+  if (effectiveLength < 0) {
+    return id57IsLength(s, effectiveLength);
+  }
+
+  const bits = id57BitsByLength.get(effectiveLength);
+  const byteLength = Math.ceil(bits / 8);
+  const { min, max } = id57Range(effectiveLength);
+  if (s.length < min || s.length > max) return false;
+  if (!isCanonical(s)) return false;
+
+  const decoded = decode(s);
+  if (decoded.length !== byteLength) return false;
+
+  const excessBits = byteLength * 8 - bits;
+  if (excessBits > 0) {
+    const mask = (1 << excessBits) - 1;
+    if ((decoded[byteLength - 1] & mask) !== 0) return false;
+  }
+
+  return true;
 }
 
 export function i57ValidateEntropy(s) {
