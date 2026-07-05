@@ -74,28 +74,6 @@ func TestID57WrappersAndHelpers(t *testing.T) {
 	maskExcessBits([]byte{0xAA}, 8)
 }
 
-func TestID57ShortWrappersAndHelpers(t *testing.T) {
-	id, err := ID57ShortGenerateDefault([]byte("hello-short"))
-	if err != nil || id == "" {
-		t.Fatalf("ID57ShortGenerateDefault failed: id=%q err=%v", id, err)
-	}
-
-	if !ID57ShortVerifyDefault([]byte("hello-short"), id) {
-		t.Fatalf("ID57ShortVerifyDefault should pass")
-	}
-	if ID57ShortVerifyDefault([]byte("hello-short!"), id) {
-		t.Fatalf("ID57ShortVerifyDefault should fail for different input")
-	}
-
-	if !ID57ShortIsValid(id) || !ID57ShortIsCanonical(id) {
-		t.Fatalf("expected generated short id to be valid and canonical")
-	}
-
-	if _, err := resolveID57ShortLength(ID57ShortLength(999)); err == nil {
-		t.Fatalf("expected invalid short length enum error")
-	}
-}
-
 func TestH57HelpersAndValidation(t *testing.T) {
 	h, err := H57Hash([]byte("hello-h57"), H57Len128)
 	if err != nil || h == "" {

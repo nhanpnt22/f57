@@ -278,20 +278,36 @@ Requirements:
 
 Supported lengths:
 
-- 128-bit → 22 chars (DEFAULT ID57)
-- 256-bit → 44 chars (DEFAULT H57)
-- 512-bit → 88 chars
+- 128-bit → 16-22 chars (DEFAULT ID57)
+- 256-bit → 32-44 chars (DEFAULT H57)
+- 512-bit → 64-88 chars
+
+Character length above is a [min_chars, max_chars] bound, not
+a fixed value - B57 is a bignum-style encoding, so the exact
+character count depends on the encoded value (see ID57 Core
+API 7.3 / id57_range). Bit length IS exact and MUST be
+enforced; character length MUST NOT be checked for equality.
 
 Profile note:
 
 - S57 intentionally restricts length_enum to this security profile subset
-  even if lower-level APIs support additional informational lengths
+  (128/256/512 bit - all POSITIVE length_enum values). Even if
+  lower-level APIs support additional lengths - including the fixed
+  widths (FIXED_k, NEGATIVE length_enum) that replaced the former
+  ID57-SHORT lengths, now in ID57 Core API section 10 - S57 does not
+  expose them; fixed widths are non-security by definition and MUST
+  NOT be used here.
 
 Requirements:
 
 - MUST enforce exact bit length
 - MUST reject invalid length_enum
 - MUST NOT truncate encoded output
+- MUST validate output length via id57_range's [min_chars,
+  max_chars] bound (or i57_validate_identifier), never via exact
+  character-count comparison. id57_is_length does NOT apply here -
+  it is defined only for fixed widths (ID57 Core API 11.5), and S57
+  never uses fixed widths
 
 ============================================================
 9. VALIDATION RULES
@@ -380,7 +396,33 @@ Outputs MUST be:
 None.
 
 ============================================================
-16. REFERENCES
+16. ERRATA
+============================================================
+
+This document remains v1.0.0 FINAL (LOCKED) - the version
+number is not bumped for this correction. Recorded here
+instead of a version change:
+
+- Section 8 (LENGTH MODEL) previously stated fixed character
+  counts (22/44/88 chars). B57 is a bignum-style encoding, so
+  character length is a [min_chars, max_chars] bound, not a
+  fixed value; the section now reads 16-22 / 32-44 / 64-88
+  chars accordingly. Bit length (the security-relevant
+  quantity) is unaffected and remains exact.
+- Cross-reference: ID57 Core API v0.2.0 merged the former
+  ID57-SHORT profile into itself; this does not change S57's
+  own length_enum subset (S57 still restricts to 128/256/512
+  bit, per the existing Profile note in section 8).
+- Cross-reference (ID57 Core API v0.3.0/v0.3.1): informational
+  lengths became fixed widths (FIXED_k, negative length_enum),
+  and id57_is_length was narrowed to apply ONLY to fixed
+  widths. Section 8's validation requirement is corrected
+  accordingly: S57 (128/256/512 bit, all positive) MUST use
+  id57_range's bound, not id57_is_length, which does not accept
+  positive length_enum values at all.
+
+============================================================
+17. REFERENCES
 ============================================================
 
 RFC 2119
