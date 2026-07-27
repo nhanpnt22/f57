@@ -5,6 +5,29 @@ All notable changes to the F57 specification family and its associated native im
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-07-27
+
+### Fixed
+- **JavaScript consumers can install this repository from git again.** Added a
+  root `package.json` so `npm install github:nhanpnt22/f57#<tag>` resolves. As
+  of v0.3.0 the JavaScript package lives at `implementations/javascript/` with
+  no manifest at the repository root, and npm has no native support for
+  installing a subdirectory of a git repository, so every git-based install
+  failed. (Go and Dart tooling both support subdirectory paths and were
+  unaffected.) The v0.1.x language tags were also deleted, so consumers still
+  pinned to them broke as well.
+  - The root manifest declares an `exports` map so subpath imports resolve to
+    the real implementation, e.g. `import { h57Hash } from 'f57-js/h57.js'`
+    and `'f57-js/b57.js'`, plus `.` for the aggregate `index.js`.
+  - `@noble/hashes` is declared at the root so the H57 BLAKE3 path installs
+    correctly for git consumers.
+  - A `files` allowlist keeps the packed artifact scoped to
+    `implementations/javascript` + `spec` (68 files, ~60 kB), excluding the
+    committed nested `node_modules` and `*.test.js`.
+- No behavior change: B57/H57 encode/decode/hash output is byte-identical to
+  v0.3.0 and v0.1.4, verified across shared inputs, so downstream cache keys
+  and identifiers are unaffected.
+
 ## [0.3.0] - 2026-07-05
 
 ### Added

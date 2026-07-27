@@ -1,0 +1,47 @@
+{
+  "name": "@aco/f57-js",
+  "version": "0.3.1",
+  "description": "JavaScript/TypeScript (Node.js) implementation of F57/H57/ID57/R57/I57/S57",
+  "license": "UNLICENSED",
+  "keywords": [
+    "f57",
+    "encoding",
+    "identifier",
+    "crypto"
+  ],
+  "type": "module",
+  "main": "./implementations/javascript/index.js",
+  "homepage": "https://github.com/nhanpnt22/f57",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nhanpnt22/f57.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nhanpnt22/f57/issues"
+  },
+  "files": [
+    "implementations/javascript",
+    "!implementations/javascript/node_modules",
+    "!implementations/javascript/**/*.test.js",
+    "spec",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./implementations/javascript/index.js",
+    "./b57.js": "./implementations/javascript/b57.js",
+    "./h57.js": "./implementations/javascript/h57.js",
+    "./i57.js": "./implementations/javascript/i57.js",
+    "./id57.js": "./implementations/javascript/id57.js",
+    "./r57.js": "./implementations/javascript/r57.js",
+    "./s57.js": "./implementations/javascript/s57.js",
+    "./errors.js": "./implementations/javascript/errors.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.8.0"
+  }
+}
